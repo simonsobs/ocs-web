@@ -24,7 +24,7 @@
 
 <script>
   import MainBrowser from './panels/MainBrowser.vue';
-  import AgentList from './panels/AgentList.vue';
+  import AgentList from './components/AgentList.vue';
   import FakeData from './panels/FakeData.vue';
   import HostManager from './panels/HostManager.vue';
 

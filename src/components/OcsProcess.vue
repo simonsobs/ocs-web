@@ -1,0 +1,55 @@
+<template>
+  <div class="process ocs_ui box">
+    <form v-on:submit.prevent>
+      <div class="ocs_row">
+        <label class="important">{{ op_name }}</label>
+        <button @click="start">Start</button>
+        <button @click="stop">Stop</button>
+      </div>
+
+      <slot></slot>
+
+      <div v-if="show_status" class="ocs_row">
+        <label>Status</label>
+        <input class="ocs_double"
+               type="text"
+               disabled="1"
+               :value="comp_status"
+        />
+      </div>
+    </form>
+  </div>
+</template>
+
+<script>
+  export default {
+    name: 'OcsProcess',
+    props: {
+      address: String,
+      op_name: String,
+      op_data: Object,
+      show_status: {
+        default: true,
+      },
+    },
+    computed: {
+      comp_status() {
+        return window.ocs_bundle.web.get_status_string(
+          this.op_data.session);
+      },
+    },
+    methods: {
+      start() {
+        window.ocs.get_client(this.address).start_proc(
+          this.op_name, this.op_data.params);
+      },
+      stop() {
+        window.ocs.get_client(this.address).stop_proc(this.op_name);
+      },
+    },
+  }
+
+</script>
+
+<style scoped>
+</style>
