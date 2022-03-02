@@ -5,8 +5,6 @@
 import $ from 'jquery';
 import autobahn from 'autobahn';
 
-//(function() {
-
 let ocs_bundle;
 
 export function init(ocs_bundle_) {
@@ -36,6 +34,8 @@ export function OCSConnection(url_func, realm_func)
         requested: false };
 
     this.agent_list = new AgentList(this);
+
+    this.ready_defer = new autobahn.when.defer();
 }
 
 OCSConnection.prototype = {
@@ -76,6 +76,9 @@ OCSConnection.prototype = {
             // Subscribe for all registered feed handlers.
             for (const [feed_name, handler] of Object.entries(this_ocs.feeds))
                 c.session.subscribe(feed_name, handler);
+
+            // Waken waiters.
+            this_ocs.ready_defer.resolve();
         };
 
         c.onclose = function(reason, details) {
@@ -179,28 +182,27 @@ AgentList.prototype = {
         var addr = info.agent_address;
         var now = ocs_bundle.util.timestamp_now();
         if (!this._data[addr]) {
-            this._data[addr] = {
-                'last_update': now,
-            };
-            this._update_states();
+            // Query the agent's API and only then add it as data.
             var client = new AgentClient(this.connection, addr);
-            var dest = this._data[addr];
-            client.scan(function () {
-                dest.agent_class = client.agent_class;
+            //var dest = this._data[addr];
+            client.scan().then(() => {
+                this._data[addr] = {
+                    agent_class: client.agent_class,
+                    last_update: now,
+                }
+                this._update_states();
             });
         } else
             this._data[addr]['last_update'] = now;
     },
 
     _update_states: function() {
-        //var table = $('<table width="100%">'); //eslint-disable-line
         var key_order = [];
         var AL = this;
         $.each(AL._data, (k, v) => key_order.push(k)); // eslint-disable-line
         key_order.sort();
         $.each(key_order, function(i, x) {
             var info = AL._data[x];
-            //let link = $('<span>').html(x);
             var is_now_ok = (ocs_bundle.util.timestamp_now() - info['last_update'] <= 5);
             // Callbacks on change.
             if (is_now_ok != info.ok) {
@@ -248,7 +250,7 @@ AgentClient.prototype = {
         // Try first on the "new" API; fall back to the old one (now
         // deprecated).
         var client = this;
-        this.ocs.connection.session.call(this.address, ['get_api'])
+        return this.ocs.connection.session.call(this.address, ['get_api'])
             .then( function(result) {
                 // Calling an invalid method address seems to return
                 // null result, rather than raise a catchable.
@@ -402,17 +404,12 @@ AgentClient.prototype = {
         this.watchers[op_name].handlers.push({f: handler, span: span});
     },
 
-    destroy: function() {
+    clear_watchers: function() {
         // Stop all timers.
-        $.each(this.watchers, (op_name, data) => clearInterval(data.timer))
+        $.each(this.watchers, (op_name, data) => clearInterval(data.timer))        
+    },
+
+    destroy: function() {
+        this.clear_watchers();
     },
 }
-
-//module.exports = {
-//    init: init,
-//    OCSConnection: OCSConnection,
-//    AgentClient: AgentClient,
-//};
-//
-//}());
-//
