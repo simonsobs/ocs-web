@@ -23,15 +23,26 @@
 </template>
 
 <script>
+
+  // Utility panels
   import MainBrowser from './panels/MainBrowser.vue';
+  import GenericAgent from './panels/GenericAgent.vue';
   import AgentList from './components/AgentList.vue';
+
+  // Agent panels - OCS
   import FakeData from './panels/FakeData.vue';
   import HostManager from './panels/HostManager.vue';
 
-  // Make a map of components to use in activeComp computed property.
-  // https://forum.vuejs.org/t/vue-received-a-component-which-was-made-a-reactive-object/119004
+  /* Make a map of components to use in activeComp computed property;
+     see
+     https://forum.vuejs.org/t/vue-received-a-component-which-was-made-a-reactive-object/119004
+     */
   let agent_panels = {
+    /* Utility */
     'MainBrowser': MainBrowser,
+    'GenericAgent': GenericAgent,
+
+    /* OCS */
     'FakeDataAgent': FakeData,
     'HostManager': HostManager,
   };
@@ -53,7 +64,6 @@
     // globals
     connection: null,
     tabman: null,
-    panel_constructors: {},
     debugs: {},
     startup_panels: [],
   };
