@@ -89,19 +89,19 @@
     },
     computed: {
       delayRequested() {
-        let x = this.ops.delay_task.data.requested_delay;
+        let x = this.ops.delay_task.session.data.requested_delay;
         if (x)
           return x.toFixed(3);
         return '?';
       },
       delaySoFar() {
-        let x = this.ops.delay_task.data.delay_so_far;
+        let x = this.ops.delay_task.session.data.delay_so_far;
         if (x)
           return x.toFixed(3);
         return '?';
       },
       progressFrac() {
-        let data = this.ops.delay_task.data;
+        let data = this.ops.delay_task.session.data;
         if (data.requested_delay) {
           return Math.min(1, data.delay_so_far / data.requested_delay);
         }

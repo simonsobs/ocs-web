@@ -8,13 +8,9 @@ function register_panel(comp, callback, dest) {
     
     Object.keys(comp.ops).forEach(k => {
       client.add_watcher(k, 1.0, (op_name, method, stat, msg, session) => {
-        if(!comp.ops || !session)
+        if(!comp.ops)
           return;
-        comp.ops[k].session = session;
-        if (session.status)
-          comp.ops[k].status = session.status;
-        if (session.data)
-          comp.ops[k].data = session.data;
+        comp.ops[k].session = friendlyize_session(session);
       });
     });
 
@@ -37,18 +33,24 @@ function unregister_panel(comp, client) {
 }
 
 export
+function friendlyize_session(session) {
+  if (!session)
+    session = {};
+  if (!session.data)
+    session.data = {};
+  if (!session.status)
+    session.status = 'unknown';
+  return session;
+}
+
+export
 function ops_data_init(params) {
   Object.entries(params).map(([key, val]) => {
     if (!val.name)
       val.name = key;
     if (!val.params)
       val.params = {};
-    if (!val.status)
-      val.status = 'unknown';
-    if (!val.data)
-      val.data = {};
-    if (!val.session)
-      val.session = {};
+    val.session = friendlyize_session(val.session);
   });
   return params;
 }
