@@ -74,3 +74,19 @@ function get_status_string(session) {
         }
     return t;
 }
+
+export
+function get_default_url() {
+  let url = process.env.VUE_APP_OCS_URL;
+  if (!url)
+    url = 'ws://localhost:8001/ws';
+  return url;
+}
+
+export
+function get_default_realm() {
+  let realm = process.env.VUE_APP_OCS_REALM;
+  if (!realm)
+    realm = 'test_realm';
+  return realm;
+}
