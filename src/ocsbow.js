@@ -237,6 +237,7 @@ export function AgentClient(_ocs, address) {
     this.feeds = null;
     this.agent_class = null;
     this.watchers = {};
+    this.connection_ok = true;
 }
 
 AgentClient.prototype = {
@@ -320,6 +321,10 @@ AgentClient.prototype = {
         // Wrap all API calls to call our onSession handler before
         // returning to the invoking agent.
         var d = new autobahn.when.defer();
+        if (!client.ocs.connection) {
+            d.reject();
+            return d.promise;
+        }
         client.ocs.connection.session.call(client.address + '.ops', _p).then(
             function (args) {
                 // OCS responds with a simple list, args = [exit_code,
@@ -396,7 +401,8 @@ AgentClient.prototype = {
             clearInterval(this.watchers[op_name].timer);
             var client = this;
             this.watchers[op_name].timer = setInterval(function () {
-                client.status(op_name);
+                if (client.connection_ok)
+                    client.status(op_name);
             }, span * 1000.0);
             // If ~slow update, trigger one immediately too.
             if (span >= 1.)

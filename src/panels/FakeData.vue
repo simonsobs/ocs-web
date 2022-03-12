@@ -18,12 +18,12 @@
         </OpReading>
         <OpParam
           caption="Delay Requested"
-          modelDisabled=1
+          :modelDisabled="true"
           v-model="delayRequested">
         </OpParam>
         <OpParam
           caption="Delay So Far"
-          modelDisabled=1
+          :modelDisabled="true"
           v-model="delaySoFar">
         </OpParam>
         <div class="ocs_row">

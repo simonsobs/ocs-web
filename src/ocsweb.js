@@ -16,6 +16,8 @@ function register_panel(comp, callback, dest) {
 
     // Subscribe to heartbeat, identify self with agent address.
     window.ocs.agent_list.subscribe(comp.address, comp.address, (addr, conn_ok) => {
+      console.log("Connection update for ", comp.address, " -> ", conn_ok);
+      client.connection_ok = conn_ok;
       comp.connection_ok = conn_ok;
     });
 
@@ -89,4 +91,18 @@ function get_default_realm() {
   if (!realm)
     realm = 'test_realm';
   return realm;
+}
+
+export
+function setup_configs() {
+  let configs = [
+    {'name': 'default',
+     'url': get_default_url(),
+     'realm': get_default_realm()},
+    {'name': 'custom',
+     'url': get_default_url(),
+     'realm': get_default_realm(),
+     'edit': true},
+  ];
+  return [configs, 0];
 }

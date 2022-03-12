@@ -6,20 +6,33 @@
     <div class="left_bar box">
       <div class="ocs_ui">
         <h2>OCS</h2>
+        <select class="ocs_dropdown"
+                :value="config_index"
+                @change="setConfigIndex($event.target.value)"
+                @input="$emit('update:modelValue', $event.target.value)">
+          <option v-for="(opt, index) in configs" v-bind:key="index" v-bind:value="index">
+            {{ opt.name }}
+          </option>
+        </select><br />
         <span class="obviously_clickable"
-              @click="showBrowser()">Browser</span>
+              @click="setMode('config')">Configs</span>
       </div>
       <AgentList @selectAgent="showPanel">
       </AgentList>
     </div>
     <div class="main">
-      <MainBrowser
-        v-if="mainView"
-        v-model:wamp_url="config.wamp_url"
-        v-model:wamp_realm="config.wamp_realm"
+      <!-- MainBrowser
+        v-if="mainMode=='main'"
         @reconnect="reconnect()"
+      / -->
+      <ConfigsWindow
+        v-if="mainMode=='config'"
+        :active_index="config_index"
+        :configs="configs"
+        @update:configs="configUpdate"
       />
       <component
+        v-if="mainMode=='agent'"
         v-bind:is="activeComp"
         :key="active_agent.addr"
         :address="active_agent.addr"
@@ -32,6 +45,7 @@
 
   // Utility panels
   import MainBrowser from './panels/MainBrowser.vue';
+  import ConfigsWindow from './panels/ConfigsWindow.vue';
   import GenericAgent from './panels/GenericAgent.vue';
   import AgentList from './components/AgentList.vue';
 
@@ -71,10 +85,7 @@
     tabman: null,
     debugs: {},
     startup_panels: [],
-    config: {
-      'wamp_url': web.get_default_url(),
-      'wamp_realm': web.get_default_realm(),
-    },
+    config: {},
   };
 
   ocs.init(ocs_bundle);
@@ -82,25 +93,28 @@
   window.ocs_bundle = ocs_bundle;
   
   window.ocs = new ocs.OCSConnection(
-    function () {return window.ocs_bundle.config.wamp_url; },
-    function () {return window.ocs_bundle.config.wamp_realm; },
+    function () {return window.ocs_bundle.config.url; },
+    function () {return window.ocs_bundle.config.realm; },
   );
-  window.ocs.start();
 
   export default {
     name: 'App',
     data() {
+      let [configs, index] = web.setup_configs();
       return {
         active_agent: {
           'comp': null,
           'addr': null,
         },
-        mainView: true,
+        config_index: index,
+        configs: configs,
+        mainMode: 'config',
       }
     },
     components: {
       AgentList,
       MainBrowser,
+      ConfigsWindow,
     },
     computed: {
       activeComp() {
@@ -111,35 +125,46 @@
         else
           return null;
       },
-      config: {
-        set(val) {
-          ocs_bundle.config = val;
-        },
-        get() {
-          return ocs_bundle.config;
-        },
-      },
-    },
-    mounted() {
-      this.showBrowser();
     },
     methods: {
+      configUpdate(index, key, val) {
+        this.configs[index][key] = val;
+      },
+      setConfigIndex(index) {
+        console.log('Change index', index);
+        if (this.config_index != index) {
+          // The quiet way ...
+          //this.config_index = index;
+          //ocs_bundle.config = this.configs[index];
+          //this.reconnect();
+          // The URLey way-- note this destroys your custom settings
+          let route = "?ocs=" + this.configs[index].name;
+          window.location.href = (route);
+        }
+      },
       showPanel(v) {
-        this.mainView = false;
+        this.mainMode = 'agent';
         this.active_agent = v;
         console.log(v, v.agent_class);
       },
-      showBrowser() {
-        this.mainView = true;
-        this.active_agent = {
-          'agent_class': null,
-          'addr': null,
-        }
+      setMode(mode) {
+        this.mainMode = mode;
       },
       reconnect() {
         // Simple "close" should trigger reconnect automatically.
         window.ocs.connection.close();
       },
+    },
+    mounted() {
+      let cfg_name = new URL(location.href).searchParams.get('ocs');
+      if (cfg_name) {
+        this.configs.forEach((cfg, idx) => {
+          if (cfg.name == cfg_name)
+            this.config_index = idx;
+        });
+      }
+      ocs_bundle.config = this.configs[this.config_index];
+      window.ocs.start();
     },
   }
 </script>
@@ -169,5 +194,9 @@
 
   .main {
     overflow: hidden;
+  }
+
+  .ocs_dropdown {
+    width: 100%;
   }
 </style>

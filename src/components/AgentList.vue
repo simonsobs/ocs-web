@@ -6,6 +6,7 @@
       <span>{{ k[0] }} </span>
       <div v-for="x in k[1]" v-bind:key="x" class="al_level2">
         <span class="obviously_clickable"
+              v-bind:class="{missing: !tracked_agents[x].ok}"
               @click="selectAgent(x)">{{ tracked_agents[x].instance_id }}</span>
       </div>
     </div>
@@ -95,4 +96,7 @@
     width: 100%;
   }
 
+  .missing {
+    background-color: #f00;
+  }
 </style>

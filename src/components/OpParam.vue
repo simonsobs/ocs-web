@@ -25,8 +25,8 @@ This component provides user-editable text fields for an Agent Panel.
     props: {
       caption: String,
       modelDisabled: {
-        type: String,
-        default: "0",
+        type: Boolean,
+        default: false,
         required: false},
       modelValue: {
         required: true},
