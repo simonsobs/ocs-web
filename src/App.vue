@@ -7,12 +7,18 @@
       <div class="ocs_ui">
         <h2>OCS</h2>
         <span class="obviously_clickable"
-              @click="show_browser()">Browser</span>
+              @click="showBrowser()">Browser</span>
       </div>
-      <AgentList @show_panel="show_panel">
+      <AgentList @selectAgent="showPanel">
       </AgentList>
     </div>
     <div class="main">
+      <MainBrowser
+        v-if="mainView"
+        v-model:wamp_url="config.wamp_url"
+        v-model:wamp_realm="config.wamp_realm"
+        @reconnect="reconnect()"
+      />
       <component
         v-bind:is="activeComp"
         :key="active_agent.addr"
@@ -39,7 +45,6 @@
      */
   let agent_panels = {
     /* Utility */
-    'MainBrowser': MainBrowser,
     'GenericAgent': GenericAgent,
 
     /* OCS */
@@ -66,6 +71,10 @@
     tabman: null,
     debugs: {},
     startup_panels: [],
+    config: {
+      'wamp_url': web.get_default_url(),
+      'wamp_realm': web.get_default_realm(),
+    },
   };
 
   ocs.init(ocs_bundle);
@@ -73,8 +82,8 @@
   window.ocs_bundle = ocs_bundle;
   
   window.ocs = new ocs.OCSConnection(
-    function () {return "ws://localhost:8001/ws"},
-    function () {return "test_realm"},
+    function () {return window.ocs_bundle.config.wamp_url; },
+    function () {return window.ocs_bundle.config.wamp_realm; },
   );
   window.ocs.start();
 
@@ -83,13 +92,15 @@
     data() {
       return {
         active_agent: {
-          'comp': 'MainBrowser',
+          'comp': null,
           'addr': null,
         },
+        mainView: true,
       }
     },
     components: {
       AgentList,
+      MainBrowser,
     },
     computed: {
       activeComp() {
@@ -99,21 +110,35 @@
           return component;
         else
           return null;
-      }
+      },
+      config: {
+        set(val) {
+          ocs_bundle.config = val;
+        },
+        get() {
+          return ocs_bundle.config;
+        },
+      },
     },
     mounted() {
-      this.show_browser();
+      this.showBrowser();
     },
     methods: {
-      show_panel(v) {
+      showPanel(v) {
+        this.mainView = false;
         this.active_agent = v;
         console.log(v, v.agent_class);
       },
-      show_browser() {
+      showBrowser() {
+        this.mainView = true;
         this.active_agent = {
-          'agent_class': 'MainBrowser',
+          'agent_class': null,
           'addr': null,
         }
+      },
+      reconnect() {
+        // Simple "close" should trigger reconnect automatically.
+        window.ocs.connection.close();
       },
     },
   }

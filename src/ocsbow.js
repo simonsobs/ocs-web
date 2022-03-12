@@ -104,7 +104,8 @@ OCSConnection.prototype = {
                 this_ocs.connect();
             } else if (this_ocs._reconnection.count++ < 1000) {
                 this_ocs._reconnection.timer = setInterval(
-                    this_ocs.connect, this_ocs._reconnection.delay*1000.0);
+                    function() {this_ocs.connect()},
+                    this_ocs._reconnection.delay*1000.0);
             }
             this_ocs._reconnection.requested = false;
         };

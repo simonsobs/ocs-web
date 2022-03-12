@@ -8,17 +8,21 @@
       <div class="box">
         <h1>Agent Browser</h1>
         <h2>Configuration</h2>
-        <form>
+        <form v-on:submit.prevent>
           <OpParam
             caption="WAMP URL"
-            modelDisabled="1"
-            :modelValue="wamp_url">
-          </OpParam>
+            :modelValue="wamp_url"
+            @input="$emit('update:wamp_url', $event.target.value)"
+          />
           <OpParam
             caption="Realm"
-            modelDisabled="1"
-            :modelValue="wamp_realm">
-          </OpParam>
+            :modelValue="wamp_realm"
+            @input="$emit('update:wamp_realm', $event.target.value)"
+          />
+          <div class="ocs_row">
+          <label>Go</label>
+          <button @click="$emit('reconnect')">Connect</button>
+          </div>
         <OpReading
           caption="Connection"
           mode="ok"
@@ -36,21 +40,22 @@
     name: 'MainBrowser',
     props: {
       address: String,
+      wamp_url: String,
+      wamp_realm: String,
     },
     data: function () {
       return {
         connection_ok: false,
-        wamp_url: window.ocs.url_func(),
-        wamp_realm: window.ocs.realm_func(),
       }
     },
+    emits: ["reconnect", "update:wamp_url", "update:wamp_realm"],
     components: {
     },
     mounted() {
       let c = window.ocs;
       c.on('connected', () => {this.connection_ok=true;});
       c.on('disconnected', () => {this.connection_ok=false;});
-      this.connection_ok
+      this.connection_ok = window.ocs.connection && window.ocs.connection.isConnected;
     },
   }
 </script>

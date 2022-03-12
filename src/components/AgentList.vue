@@ -6,7 +6,7 @@
       <span>{{ k[0] }} </span>
       <div v-for="x in k[1]" v-bind:key="x" class="al_level2">
         <span class="obviously_clickable"
-              @click="show_panel(x)">{{ tracked_agents[x].instance_id }}</span>
+              @click="selectAgent(x)">{{ tracked_agents[x].instance_id }}</span>
       </div>
     </div>
   </div>
@@ -33,8 +33,8 @@
       }
     },
     methods: {
-      show_panel(key) {
-        this.$emit('show_panel', this.tracked_agents[key]);
+      selectAgent(key) {
+        this.$emit('selectAgent', this.tracked_agents[key]);
       },
       update_agent_list(agent_addr, new_state, info) {
         let short = agent_addr;
