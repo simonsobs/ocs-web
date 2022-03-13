@@ -3,7 +3,7 @@
   <div class="ocs_ui">
     <h2>Agents</h2>
     <div v-for="k in active_list" v-bind:key="k" class="al_level1">
-      <span>{{ k[0] }} </span>
+      <span>{{ k[0] }} </span><span v-if="!known_classes.includes(k[0])">[?]</span>
       <div v-for="x in k[1]" v-bind:key="x" class="al_level2">
         <span class="obviously_clickable"
               v-bind:class="{missing: !tracked_agents[x].ok}"
@@ -20,6 +20,7 @@
       prefix: {
         default: 'observatory.',
       },
+      known_classes: Array,
     },
     data: function () {
       return {

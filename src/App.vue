@@ -17,7 +17,7 @@
         <span class="obviously_clickable"
               @click="setMode('config')">Configs</span>
       </div>
-      <AgentList @selectAgent="showPanel">
+      <AgentList @selectAgent="showPanel" :known_classes="known_classes">
       </AgentList>
     </div>
     <div class="main">
@@ -120,12 +120,16 @@
     },
     computed: {
       activeComp() {
-        let component = agent_panels[this.active_agent['agent_class']];
-        console.log('set', component);
-        if (component)
-          return component;
-        else
-          return null;
+        let component = null;
+        if (this.active_agent) {
+          component = agent_panels[this.active_agent['agent_class']];
+          if (!component)
+            component = agent_panels['GenericAgent'];
+        }
+        return component;
+      },
+      known_classes() {
+        return Object.keys(agent_panels);
       },
     },
     methods: {
