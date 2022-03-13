@@ -52,7 +52,7 @@
   import AgentList from './components/AgentList.vue';
 
   // Agent panels - OCS
-  import FakeData from './panels/FakeData.vue';
+  import FakeDataAgent from './panels/FakeDataAgent.vue';
   import HostManager from './panels/HostManager.vue';
 
   /* Make a map of components to use in activeComp computed property;
@@ -64,7 +64,7 @@
     'GenericAgent': GenericAgent,
 
     /* OCS */
-    'FakeDataAgent': FakeData,
+    'FakeDataAgent': FakeDataAgent,
     'HostManager': HostManager,
   };
   
