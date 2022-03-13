@@ -57,7 +57,6 @@
         // And also lists by agent class ...
         let by_class = {};
         alpha.map(k => {
-          console.log(k, this.tracked_agents[k]);
           let c = this.tracked_agents[k].agent_class;
           if (!by_class[c])
             by_class[c] = [];

@@ -16,7 +16,6 @@ function register_panel(comp, callback, dest) {
 
     // Subscribe to heartbeat, identify self with agent address.
     window.ocs.agent_list.subscribe(comp.address, comp.address, (addr, conn_ok) => {
-      console.log("Connection update for ", comp.address, " -> ", conn_ok);
       client.connection_ok = conn_ok;
       comp.connection_ok = conn_ok;
     });
@@ -78,32 +77,14 @@ function get_status_string(session) {
 }
 
 export
-function get_default_url() {
-  let url = process.env.VUE_APP_OCS_URL;
-  if (!url)
-    url = 'ws://localhost:8001/ws';
-  return url;
-}
-
-export
-function get_default_realm() {
-  let realm = process.env.VUE_APP_OCS_REALM;
-  if (!realm)
-    realm = 'test_realm';
-  return realm;
-}
-
-export
 function setup_configs() {
   let configs = [];
 
   // Decode environment var ... expecting format
   // "name1,url1,realm1;name2,url2,realm2;..."
   let addrs = process.env.VUE_APP_OCS_ADDRS;
-  console.log('ADDRS?', addrs);
   if (addrs) {
     addrs.split(';').map(addr => {
-      console.log("A", addr);
       let [name, url, realm] = addr.split(',');
       configs.push({
         name: name,

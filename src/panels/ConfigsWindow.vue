@@ -52,7 +52,6 @@
     emits: ["reconnect", "update:configs"],
     methods: {
       emitConfigChange(index, field, value) {
-        console.log('EMT');
         this.$emit('update:configs', index, field, value);
       },
     },

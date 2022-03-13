@@ -139,7 +139,6 @@
           this.cookies.set("ocsWebConfig", this.configs[index], "100y");
       },
       setConfigIndex(index) {
-        console.log('Change index', index);
         if (this.config_index != index) {
           // The quiet way ...
           //this.config_index = index;
@@ -153,7 +152,6 @@
       showPanel(v) {
         this.mainMode = 'agent';
         this.active_agent = v;
-        console.log(v, v.agent_class);
       },
       setMode(mode) {
         this.mainMode = mode;
