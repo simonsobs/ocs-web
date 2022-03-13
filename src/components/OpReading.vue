@@ -18,7 +18,7 @@ can't change the values.  Special
            :class="{
              bad: conditionIs('bad'),
              good: conditionIs('good'), 
-             centered: conditionIs('centered'),
+             centered: (align == 'center'),
            }" 
            :value="compValue"
     />
@@ -36,6 +36,10 @@ can't change the values.  Special
         type: String,
         default: "display",
         required: false},
+      align: {
+        type: String,
+        default: "center",
+        required: false},
     },
     methods: {
       conditionIs(cond) {
@@ -44,8 +48,6 @@ can't change the values.  Special
             return (this.mode == 'ok' && !this.value);
           case 'good':
             return (this.mode == 'ok' && this.value);
-          case 'centered':
-            return this.mode == 'ok';
         }
         return false;
       },
@@ -80,5 +82,7 @@ can't change the values.  Special
   }
   input.centered {
     text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 </style>

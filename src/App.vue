@@ -52,6 +52,7 @@
   import AgentList from './components/AgentList.vue';
 
   // Agent panels - OCS
+  import AggregatorAgent from './panels/AggregatorAgent.vue';
   import FakeDataAgent from './panels/FakeDataAgent.vue';
   import HostManager from './panels/HostManager.vue';
 
@@ -64,6 +65,7 @@
     'GenericAgent': GenericAgent,
 
     /* OCS */
+    'AggregatorAgent': AggregatorAgent,
     'FakeDataAgent': FakeDataAgent,
     'HostManager': HostManager,
   };
