@@ -95,14 +95,28 @@ function get_default_realm() {
 
 export
 function setup_configs() {
-  let configs = [
-    {'name': 'default',
-     'url': get_default_url(),
-     'realm': get_default_realm()},
+  let configs = [];
+
+  // Decode environment var ... expecting format
+  // "name1,url1,realm1;name2,url2,realm2;..."
+  let addrs = process.env.VUE_APP_OCS_ADDRS;
+  console.log('ADDRS?', addrs);
+  if (addrs) {
+    addrs.split(';').map(addr => {
+      console.log("A", addr);
+      let [name, url, realm] = addr.split(',');
+      configs.push({
+        name: name,
+        url: url,
+        realm: realm});
+    });
+  }
+
+  configs.push(
     {'name': 'custom',
-     'url': get_default_url(),
-     'realm': get_default_realm(),
-     'edit': true},
-  ];
+     'url': 'ws://localhost:8001/ws',
+     'realm': 'test_realm',
+     'edit': true});
+
   return [configs, 0];
 }
