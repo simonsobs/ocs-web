@@ -43,6 +43,8 @@
 
 <script>
 
+  import { useCookies } from "vue3-cookies";
+
   // Utility panels
   import MainBrowser from './panels/MainBrowser.vue';
   import ConfigsWindow from './panels/ConfigsWindow.vue';
@@ -129,6 +131,8 @@
     methods: {
       configUpdate(index, key, val) {
         this.configs[index][key] = val;
+        if (this.configs[index].name == 'custom')
+          this.cookies.set("ocsWebConfig", this.configs[index], "100y");
       },
       setConfigIndex(index) {
         console.log('Change index', index);
@@ -155,7 +159,24 @@
         window.ocs.connection.close();
       },
     },
+    setup() {
+      const { cookies } = useCookies();
+      return { cookies };
+    },
     mounted() {
+      // Process cookie ("custom" address).
+      let cfg_cookie = this.cookies.get("ocsWebConfig");
+      if (cfg_cookie) {
+        this.configs.forEach(cfg => {
+          if (cfg.name == "custom") {
+            if (cfg_cookie.url)
+              cfg.url = cfg_cookie.url;
+            if (cfg_cookie.realm)
+              cfg.realm = cfg_cookie.realm;
+          }
+        });
+      }
+
       let cfg_name = new URL(location.href).searchParams.get('ocs');
       if (cfg_name) {
         this.configs.forEach((cfg, idx) => {
