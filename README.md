@@ -1,4 +1,9 @@
-# hello-world
+# ocs-web
+
+## Background
+
+This is browser-based control panel system for
+[OCS](https://github.com/simonsobs/ocs), written in Vue 3.
 
 ## Project setup
 
