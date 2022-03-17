@@ -2,7 +2,7 @@
   <div class="task ocs_ui box">
     <form v-on:submit.prevent>
       <div class="ocs_row">
-        <label class="important">{{ op_name }}</label>
+        <label class="important">{{ name }}</label>
         <button @click="start">Start</button>
         <span></span>
       </div>
@@ -26,8 +26,8 @@
     name: 'OcsTask',
     props: {
       address: String,
-      op_name: String,
       op_data: Object,
+      op_name: String,
       show_status: {
         default: true,
       },
@@ -36,6 +36,11 @@
       comp_status() {
         return window.ocs_bundle.web.get_status_string(
           this.op_data.session);
+      },
+      name() {
+        if (this.op_name)
+          return this.op_name;
+        return this.op_data.name;
       },
     },
     methods: {

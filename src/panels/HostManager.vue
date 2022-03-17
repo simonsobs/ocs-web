@@ -40,20 +40,17 @@
     <div class="block_unit">
       <OcsProcess
         :address="address"
-        :op_data="ops.manager"
-        op_name="manager">
+        :op_data="ops.manager">
       </OcsProcess>
 
       <OcsTask
         :address="address"
-        :op_data="ops.update"
-        op_name="update">
+        :op_data="ops.update">
       </OcsTask>
 
       <OcsTask
         :address="address"
-        :op_data="ops.die"
-        op_name="die">
+        :op_data="ops.die">
       </OcsTask>
     </div>
   </div>

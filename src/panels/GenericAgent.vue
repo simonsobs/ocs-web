@@ -23,12 +23,10 @@
     <div class="block_unit">
       <OcsTask v-for="op in ops_task" v-bind:key="op"
                :address="address"
-               :op_data="op"
-               :op_name="op.name" />
+               :op_data="op" />
       <OcsProcess v-for="op in ops_proc" v-bind:key="op"
                :address="address"
-               :op_data="op"
-               :op_name="op.name" />
+               :op_data="op" />
     </div>
 
   </div>

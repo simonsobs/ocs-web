@@ -42,25 +42,23 @@
 
     <!-- Right block -->
     <div class="block_unit">
+
       <OcsTask
         :address="address"
-        :op_data="ops.delay_task"
-        op_name="delay_task">
+        :op_data="ops.delay_task">
         <OpParam
-          caption="Delay (s)" 
-          v-model.number="ops.delay_task.params.delay">
-        </OpParam>
+          caption="Delay (s)"
+          v-model.number="ops.delay_task.params.delay" />
         <OpSelect
           caption="Suggestions"
           v-bind:options="options"
-          v-model.number="ops.delay_task.params.delay"></OpSelect>
+          v-model.number="ops.delay_task.params.delay" />
       </OcsTask>
 
       <OcsProcess
         :address="address"
         :op_data="ops.acq"
-        op_name="acq">
-      </OcsProcess>
+      />
 
     </div>
 

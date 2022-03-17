@@ -34,10 +34,10 @@
 
     <!-- Right block -->
     <div class="block_unit">
+
       <OcsProcess
         :address="address"
-        :op_data="ops.record"
-        op_name="record">
+        :op_data="ops.record">
       </OcsProcess>
 
     </div>
