@@ -137,8 +137,11 @@
     methods: {
       configUpdate(index, key, val) {
         this.configs[index][key] = val;
-        if (this.configs[index].name == 'custom')
+        if (this.configs[index].name == 'custom') {
           this.cookies.set("ocsWebConfig", this.configs[index], "100y");
+          if (index == this.config_index)
+            this.reconnect();
+        }
       },
       setConfigIndex(index) {
         if (this.config_index != index) {
@@ -160,7 +163,8 @@
       },
       reconnect() {
         // Simple "close" should trigger reconnect automatically.
-        window.ocs.connection.close();
+        if (window.ocs.connection)
+          window.ocs.connection.close();
       },
     },
     setup() {
