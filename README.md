@@ -75,3 +75,62 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
+## Docker
+
+The Dockerfile in this directory will produce an image that can launch
+the Vue development server.  This is a choice made to facilitate
+development rather than performance.
+
+To build the image and tag it as "ocs-web":
+```
+docker build -t ocs-web
+```
+
+To launch the image as a test:
+```
+docker run -p 8080:8080 --rm ocs-web
+```
+
+Then browse to http://localhost:8080/
+
+Here is a docker-compose.yaml that declares a service running the
+ocs-web image:
+```
+version: '2'
+services:
+  ocs-web-1:
+    image: ocs-web
+    ports:
+      - 8080:8080
+```
+
+Below, find a few ways to customize the configuration through
+docker-compose.
+
+### Environment variables
+
+To set any of the VUE_APP_* environment variables described above, add
+them to the docker-compose environment without the VUE_APP_ prefix.
+For example:
+```
+version: '2'
+services:
+  ocs-web-1:
+    image: ocs-web
+    ports:
+      - 8080:8080
+    environment:
+      - OCS_ADDRS=My new lab,http://localhost:8080/ws,test_realm
+```
+
+(These variables get appended to .env.local inside the container; if
+you bind-mount that file make sure it's readonly.)
+
+To set the port on which OCS is served (inside the container), use the
+PORT variable;
+```
+    environment:
+      - PORT=8200
+```
