@@ -11,5 +11,4 @@ COPY . .
 
 # Run the vue development server.
 EXPOSE 8080
-#CMD ["npm", "run", "serve"]
 CMD ["docker/run.sh"]
