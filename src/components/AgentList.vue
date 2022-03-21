@@ -1,7 +1,6 @@
 /* eslint-disable */
 <template>
   <div class="ocs_ui">
-    <h2>Agents</h2>
     <div v-for="k in active_list" v-bind:key="k" class="al_level1">
       <span>{{ k[0] }} </span><span v-if="!known_classes.includes(k[0])">[?]</span>
       <div v-for="x in k[1]" v-bind:key="x" class="al_level2">
@@ -20,6 +19,7 @@
       prefix: {
         default: 'observatory.',
       },
+      parent_id: String,
       known_classes: Array,
     },
     data: function () {
@@ -73,10 +73,10 @@
     mounted() {
       //window.ocs_bundle.web.register_panel(this, null, ocs_reg);
       let c = window.ocs;
-      c.agent_list.subscribe('sidebar', '*', this.update_agent_list);
+      c.agent_list.subscribe(this.parent_id, '*', this.update_agent_list);
     },
     beforeUnmount() {
-      window.ocs.agent_list.unsubscribe('sidebar');
+      window.ocs.agent_list.unsubscribe(this.parent_id);
     },
   }
 </script>

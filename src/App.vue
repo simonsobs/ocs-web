@@ -15,21 +15,23 @@
           </option>
         </select><br />
         <span class="obviously_clickable"
-              @click="setMode('config')">Configs</span>
+              @click="setMode('config')">Configs</span><br />
+        <span class="obviously_clickable"
+              @click="setMode('browse')">Browser</span>
       </div>
-      <AgentList @selectAgent="showPanel" :known_classes="known_classes">
+      <AgentList @selectAgent="showPanel" :known_classes="known_classes"
+                                          parent_id="sidebar">
       </AgentList>
     </div>
     <div class="main">
-      <!-- MainBrowser
-        v-if="mainMode=='main'"
-        @reconnect="reconnect()"
-      / -->
       <ConfigsWindow
         v-if="mainMode=='config'"
         :active_index="config_index"
         :configs="configs"
         @update:configs="configUpdate"
+      />
+      <MainBrowser
+        v-if="mainMode=='browse'"
       />
       <component
         v-if="mainMode=='agent'"

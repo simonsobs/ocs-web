@@ -169,7 +169,11 @@ AgentList.prototype = {
         if (!this._callbacks[agent_addr])
             this._callbacks[agent_addr] = {};
         this._callbacks[agent_addr][subscriber] = callback;
-        if (this._data[agent_addr])
+        if (agent_addr == '*') {
+            Object.entries(this._data).map(([name, info]) => {
+                callback(name, info.ok, info);
+            });
+        } else if (this._data[agent_addr])
             callback(agent_addr, this._data[agent_addr].ok);
     },
 
@@ -411,12 +415,18 @@ AgentClient.prototype = {
         this.watchers[op_name].handlers.push({f: handler, span: span});
     },
 
-    clear_watchers: function() {
-        // Stop all timers.
-        $.each(this.watchers, (op_name, data) => clearInterval(data.timer))        
+    clear_watchers: function(op_name) {
+        // If op_name is not set, clears all watchers.
+        if (!op_name)
+            return Object.keys(this.watchers).map(k => this.clear_watchers(k));
+        if (this.watchers[op_name]) {
+            clearInterval(this.watchers[op_name].timer);
+            delete this.watchers[op_name];
+        }
     },
 
     destroy: function() {
+        // Stop all timers.  No more callbacks.
         this.clear_watchers();
     },
 }

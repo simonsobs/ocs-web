@@ -45,7 +45,7 @@
     },
     methods: {
       start() {
-        window.ocs.get_client(this.address).run_task(this.op_name, this.op_data.params);
+        window.ocs.get_client(this.address).run_task(this.name, this.op_data.params);
       },
     },
 }
