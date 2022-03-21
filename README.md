@@ -142,8 +142,10 @@ the HOST variable;
       - HOST=my-ocs-web-service
 ```
 
-(If you are proxying OCS and get a "Invalid Host Header" message, try
-to fix it with the HOST variable.  This message means that the proxy
-is forwarding your requests correctly, but the hostname you're using
-in the proxy target does not match the value of HOST (default:
-localhost).
+(If you are proxying this service and get a "Invalid Host Header"
+message, try to fix it with the HOST variable.  This message means
+that the proxy is forwarding your requests correctly, but the hostname
+you're using in the proxy target does not match the value of HOST
+(default: localhost).  If you are using a docker-compose service name
+in the proxy address, e.g. http://my-ocs-web-service:8080/, then that
+service name might be what you want in HOST, too.)
