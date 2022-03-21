@@ -9,4 +9,5 @@ EOF
 
 # Run development server...
 PORT=${PORT:=8080}
-npm run serve -- --port $PORT
+HOST=${HOST:=localhost}
+npm run serve -- --port $PORT --host $HOST
