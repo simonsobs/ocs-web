@@ -58,6 +58,16 @@ function timestamp_now() {
 }
 
 export
+function pad_decimal(val, places, space) {
+    let idx = val.indexOf('.');
+    if (idx < 0)
+        idx = val.length;
+    if (!space)
+        space = '&nbsp;'
+    return space.repeat(places - idx) + val;
+}
+
+export
 function log(msg) {
     var log = $("#messages");
     log.html(log.html() + msg + '<br>');
