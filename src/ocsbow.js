@@ -355,15 +355,32 @@ AgentClient.prototype = {
     },
 
     // run_task is the equivalent of start_task followed by wait_task.
+    // It returns a promise that will resolve once the Task has
+    // completed, and will reject if the start fails.
     run_task : function(task_name, params) {
         let client = this;
         var d = new autobahn.when.defer();
-        client.start_task(task_name, params).then( function (result) {
-            ocs_bundle.util.log(result[1] + ' code ' + result[0]);
-            client.wait_task(task_name, params).then(function (result) {
-                d.resolve(result);
-            });
-        });
+        client.start_task(task_name, params).then(
+            function (result) {
+                // Reply from start()
+                if (result[0] == 0) {
+                    client.wait_task(task_name, params).then(
+                        // wait: success?
+                        function (result) {
+                            d.resolve(result[1]);
+                        },
+                        function (result) {
+                            d.reject('Could not complete wait() request');
+                        }
+                    );
+                } else
+                    d.reject(result[1]);
+            },
+            // start: failure?
+            function (result) {
+                d.reject('Could not issue start() request.')
+            }
+        );
         return d.promise;
     },
 

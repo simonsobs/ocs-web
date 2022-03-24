@@ -2,7 +2,32 @@
 <template>
   <h1>Observatory Control System</h1>
   <hr />
+
+  <!-- Viewport-fixed for unscrollables-->
+  <div class="viewport">
+
+    <!-- Alert box -->
+    <div class="errorModal" v-if="errorInfo">
+      <div class="errorModalContent">
+        <div v-if="errorInfo.type=='op'">
+          <h2>Failed Operation Request</h2>
+          <p><b>Agent:</b> {{ errorInfo.address }}</p>
+          <p><b>Operation:</b> {{ errorInfo.op_name }}</p>
+          <p><b>Response:</b>  {{ errorInfo.message }}</p>
+        </div>
+        <div v-else>
+          <b>Error</b>
+          <pre v-html="JSON.stringify(errorInfo, null, 2)" />
+        </div>
+        <button style="width: 200px" @click="op_error(null)">Ok</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Container for main interface -->
   <div class="container">
+
+    <!-- Sidebar -->
     <div class="left_bar box">
       <div class="ocs_ui">
         <h2>OCS</h2>
@@ -23,6 +48,8 @@
                                           parent_id="sidebar">
       </AgentList>
     </div>
+
+    <!-- Panels -->
     <div class="main">
       <ConfigsWindow
         v-if="mainMode=='config'"
@@ -40,6 +67,7 @@
         :address="active_agent.addr"
       />
     </div>
+
   </div>
 </template>
 
@@ -86,6 +114,9 @@
     AgentClient: ocs.AgentClient,
     OCSConnection: ocs.OCSConnection,
 
+    // handlers
+    on_error: null,
+
     // globals
     connection: null,
     tabman: null,
@@ -115,6 +146,7 @@
         config_index: index,
         configs: configs,
         mainMode: 'config',
+        errorInfo: null,
       }
     },
     components: {
@@ -168,6 +200,9 @@
         if (window.ocs.connection)
           window.ocs.connection.close();
       },
+      op_error(msg) {
+        this.errorInfo = msg;
+      },
     },
     setup() {
       const { cookies } = useCookies();
@@ -196,6 +231,11 @@
       }
       ocs_bundle.config = this.configs[this.config_index];
       window.ocs.start();
+
+      // Register error handler.
+      ocs_bundle.on_error = (msg) => {
+        this.op_error(msg);
+      };
     },
   }
 </script>
@@ -211,20 +251,54 @@
   }
 
   .container {
+    position: absolute;
     height: 100%;
     width: 100%;
     display: grid;
     grid-template-columns: 200px 1fr;
   }
 
+  .container > div {
+    position: absolute;
+  }
+
   .left_bar {
+    left: 0;
+    width: 20%;
     height: 85vh;
     background-color: #ccf;
     overflow: ellipsis;
   }
 
   .main {
+    left: 20%;
+    width: 80%;
     overflow: hidden;
+  }
+
+  /* Modal error box */
+  .errorModal {
+    position: fixed;
+    z-index: 1;
+    left: 25%;
+    top: 15%;
+    width: 50%;
+    //height: 30%;
+    background-color: #4888;
+  }
+  @media screen and (max-width: 1000px) {
+    .errorModal {
+      left: 5%;
+      width: 90%;
+    }
+  }
+  .errorModalContent {
+    margin: 5%;
+    height: 80%;
+    padding: 20px;
+    border: 1px solid #88c;
+    background-color: #fff;
+    width: 90%;
   }
 
   .ocs_dropdown {
