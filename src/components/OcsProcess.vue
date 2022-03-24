@@ -45,8 +45,19 @@
     },
     methods: {
       start() {
-        window.ocs.get_client(this.address).start_proc(
-          this.name, this.op_data.params);
+        window.ocs.get_client(this.address)
+              .start_proc(this.name, this.op_data.params)
+              .then(
+                result => {
+                  if (result[0] != 0) {
+                    let msg = result[1]
+                    window.ocs_bundle.on_error(
+                      {'type': 'op',
+                       'address': this.address,
+                       'op_name': this.name,
+                       'message': msg});
+                  }
+                });
       },
       stop() {
         window.ocs.get_client(this.address).stop_proc(this.name);

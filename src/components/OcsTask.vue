@@ -43,12 +43,21 @@
         return this.op_data.name;
       },
     },
+    emits: ["op_error"],
     methods: {
       start() {
-        window.ocs.get_client(this.address).run_task(this.name, this.op_data.params);
+        window.ocs.get_client(this.address).run_task(this.name, this.op_data.params).then(
+          (msg) => console.log('ok', msg),
+          //(msg) => this.$emit('op_error', 'Failed to run ' + this.name + ' because: ' + msg)
+          (msg) => window.ocs_bundle.on_error(
+            {'type': 'op',
+             'address': this.address,
+             'op_name': this.name,
+             'message': msg})
+        );
       },
     },
-}
+  }
 </script>
 
 <style scoped>
