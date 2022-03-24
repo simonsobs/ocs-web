@@ -19,14 +19,14 @@
         <form class="hm_kids" v-on:submit.prevent>
           <div class="hm_row hm_header">
             <span>instance-id</span>
-            <span>class-name</span>
+            <span>agent-class</span>
             <span class="hm_center">current</span>
             <span class="hm_center">target</span>
             <span class="ocs_double hm_center">set-target</span>
           </div>
           <div v-for="item in children" :key="item.instance_id" class="hm_row">
             <span>{{ item.instance_id }}</span>
-            <span>{{ item.class_name }}</span>
+            <span>{{ item.agent_class }}</span>
             <span class="hm_center">{{ item.next_action }}</span>
             <span class="hm_center">{{ item.target_state }}</span>
             <button @click="set_target(item.instance_id, 'up')">up</button>
