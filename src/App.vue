@@ -149,6 +149,7 @@
           'comp': null,
           'addr': null,
         },
+        force_generic: false,
         config_index: index,
         configs: configs,
         mainMode: 'config',
@@ -165,7 +166,7 @@
         let component = null;
         if (this.active_agent) {
           component = agent_panels[this.active_agent['agent_class']];
-          if (!component)
+          if (!component || this.force_generic)
             component = agent_panels['GenericAgent'];
         }
         return component;
@@ -194,9 +195,10 @@
           window.location.href = (route);
         }
       },
-      showPanel(v) {
+      showPanel(v, debug) {
         this.mainMode = 'agent';
         this.active_agent = v;
+        this.force_generic = debug;
       },
       setMode(mode) {
         this.mainMode = mode;

@@ -59,6 +59,11 @@
         :op_data="ops.acq"
       />
 
+      <OcsOpAutofill
+        :address="address"
+        :ops_parent="ops"
+      />
+
     </div>
 
   </div>
