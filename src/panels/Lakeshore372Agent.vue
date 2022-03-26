@@ -121,7 +121,6 @@
         }
         return new_data;
       },
-      
     },
     methods: {
       op_error(text) {
@@ -159,5 +158,4 @@
   .data_table > div:first-child {
     background-color: #fff;
   }
-    
 </style>
