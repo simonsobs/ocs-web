@@ -6,7 +6,9 @@
       <div v-for="x in k[1]" v-bind:key="x" class="al_level2">
         <span class="obviously_clickable"
               v-bind:class="{missing: !tracked_agents[x].ok}"
-              @click="selectAgent(x)">{{ tracked_agents[x].instance_id }}</span>
+              @click.exact="selectAgent(x)"
+              @click.shift="selectAgent(x, true)"
+        >{{ tracked_agents[x].instance_id }}</span>
       </div>
     </div>
   </div>
@@ -35,8 +37,8 @@
       }
     },
     methods: {
-      selectAgent(key) {
-        this.$emit('selectAgent', this.tracked_agents[key]);
+      selectAgent(key, debug) {
+        this.$emit('selectAgent', this.tracked_agents[key], debug);
       },
       update_agent_list(agent_addr, new_state, info) {
         let short = agent_addr;

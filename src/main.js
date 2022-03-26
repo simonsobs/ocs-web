@@ -13,6 +13,7 @@ import OpReading      from './components/OpReading.vue'
 import OpStatus       from './components/OpStatus.vue'
 import OpSelect       from './components/OpDropdown.vue'
 import ProgressBar    from './components/ProgressBar.vue'
+import OcsOpAutofill  from './components/OcsOpAutofill.vue'
 
 app
   .component('OcsTask',     OcsTask)
@@ -22,6 +23,7 @@ app
   .component('OpStatus',    OpStatus)
   .component('OpSelect',    OpSelect)
   .component('ProgressBar', ProgressBar)
+  .component('OcsOpAutofill', OcsOpAutofill)
 ;
  
   

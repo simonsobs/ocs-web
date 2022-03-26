@@ -86,6 +86,9 @@
   import FakeDataAgent from './panels/FakeDataAgent.vue';
   import HostManager from './panels/HostManager.vue';
 
+  // Agent panels - SOCS
+  import Lakeshore372Agent from './panels/Lakeshore372Agent.vue';
+
   /* Make a map of components to use in activeComp computed property;
      see
      https://forum.vuejs.org/t/vue-received-a-component-which-was-made-a-reactive-object/119004
@@ -98,6 +101,9 @@
     'AggregatorAgent': AggregatorAgent,
     'FakeDataAgent': FakeDataAgent,
     'HostManager': HostManager,
+
+    /* SOCS */
+    'Lakeshore372Agent': Lakeshore372Agent,
   };
   
   let ocs = require('./ocsbow');
@@ -143,6 +149,7 @@
           'comp': null,
           'addr': null,
         },
+        force_generic: false,
         config_index: index,
         configs: configs,
         mainMode: 'config',
@@ -159,7 +166,7 @@
         let component = null;
         if (this.active_agent) {
           component = agent_panels[this.active_agent['agent_class']];
-          if (!component)
+          if (!component || this.force_generic)
             component = agent_panels['GenericAgent'];
         }
         return component;
@@ -188,9 +195,10 @@
           window.location.href = (route);
         }
       },
-      showPanel(v) {
+      showPanel(v, debug) {
         this.mainMode = 'agent';
         this.active_agent = v;
+        this.force_generic = debug;
       },
       setMode(mode) {
         this.mainMode = mode;
