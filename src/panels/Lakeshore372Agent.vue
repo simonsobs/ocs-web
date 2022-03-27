@@ -38,7 +38,6 @@
       </OcsTask>
       <OcsTask
         :address="address"
-        @op_error="op_error"
         :op_data="ops.set_autoscan">
         <div class="ocs_row">
           <label>Set autoscan?</label>
@@ -121,11 +120,6 @@
           });
         }
         return new_data;
-      },
-    },
-    methods: {
-      op_error(text) {
-        this.$emit('op_error', text);
       },
     },
     mounted() {
