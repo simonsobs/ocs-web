@@ -3,8 +3,12 @@
     <form v-on:submit.prevent>
       <div class="ocs_row">
         <label class="important">{{ name }}</label>
-        <button @click="start">Start</button>
-        <button @click="stop">Stop</button>
+        <button
+          :disabled="accessLevel < 1"
+          @click="start">Start</button>
+        <button
+          :disabled="accessLevel < 1"
+          @click="stop">Stop</button>
       </div>
 
       <slot></slot>
@@ -32,6 +36,7 @@
         default: true,
       },
     },
+    inject: ['accessLevel'],
     computed: {
       comp_status() {
         return window.ocs_bundle.web.get_status_string(

@@ -5,7 +5,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>Lakeshore372Agent</h1>
+        <h1>Lakeshore372Agent <OpLocker /></h1>
         <h2>Connection</h2>
         <OpReading
           caption="Address"
@@ -38,7 +38,6 @@
       </OcsTask>
       <OcsTask
         :address="address"
-        @op_error="op_error"
         :op_data="ops.set_autoscan">
         <div class="ocs_row">
           <label>Set autoscan?</label>
@@ -77,6 +76,7 @@
     props: {
       address: String,
     },
+    inject: ['accessLevel'],
     data: function () {
       return {
         extension: 5,
@@ -120,11 +120,6 @@
           });
         }
         return new_data;
-      },
-    },
-    methods: {
-      op_error(text) {
-        this.$emit('op_error', text);
       },
     },
     mounted() {

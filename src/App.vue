@@ -73,6 +73,7 @@
 
 <script>
 
+  import { computed } from 'vue'
   import { useCookies } from "vue3-cookies";
 
   // Utility panels
@@ -154,6 +155,15 @@
         configs: configs,
         mainMode: 'config',
         errorInfo: null,
+        accessLevel: 0,
+      }
+    },
+    provide() {
+      return {
+        accessLevel: computed({
+          get: () => this.accessLevel,
+          set: (v) => {this.accessLevel = v;}
+        })
       }
     },
     components: {
@@ -199,6 +209,7 @@
         this.mainMode = 'agent';
         this.active_agent = v;
         this.force_generic = debug;
+        this.accessLevel = 1;
       },
       setMode(mode) {
         this.mainMode = mode;

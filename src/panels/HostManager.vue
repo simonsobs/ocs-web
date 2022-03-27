@@ -5,7 +5,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>Host Manager</h1>
+        <h1>Host Manager <OpLocker /></h1>
         <h2>Connection</h2>
         <OpReading caption="Address"
                  v-bind:value="address">
@@ -29,8 +29,8 @@
             <span>{{ item.agent_class }}</span>
             <span class="hm_center">{{ item.next_action }}</span>
             <span class="hm_center">{{ item.target_state }}</span>
-            <button @click="set_target(item.instance_id, 'up')">up</button>
-            <button @click="set_target(item.instance_id, 'down')">down</button>
+            <button :disabled="accessLevel < 1" @click="set_target(item.instance_id, 'up')">up</button>
+            <button :disabled="accessLevel < 1" @click="set_target(item.instance_id, 'down')">down</button>
           </div>
         </form>
       </div>
@@ -61,6 +61,7 @@
 
   export default {
     name: 'HostManager',
+    inject: ['accessLevel'],
     data: function () {
       return {
         connection_ok: false,
