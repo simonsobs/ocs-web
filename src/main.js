@@ -14,6 +14,7 @@ import OpStatus       from './components/OpStatus.vue'
 import OpSelect       from './components/OpDropdown.vue'
 import ProgressBar    from './components/ProgressBar.vue'
 import OcsOpAutofill  from './components/OcsOpAutofill.vue'
+import OpLocker       from './components/OpLocker.vue'
 
 app
   .component('OcsTask',     OcsTask)
@@ -24,7 +25,10 @@ app
   .component('OpSelect',    OpSelect)
   .component('ProgressBar', ProgressBar)
   .component('OcsOpAutofill', OcsOpAutofill)
+  .component('OpLocker',    OpLocker)
 ;
- 
+
+// This is needed in vue<3.3 to use computed function with provide/inject
+app.config.unwrapInjectedRef = true;
   
 app.mount('#app');

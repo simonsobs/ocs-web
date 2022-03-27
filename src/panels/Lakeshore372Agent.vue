@@ -5,7 +5,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>Lakeshore372Agent</h1>
+        <h1>Lakeshore372Agent <OpLocker /></h1>
         <h2>Connection</h2>
         <OpReading
           caption="Address"
@@ -77,6 +77,7 @@
     props: {
       address: String,
     },
+    inject: ['accessLevel'],
     data: function () {
       return {
         extension: 5,

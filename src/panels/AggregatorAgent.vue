@@ -5,7 +5,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>Aggregator Agent</h1>
+        <h1>Aggregator Agent <OpLocker /></h1>
         <h2>Connection</h2>
         <OpReading
           caption="Address"
