@@ -7,21 +7,24 @@
   <div class="viewport">
 
     <!-- Alert box -->
-    <div class="errorModal" v-if="errorInfo">
-      <div class="errorModalContent">
-        <div v-if="errorInfo.type=='op'">
-          <h2>Failed Operation Request</h2>
-          <p><b>Agent:</b> {{ errorInfo.address }}</p>
-          <p><b>Operation:</b> {{ errorInfo.op_name }}</p>
-          <p><b>Response:</b>  {{ errorInfo.message }}</p>
+    <div class="fullScreenMask" v-if="errorInfo">
+      <div class="errorModal">
+        <div class="errorModalContent">
+          <div v-if="errorInfo.type=='op'">
+            <h2>Failed Operation Request</h2>
+            <p><b>Agent:</b> {{ errorInfo.address }}</p>
+            <p><b>Operation:</b> {{ errorInfo.op_name }}</p>
+            <p><b>Response:</b>  {{ errorInfo.message }}</p>
+          </div>
+          <div v-else>
+            <b>Error</b>
+            <pre v-html="JSON.stringify(errorInfo, null, 2)" />
+          </div>
+          <button style="width: 200px" @click="op_error(null)">Ok</button>
         </div>
-        <div v-else>
-          <b>Error</b>
-          <pre v-html="JSON.stringify(errorInfo, null, 2)" />
-        </div>
-        <button style="width: 200px" @click="op_error(null)">Ok</button>
       </div>
     </div>
+
   </div>
 
   <!-- Container for main interface -->
@@ -296,13 +299,18 @@
   }
 
   /* Modal error box */
-  .errorModal {
+  .fullScreenMask {
     position: fixed;
     z-index: 1;
+    width: 100%;
+    height: 100%;
+    background-color: #0000;
+  }
+  .errorModal {
+    position: fixed;
     left: 25%;
     top: 15%;
     width: 50%;
-    //height: 30%;
     background-color: #4888;
   }
   @media screen and (max-width: 1000px) {
