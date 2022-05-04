@@ -31,25 +31,36 @@
   <div class="container">
 
     <!-- Sidebar -->
-    <div class="left_bar box">
-      <div class="ocs_ui">
-        <h2>OCS</h2>
-        <select class="ocs_dropdown"
-                :value="config_index"
-                @change="setConfigIndex($event.target.value)"
-                @input="$emit('update:modelValue', $event.target.value)">
-          <option v-for="(opt, index) in configs" v-bind:key="index" v-bind:value="index">
-            {{ opt.name }}
-          </option>
-        </select><br />
-        <span class="obviously_clickable"
-              @click="setMode('config')">Configs</span><br />
-        <span class="obviously_clickable"
-              @click="setMode('browse')">Browser</span>
+    <div class="left_bar">
+      <div class="left_bar_menu box">
+        <h2>Main</h2>
+        <div class="ocs_ui">
+          <ul>
+            <li>
+              <select class="ocs_dropdown"
+                  :value="config_index"
+                  @change="setConfigIndex($event.target.value)"
+                  @input="$emit('update:modelValue', $event.target.value)">
+            <option v-for="(opt, index) in configs" v-bind:key="index" v-bind:value="index">
+              {{ opt.name }}
+            </option>
+              </select><br />
+            </li>
+            <li>
+              <span class="obviously_clickable"
+                    @click="setMode('config')">Configs</span><br />
+            </li>
+            <li>
+              <span class="obviously_clickable"
+                    @click="setMode('browse')">Browser</span>
+            </li>
+          </ul>
+        </div>
+        <h2>Agents</h2>
+        <AgentList @selectAgent="showPanel" :known_classes="known_classes"
+                                            parent_id="sidebar">
+        </AgentList>
       </div>
-      <AgentList @selectAgent="showPanel" :known_classes="known_classes"
-                                          parent_id="sidebar">
-      </AgentList>
     </div>
 
     <!-- Panels -->
@@ -96,7 +107,7 @@
   /* Make a map of components to use in activeComp computed property;
      see
      https://forum.vuejs.org/t/vue-received-a-component-which-was-made-a-reactive-object/119004
-     */
+   */
   let agent_panels = {
     /* Utility */
     'GenericAgent': GenericAgent,
@@ -273,8 +284,6 @@
   }
 
   .container {
-    position: absolute;
-    height: 100%;
     width: 100%;
     display: grid;
     grid-template-columns: 200px 1fr;
@@ -287,9 +296,31 @@
   .left_bar {
     left: 0;
     width: 20%;
-    height: 85vh;
-    background-color: #ccf;
+    margin: 0%;
     overflow: ellipsis;
+    padding: 10px;
+  }
+
+  .left_bar_menu {
+    background-color: #ccf;
+  }
+
+  .left_bar_menu > div {
+    padding-bottom: 10px;
+  }
+
+  .left_bar_menu > .ocs_ui > ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0px 10px;
+  }
+
+  .left_bar_menu .al_level1 {
+    padding-left: 10px;
+  }
+
+  .left_bar_menu {
+    overflow: clip;
   }
 
   .main {

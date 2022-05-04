@@ -121,19 +121,11 @@
     display: grid;
     grid-template-columns: 3fr 3fr 1fr 1fr 1fr 1fr ;
   }
-  .hm_row > span {
+  .hm_row > div, button, span {
+    font-size: 9pt;
     padding: 10px 0px;
-    font-size: 13pt;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-  .hm_row > div {
-    padding: 10px 0px;
-    font-size: 13pt;
-  }
-  .hm_row > button {
-    padding: 10px 0px;
-    font-size: 13pt;
   }
   .hm_header {
     border-bottom: 1px solid black;
