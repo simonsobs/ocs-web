@@ -319,6 +319,10 @@
     padding-left: 10px;
   }
 
+  .left_bar_menu {
+    overflow: clip;
+  }
+
   .main {
     left: 20%;
     width: 80%;
