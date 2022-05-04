@@ -3,12 +3,12 @@
   <div class="ocs_ui">
     <div v-for="k in active_list" v-bind:key="k" class="al_level1">
       <span>{{ k[0] }} </span><span v-if="!known_classes.includes(k[0])">[?]</span>
-      <div v-for="x in k[1]" v-bind:key="x" class="al_level2">
-        <span class="obviously_clickable"
-              v-bind:class="{missing: !tracked_agents[x].ok}"
-              @click.exact="selectAgent(x)"
-              @click.shift="selectAgent(x, true)"
-        >{{ tracked_agents[x].instance_id }}</span>
+      <div v-for="x in k[1]" v-bind:key="x"
+           class="al_level2 obviously_clickable"
+           @click.exact="selectAgent(x)"
+           @click.shift="selectAgent(x, true)"
+           v-bind:class="{missing: !tracked_agents[x].ok}">
+        {{ tracked_agents[x].instance_id }}
       </div>
     </div>
   </div>
@@ -94,10 +94,6 @@
     padding: 0px 10px;
     font-weight: normal;
   }
-  .sidebar {
-    width: 100%;
-  }
-
   .missing {
     background-color: #f00;
   }
