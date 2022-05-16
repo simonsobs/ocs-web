@@ -36,15 +36,27 @@
         :address="address"
         :op_data="ops.init_lakeshore">
       </OcsTask>
+
+      <OcsProcess
+        :address="address"
+        :op_data="ops.acq"
+      />
+
       <OcsTask
         :address="address"
+        :show_start="false"
         :op_data="ops.set_autoscan">
         <div class="ocs_row">
-          <label>Set autoscan?</label>
-          <input type="checkbox"
-                 v-model="ops.set_autoscan.params.autoscan" />
+          <label>Autoscan?</label>
+          <button
+            :disabled="accessLevel < 1"
+            @click="set_autoscan(true)">Set on</button>
+          <button
+            :disabled="accessLevel < 1"
+            @click="set_autoscan(false)">Set off</button>
         </div>
       </OcsTask>
+
       <OcsTask
         :address="address"
         :op_data="ops.set_active_channel">
@@ -53,10 +65,205 @@
           v-model.number="ops.set_active_channel.params.channel" />
       </OcsTask>
 
-      <OcsProcess
+      <OcsTask
         :address="address"
-        :op_data="ops.acq"
-      />
+        :op_data="ops.set_output_mode">
+        <OpDropdown
+          caption="Heater"
+          :options="['sample', 'still']"
+          v-model="ops.set_output_mode.params.heater" />
+        <OpDropdown
+          caption="Mode"
+          :options="['Off', 'Monitor Out', 'Open Loop', 'Zone', 'Still', 'Closed Loop', 'Warm up']"
+          v-model="ops.set_output_mode.params.mode" />
+      </OcsTask>
+
+      <OcsTask
+        :address="address"
+        :op_data="ops.set_pid">
+        <OpParam
+          caption="P (int)"
+          v-model.number="ops.set_pid.params.P" />
+        <OpParam
+          caption="I (int)"
+          v-model.number="ops.set_pid.params.I" />
+        <OpParam
+          caption="D (int)"
+          v-model.number="ops.set_pid.params.D" />
+      </OcsTask>
+
+      <OcsTask
+        :address="address"
+        :op_data="ops.set_heater_range">
+        <OpDropdown
+          caption="Heater"
+          :options="['sample', 'still']"
+          v-model="ops.set_heater_range.params.heater" />
+        <OpParam
+          caption="Range"
+          v-model.number="ops.set_heater_range.params.range" />
+        <OpParam
+          caption="Wait"
+          v-model.number="ops.set_heater_range.params.wait" />
+      </OcsTask>
+
+      <OcsTask
+        :address="address"
+        :op_data="ops.servo_to_temperature">
+        <OpParam
+          caption="Temperature (float)"
+          v-model.number="ops.servo_to_temperature.params.temperature" />
+      </OcsTask>
+
+      <OcsTask
+        :address="address"
+        :op_data="ops.set_heater_output">
+        <OpDropdown
+          caption="Heater"
+          :options="['sample', 'still']"
+          v-model="ops.set_heater_output.params.heater" />
+        <OpParam
+          caption="Output"
+          v-model.number="ops.set_heater_output.params.output" />
+        <OpDropdown
+          caption="Display"
+          :options="['current', 'power']"
+          v-model="ops.set_heater_output.params.display" />
+      </OcsTask>
+
+      <OcsTask
+        :address="address"
+        :op_data="ops.set_resistance_range">
+        <OpParam
+          caption="Channel (int)"
+          v-model.number="ops.set_resistance_range.params.channel" />
+        <OpParam
+          caption="Range (Ohms)"
+          v-model.number="ops.set_resistance_range.params.output" />
+      </OcsTask>
+
+      ----
+      <OcsTask
+        :address="address"
+        :op_data="ops.get_dwell">
+        <OpParam
+          caption="Channel (int)"
+          v-model.number="ops.get_dwell.params.channel" />
+        <OpReading
+          caption="Dwell time (s)"
+          :value="ops.get_dwell.session.data.dwell_time">
+        </OpReading>
+      </OcsTask>
+
+      <OcsTask
+        :address="address"
+        :op_data="ops.get_excitation">
+        <OpParam
+          caption="Channel (int)"
+          v-model.number="ops.get_excitation.params.channel" />
+        <OpReading
+          caption="Excitation value"
+          :value="ops.get_excitation.session.data.excitation">
+        </OpReading>
+        <OpReading
+          caption="Mode (units)"
+          :value="ops.get_excitation.session.data.mode">
+        </OpReading>
+      </OcsTask>
+
+      <OcsTask
+        :address="address"
+        :op_data="ops.get_resistance_range">
+        <OpParam
+          caption="Channel (int)"
+          v-model.number="ops.get_resistance_range.params.channel" />
+        <OpReading
+          caption="Resistance Range (ohms)"
+          :value="ops.get_resistance_range.session.data.resistance_range">
+        </OpReading>
+      </OcsTask>
+
+      <OcsTask
+        :address="address"
+        :op_data="ops.get_still_output">
+        <OpReading
+          caption="Still Output (%)"
+          :value="ops.get_still_output.session.data.still_heater_still_out">
+        </OpReading>
+      </OcsTask>
+
+      <OcsTask
+        :address="address"
+        :op_data="ops.set_excitation">
+        <OpParam
+          caption="Channel (int)"
+          v-model.number="ops.set_excitation.params.channel" />
+        <OpParam
+          caption="Value (float)"
+          v-model.number="ops.set_excitation.params.value" />
+      </OcsTask>
+
+      <OcsTask
+        :address="address"
+        :op_data="ops.set_excitation_mode">
+        <OpParam
+          caption="Channel (int)"
+          v-model.number="ops.set_excitation_mode.params.channel" />
+        <OpDropdown
+          caption="Display"
+          :options="['current', 'voltage']"
+          v-model="ops.set_excitation_mode.params.display" />
+      </OcsTask>
+
+      <OcsTask
+        :address="address"
+        :op_data="ops.set_heater_range">
+        <OpDropdown
+          caption="Heater"
+          :options="['sample', 'still']"
+          v-model="ops.set_heater_range.params.heater" />
+        <OpParam
+          caption="Range"
+          v-model.number="ops.set_heater_range.params.range" />
+        <OpParam
+          caption="Wait"
+          v-model.number="ops.set_heater_range.params.wait" />
+      </OcsTask>
+
+      <OcsTask
+        :address="address"
+        :op_data="ops.set_still_output">
+        <OpParam
+          caption="Output (%)"
+          v-model.number="ops.set_still_output.params.output" />
+      </OcsTask>
+
+      <OcsTask
+        :address="address"
+        :op_data="ops.set_dwell">
+        <OpParam
+          caption="Channel (int)"
+          v-model.number="ops.set_dwell.params.channel" />
+        <OpParam
+          caption="Dwell (1-200)"
+          v-model.number="ops.set_dwell.params.dwell" />
+      </OcsTask>
+
+      <OcsTask
+        :address="address"
+        :op_data="ops.enable_control_chan"
+        op_name="enable_control_chan/disable_control_chan"
+        :show_start="false">
+        <div class="ocs_row">
+          <label>Control channel</label>
+          <button
+            :disabled="accessLevel < 1"
+            @click="set_control_chan(true)">Enable</button>
+          <button
+            :disabled="accessLevel < 1"
+            @click="set_control_chan(false)">Disable</button>
+        </div>
+      </OcsTask>
 
       <OcsOpAutofill
         :address="address"
@@ -95,6 +302,27 @@
             },
           },
           acq: {},
+          get_dwell: {},
+          get_resistance_range: {},
+          get_excitation: {},
+          get_still_output: {},
+          servo_to_temperature: {},
+          set_excitation: {},
+          set_excitation_mode: {},
+          set_resistance_range: {},
+          set_heater_output: {heater: 'sample',
+                              output: 0.0,
+                              display: 'current'},
+          set_heater_range: {heater: 'sample',
+                             range: 0.0,
+                             wait: 0},
+          set_output_mode: {},
+          set_dwell: {},
+          set_pid: {},
+          set_still_output: {},
+          // Note enable/disable_control_chan handled in single widget.
+          enable_control_chan: {},
+          disable_control_chan: {},
         }),
       }
     },
@@ -120,6 +348,15 @@
           });
         }
         return new_data;
+      },
+    },
+    methods: {
+      set_autoscan(on) {
+        window.ocs_bundle.ui_run_task(this.address, 'set_autoscan', {autoscan: on});
+      },
+      set_control_chan(on) {
+        let task = {true: 'enable', false: 'disable'}[on] + '_control_chan';
+        window.ocs_bundle.ui_run_task(this.address, task, {});
       },
     },
     mounted() {
