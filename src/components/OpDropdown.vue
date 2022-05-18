@@ -22,8 +22,6 @@
         required: true
       },
       modelValue: {
-        type: Number,
-        default: 0,
         required: true},
     },
 }

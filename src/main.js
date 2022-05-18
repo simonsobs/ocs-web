@@ -9,6 +9,7 @@ const app = createApp(App);
 import OcsTask        from './components/OcsTask.vue'
 import OcsProcess     from './components/OcsProcess.vue'
 import OpParam        from './components/OpParam.vue'
+import OpDropdown     from './components/OpDropdown.vue'
 import OpReading      from './components/OpReading.vue'
 import OpStatus       from './components/OpStatus.vue'
 import OpSelect       from './components/OpDropdown.vue'
@@ -20,6 +21,7 @@ app
   .component('OcsTask',     OcsTask)
   .component('OcsProcess',  OcsProcess)
   .component('OpParam',     OpParam)
+  .component('OpDropdown',  OpDropdown)
   .component('OpReading',   OpReading)
   .component('OpStatus',    OpStatus)
   .component('OpSelect',    OpSelect)
