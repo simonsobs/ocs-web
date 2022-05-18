@@ -4,6 +4,7 @@
       <div class="ocs_row">
         <label class="important">{{ name }}</label>
         <button
+          v-if="show_start"
           :disabled="accessLevel < 1"
           @click="start">Start</button>
         <span></span>
@@ -33,6 +34,9 @@
       show_status: {
         default: true,
       },
+      show_start: {
+        default: true,
+      },
     },
     inject: ['accessLevel'],
     computed: {
@@ -49,14 +53,7 @@
     emits: ["op_error"],
     methods: {
       start() {
-        window.ocs.get_client(this.address).run_task(this.name, this.op_data.params).then(
-          (msg) => console.log('ok', msg),
-          (msg) => window.ocs_bundle.on_error(
-            {'type': 'op',
-             'address': this.address,
-             'op_name': this.name,
-             'message': msg})
-        );
+        window.ocs_bundle.ui_run_task(this.address, this.name, this.op_data.params);
       },
     },
   }

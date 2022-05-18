@@ -130,7 +130,7 @@
     ocsbow: ocs,
     web: web,
     util: util,
-    
+
     // classes
     AgentClient: ocs.AgentClient,
     OCSConnection: ocs.OCSConnection,
@@ -269,6 +269,50 @@
       ocs_bundle.on_error = (msg) => {
         this.op_error(msg);
       };
+
+      // Functions that wrap operation start/stop with UI error windows.
+      ocs_bundle.ui_run_task = (agent_address, op_name, op_params) => {
+        window.ocs.get_client(agent_address).run_task(op_name, op_params).then(
+          (msg) => console.log('ok', msg),
+          (msg) => window.ocs_bundle.on_error(
+            {'type': 'op',
+             'address': agent_address,
+             'op_name': op_name,
+             'message': msg})
+        );
+      };
+
+      ocs_bundle.ui_start_proc = (agent_address, op_name, op_params) => {
+        window.ocs.get_client(agent_address)
+              .start_proc(op_name, op_params)
+              .then(
+                result => {
+                  if (result[0] != 0) {
+                    let msg = result[1]
+                    window.ocs_bundle.on_error(
+                      {'type': 'op',
+                       'address': agent_address,
+                       'op_name': op_name,
+                       'message': msg});
+                  }
+              });
+      };
+
+      ocs_bundle.ui_stop_proc = (agent_address, op_name) => {
+        window.ocs.get_client(agent_address).stop_proc(op_name)
+              .then(
+                result => {
+                  if (result[0] != 0) {
+                    let msg = result[1]
+                    window.ocs_bundle.on_error(
+                      {'type': 'op',
+                       'address': agent_address,
+                       'op_name': op_name,
+                       'message': msg});
+                }
+              });
+      };
+
     },
   }
 </script>
