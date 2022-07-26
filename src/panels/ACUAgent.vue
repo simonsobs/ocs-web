@@ -18,21 +18,44 @@
         </OpReading>
 
         <h2>Position</h2>
-        <OpParam
+        <OpReading
           caption="Azimuth"
-          :modelDisabled="true"
-          v-model="currentAz">
-        </OpParam>
-        <OpParam
+          v-bind:value="currentPosAndMode('Azimuth')">
+        </OpReading>
+        <OpReading
           caption="Elevation"
-          :modelDisabled="true"
-          v-model="currentEl">
-        </OpParam>
-        <OpParam
+          v-bind:value="currentPosAndMode('Elevation')">
+        </OpReading>
+        <OpReading
           caption="Boresight"
-          :modelDisabled="true"
-          v-model="currentBoresight">
-        </OpParam>
+          v-bind:value="currentPosAndMode('Boresight')">
+        </OpReading>
+
+        <h2>Scan control</h2>
+        <OpDropdown
+          caption="Type"
+          :options="scan_types"
+          v-model="scan_control.type"
+        />
+        <form v-on:submit.prevent
+              v-if="scan_control.type == 'Constant el'">
+          <OpParam
+            caption="Azimuth center"
+            v-model.number="scan_control.az_center"
+          />
+          <OpParam
+            v-if="scan_control.type == 'Constant el'"
+            caption="Azimuth throw"
+            v-model.number="scan_control.az_throw"
+          />
+          <div class="ocs_row">
+            <label />
+            <button
+              @click="startScan">Start</button>
+            <button
+              @click="stopScan">Stop</button>
+          </div>
+        </form>
 
       </div>
     </div>
@@ -161,10 +184,44 @@
             params: {},
           },
         }),
+        scan_types: ["Constant el"],
+        scan_control: {
+          type: "Constant el",
+          az_center: 180,
+          az_throw: 10,
+        },
       }
     },
     methods: {
-      currentSomething(prefix) {
+      startScan() {
+        // Called from the special scan_control widget.
+        let p = this.scan_control;
+        if (p.type == "Constant el") {
+          // Update the parameters of the generate_scan process.
+          let gs = this.ops.generate_scan.params;
+          gs['az_endpoint1'] = p.az_center - p.az_throw;
+          gs['az_endpoint2'] = p.az_center + p.az_throw;
+
+          let pos = this.currentPositions();
+          gs['el_endpoint1'] = pos['el'];
+          gs['el_endpoint2'] = pos['el'];
+
+          window.ocs_bundle.ui_start_proc(this.address, 'generate_scan',
+                                          this.ops.generate_scan.params);
+        }
+      },
+      stopScan() {
+        window.ocs_bundle.ui_run_task(this.address, 'stop_and_clear', {});
+      },
+      currentPositions() {
+        let data = this.ops.monitor.session.data;
+        return {
+          'az': data['Azimuth current position'],
+          'el': data['Elevation current position'],
+          'boresight': data['Boresight current position'],
+        };
+      },
+      currentPosAndMode(prefix) {
         let data = this.ops.monitor.session.data;
         if (!data)
           return '?';
@@ -175,15 +232,6 @@
       },
     },
     computed: {
-      currentAz() {
-        return this.currentSomething('Azimuth');
-      },
-      currentEl() {
-        return this.currentSomething('Elevation');
-      },
-      currentBoresight() {
-        return this.currentSomething('Boresight');
-      },
     },
     mounted() {
       window.ocs_bundle.web.register_panel(this, null, ocs_reg);
