@@ -57,7 +57,36 @@
           </div>
         </form>
 
+        <h2>Dataset</h2>
+
+        <div class="acu_dataset">
+          <form v-on:submit.prevent>
+            <select v-model="dataset.view" class="dataset_filter">
+              <option value="all" default>Show all</option>
+              <option value="nonnom">Show non-nominal readings</option>
+              <option value="az-only">Show Azimuth</option>
+              <option value="el-only">Show Elevation</option>
+              <option value="bore-only">Show Boresight</option>
+              <option value="other-only">Show Other</option>
+              <option value="nothing" default>Show nothing</option>
+            </select>
+          </form>
+
+          <div class="acu_row acu_header">
+            <span class="acu_value">Value</span>
+            <span class="acu_label">Field</span>
+          </div>
+          <div v-for="item in statusVars" v-bind:key="item.name">
+            <div v-if="dataset.view=='all' || dataset.view=='nonnom' && (item.classObj.isPassive || item.classObj.isBad || item.classObj.isActive) || dataset.view==item.props.specialization" class="acu_row">
+              <span class="acu_value"
+                    v-bind:class="item.classObj"
+              >{{ item.value }}</span>
+              <span class="acu_label">{{ item.name }}</span>
+            </div>
+          </div>
+        </div>
       </div>
+
     </div>
 
     <!-- Right block -->
@@ -190,6 +219,9 @@
           az_center: 180,
           az_throw: 10,
         },
+        dataset: {
+          view: "all",
+        },
       }
     },
     methods: {
@@ -232,6 +264,93 @@
       },
     },
     computed: {
+      statusVars() {
+        let data = this.ops.monitor.session.data;
+        let annotated = [];
+        if (!data)
+          return annotated;
+        for (const [key, value] of Object.entries(data)) {
+          let d = {
+            name: key,
+            value: value,
+            props: {
+              type: 'passive',
+              inverted: false,
+              specialization: 'other-only',
+            },
+          };
+
+          if (key.includes('Azimuth'))
+            d.props.specialization = 'az-only';
+          if (key.includes('Elevation'))
+            d.props.specialization = 'el-only';
+          if (key.includes('Boresight'))
+            d.props.specialization = 'bore-only';
+
+          let test_val = value;
+          if (test_val === true || test_val === false)
+            d.props.type = 'error';
+
+          switch(key) {
+            case 'Azimuth brakes released':
+            case 'Elevation brakes released':
+            case 'Boresight brakes released':
+              d.props.type = 'indicator';
+              break;
+
+            case 'Azimuth current velocity':
+            case 'Elevation current velocity':
+            case 'Boresight current velocity':
+            case 'Azimuth average position error':
+            case 'Elevation average position error':
+            case 'Boresight average position error':
+            case 'Azimuth peak position error':
+            case 'Elevation peak position error':
+            case 'Boresight peak position error':
+              d.props.type = 'indicator';
+              test_val = (test_val != 0);
+              break;
+
+            case 'Qty of free program track stack positions':
+              d.props.type = 'indicator';
+              test_val = (test_val != 9999);
+              break;
+
+            case 'Azimuth mode':
+            case 'Elevation mode':
+            case 'Boresight mode':
+              d.props.type = 'indicator';
+              test_val = (test_val != 'Stop')
+              break;
+
+            case 'Azimuth axis in stop':
+            case 'Azimuth power on':
+            case 'Elevation axis in stop':
+            case 'Elevation power on':
+            case 'Boresight axis in stop':
+            case 'Boresight power on':
+            case 'ACU in remote mode':
+              d.props.type = 'indicator';
+              d.props.inverted = true;
+              break;
+          }
+
+          let x = test_val ^ d.props.inverted;
+          switch (d.props.type) {
+            case 'error':
+              d.classObj = { isNormal: !x, isBad: x };
+              break;
+            case 'indicator':
+              d.classObj = { isNormal: !x, isActive: x };
+              break;
+            default:
+              d.classObj = { isPassive: true};
+          }
+
+          annotated.push(d);
+        }
+        return annotated;
+      },
     },
     mounted() {
       window.ocs_bundle.web.register_panel(this, null, ocs_reg);
@@ -244,4 +363,61 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+  .acu_dataset > div:nth-child(3n+1) {
+    background-color: #fff;
+  }
+  .acu_dataset > div:nth-child(3n+3) {
+    background-color: #f0f0f0;
+  }
+  .acu_dataset > div:nth-child(3n+2) {
+    background-color: #f8f8f8;
+  }
+  .acu_row {
+    display: grid;
+    grid-template-columns: 1fr 4fr ;
+  }
+  .acu_row > div, button, span {
+    font-size: 11pt;
+    padding: 5px 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .acu_header {
+    border-bottom: 1px solid black;
+  }
+  .acu_header > span {
+    font-weight: bold;
+    padding: 10px 0px;
+  }
+  .acu_value {
+    text-align: center;
+  }
+  .acu_label {
+    text-align: left;
+  }
+
+  .dataset_filter {
+    width: 100%;
+  }
+
+  /* Classes for rows in the Dataset table:
+   * - isNormal: no error / idle.
+   * - isBad: error.
+   * - isActive: not idle but not an error.
+   * - isPassive: otherwise unclassifiable.
+   */
+
+  .isNormal {
+    background-color: #32cd32;
+  }
+  .isBad {
+    background-color: #ff8888;
+  }
+  .isActive {
+    background-color: #8888ff;
+  }
+  .isPassive {
+    background-color: #ccccff;
+  }
+
 </style>
