@@ -76,7 +76,33 @@
         :op_data="ops.stop_and_clear">
       </OcsTask>
 
-      <!-- Processes -->
+      <OcsProcess
+        :address="address"
+        :op_data="ops.generate_scan">
+        <OpParam
+          caption="az1"
+          v-model.number="ops.generate_scan.params.az_endpoint1" />
+        <OpParam
+          caption="az2"
+          v-model.number="ops.generate_scan.params.az_endpoint2" />
+        <OpParam
+          caption="el1"
+          v-model.number="ops.generate_scan.params.el_endpoint1" />
+        <OpParam
+          caption="el2"
+          v-model.number="ops.generate_scan.params.el_endpoint2" />
+        <OpParam
+          caption="az_speed"
+          v-model.number="ops.generate_scan.params.az_speed" />
+        <OpParam
+          caption="el_speed"
+          v-model.number="ops.generate_scan.params.el_speed" />
+        <OpParam
+          caption="az_acc"
+          v-model.number="ops.generate_scan.params.acc" />
+      </OcsProcess>
+
+      <!-- Background processes -->
 
       <OcsProcess
         :address="address"
@@ -85,10 +111,6 @@
       <OcsProcess
         :address="address"
         :op_data="ops.broadcast"
-      />
-      <OcsProcess
-        :address="address"
-        :op_data="ops.generate_scan"
       />
 
     </div>
@@ -121,14 +143,23 @@
           stop_and_clear: {
             params: {},
           },
+          generate_scan: {
+            params: {
+              az_endpoint1: 170,
+              az_endpoint2: 190,
+              az_speed: 1,
+              acc: 1,
+              el_endpoint1: 60,
+              el_endpoint2: 60,
+              el_speed: 1,
+            },
+          },
           monitor: {
             params: {},
           },
           broadcast: {
             params: {},
           },
-          generate_scan: {            params: {},
-},
         }),
       }
     },
