@@ -328,6 +328,21 @@
         );
       };
 
+      ocs_bundle.ui_abort_task = (agent_address, op_name) => {
+        window.ocs.get_client(agent_address).abort_task(op_name)
+              .then(
+                result => {
+                  if (result[0] != 0) {
+                    let msg = result[1]
+                    window.ocs_bundle.on_error(
+                      {'type': 'op',
+                       'address': agent_address,
+                       'op_name': op_name,
+                       'message': msg});
+                }
+              });
+      };
+
       ocs_bundle.ui_start_proc = (agent_address, op_name, op_params) => {
         window.ocs.get_client(agent_address)
               .start_proc(op_name, op_params)
