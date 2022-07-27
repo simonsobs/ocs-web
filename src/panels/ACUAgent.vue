@@ -59,33 +59,45 @@
 
         <h2>Dataset</h2>
 
-        <div class="acu_dataset">
           <form v-on:submit.prevent>
-            <select v-model="dataset.view" class="dataset_filter">
-              <option value="all" default>Show all</option>
-              <option value="nonnom">Show non-nominal readings</option>
-              <option value="az-only">Show Azimuth</option>
-              <option value="el-only">Show Elevation</option>
-              <option value="bore-only">Show Boresight</option>
-              <option value="other-only">Show Other</option>
-              <option value="nothing" default>Show nothing</option>
-            </select>
+            <div class="acu_row">
+              <span>Group</span>
+              <span>
+                <select v-model="dataset.view" class="dataset_filter">
+                  <option value="all" default>Show all</option>
+                  <option value="nonnom">Show non-nominal readings</option>
+                  <option value="az-only">Show Azimuth</option>
+                  <option value="el-only">Show Elevation</option>
+                  <option value="bore-only">Show Boresight</option>
+                  <option value="other-only">Show Other</option>
+                  <option value="nothing" default>Show nothing</option>
+                </select>
+              </span>
+            </div>
+            <div class="acu_row">
+              <span>Filter</span>
+              <span><input type="text"
+                           class="acu_double"
+                           v-model="dataset.filter"
+                    /></span>
+            </div>
           </form>
 
-          <div class="acu_row acu_header">
-            <span class="acu_value">Value</span>
-            <span class="acu_label">Field</span>
-          </div>
-          <div v-for="item in statusVars" v-bind:key="item.name">
-            <div v-if="dataset.view=='all' || dataset.view=='nonnom' && (item.classObj.isPassive || item.classObj.isBad || item.classObj.isActive) || dataset.view==item.props.specialization" class="acu_row">
-              <span class="acu_value"
-                    v-bind:class="item.classObj"
-              >{{ item.value }}</span>
-              <span class="acu_label">{{ item.name }}</span>
+          <div id="dataset_table">
+            <div class="acu_row acu_header">
+              <span class="acu_value">Value</span>
+              <span class="acu_label">Field</span>
+            </div>
+            <div v-for="item in statusVars" v-bind:key="item.name">
+              <div v-if="(dataset.view=='all' || dataset.view=='nonnom' && (item.classObj.isBad || item.classObj.isActive) || dataset.view==item.props.specialization) && (dataset.filter == '' || item.name.trim().toLowerCase().includes(dataset.filter.trim().toLowerCase()))" class="acu_row">
+                <span class="acu_value"
+                      v-bind:class="item.classObj"
+                >{{ item.value }}</span>
+                <span class="acu_label">{{ item.name }}</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
     </div>
 
@@ -221,6 +233,7 @@
         },
         dataset: {
           view: "all",
+          filter: "",
         },
       }
     },
@@ -363,18 +376,9 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .acu_dataset > div:nth-child(3n+1) {
-    background-color: #fff;
-  }
-  .acu_dataset > div:nth-child(3n+3) {
-    background-color: #f0f0f0;
-  }
-  .acu_dataset > div:nth-child(3n+2) {
-    background-color: #f8f8f8;
-  }
   .acu_row {
     display: grid;
-    grid-template-columns: 1fr 4fr ;
+    grid-template-columns: 1fr 2fr ;
   }
   .acu_row > div, button, span {
     font-size: 11pt;
@@ -391,9 +395,26 @@
   }
   .acu_value {
     text-align: center;
+    margin: 2px;
   }
   .acu_label {
     text-align: left;
+    margin: 2px;
+  }
+  .acu_double {
+    width: 100%;
+    grid-column-start: span 2;
+  }
+
+  #dataset_table {
+    border: 1px solid black;
+    border-radius: 3px;
+  }
+  #dataset_table > div:nth-child(odd) {
+    background-color: #fff;
+  }
+  #dataset_table > div:nth-child(even) {
+    background-color: #eee;
   }
 
   .dataset_filter {
