@@ -5,7 +5,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>ACU Agent</h1>
+        <h1>ACU Agent <OpLocker /></h1>
         <h2>Connection</h2>
         <OpReading
           caption="Address"
@@ -51,8 +51,10 @@
           <div class="ocs_row">
             <label />
             <button
+              :disabled="accessLevel < 1"
               @click="startScan">Start</button>
             <button
+              :disabled="accessLevel < 1"
               @click="stopScan">Stop</button>
           </div>
         </form>
@@ -190,6 +192,7 @@
     props: {
       address: String,
     },
+    inject: ['accessLevel'],
     data: function () {
       return {
         connection_ok: false,
