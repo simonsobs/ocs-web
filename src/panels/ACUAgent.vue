@@ -30,6 +30,10 @@
           caption="Boresight"
           v-bind:value="currentPosAndMode('Boresight')">
         </OpReading>
+        <OpReading
+          caption="Timestamp"
+          v-bind:value="currentPosAndMode('Timestamp')">
+        </OpReading>
 
         <h2>Scan control</h2>
         <OpDropdown
@@ -273,6 +277,12 @@
         let data = this.ops.monitor.session.data;
         if (!data)
           return '?';
+        if (prefix == 'Timestamp') {
+          let year = Math.floor(new Date(data['Year'] + '.01.01').getTime() / 1000);
+          let offset_seconds = Number(data['Time']) * 86400;
+          return window.ocs_bundle.util.get_date_time_string(year + offset_seconds, ' ');
+        }
+
         let mode = data[prefix + ' mode'];
         let pos = Number(data[prefix + ' current position']);
         return (window.ocs_bundle.util.pad_decimal(pos.toFixed(4), 3, ' ') +
