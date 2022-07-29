@@ -103,6 +103,7 @@
 
   // Agent panels - SOCS
   import Lakeshore372Agent from './panels/Lakeshore372Agent.vue';
+  import ACUAgent from './panels/ACUAgent.vue';
 
   /* Make a map of components to use in activeComp computed property;
      see
@@ -119,6 +120,8 @@
 
     /* SOCS */
     'Lakeshore372Agent': Lakeshore372Agent,
+    'ACUAgent': ACUAgent,
+
   };
   
   let ocs = require('./ocsbow');
