@@ -2,6 +2,8 @@ FROM node:lts-alpine as build-stage
 
 WORKDIR /app
 
+RUN apk add dumb-init
+
 # Install dependencies first
 COPY package*.json ./
 RUN npm install
@@ -11,4 +13,4 @@ COPY . .
 
 # Run the vue development server.
 EXPOSE 8080
-CMD ["docker/run.sh"]
+ENTRYPOINT ["dumb-init", "docker/run.sh"]
