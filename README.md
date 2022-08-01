@@ -154,9 +154,28 @@ the HOST variable;
 ```
 
 (If you are proxying this service and get a "Invalid Host Header"
-message, try to fix it with the HOST variable.  This message means
-that the proxy is forwarding your requests correctly, but the hostname
-you're using in the proxy target does not match the value of HOST
-(default: 0.0.0.0).  If you are using a docker-compose service name
-in the proxy address, e.g. http://my-ocs-web-service:8080/, then that
-service name might be what you want in HOST, too.)
+message, try to fix it with the HOST variable and the the docker
+"hostname" option.  Here's an example:
+
+```
+version: '2'
+services:
+  ocs-web-1:
+    image: ocs-web
+    environment:
+     - HOST=my-ocs-web
+    hostname: my-ocs-web
+  my-nginx:
+    image: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+     - "8100:80"
+```
+
+The nginx proxy fragment would be something like:
+```
+    location /ocs/ {
+      proxy_pass http://my-ocs-web:8080/;
+    }
+```
