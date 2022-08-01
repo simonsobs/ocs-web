@@ -102,8 +102,8 @@ It may be necessary to give the container a specific hostname (with
 docker run -p 8080:8080 --rm --hostname=my-ocs-web -e HOST=my-ocs-web ocs-web
 ```
 
-(Note that even if the server output you to browse to `my-ocs-web:8080`,
-you should browse to `localhost:8080`.)
+(Note that even if the server output tells you to browse to
+`my-ocs-web:8080`, you should browse to `localhost:8080`.)
 
 Here is a docker-compose.yaml that declares a service running the
 ocs-web image:
@@ -114,9 +114,6 @@ services:
     image: ocs-web
     ports:
       - 8080:8080
-    hostname: my-ocs-web-host
-    environment:
-      - HOST=my-ocs-web-host
 ```
 
 Below, find a few ways to customize the configuration through
@@ -134,9 +131,7 @@ services:
     image: ocs-web
     ports:
       - 8080:8080
-    hostname: my-ocs-web-host
     environment:
-      - HOST=my-ocs-web-host
       - OCS_ADDRS=My new lab,http://localhost:8080/ws,test_realm
 
 ```
@@ -162,6 +157,6 @@ the HOST variable;
 message, try to fix it with the HOST variable.  This message means
 that the proxy is forwarding your requests correctly, but the hostname
 you're using in the proxy target does not match the value of HOST
-(default: localhost).  If you are using a docker-compose service name
+(default: 0.0.0.0).  If you are using a docker-compose service name
 in the proxy address, e.g. http://my-ocs-web-service:8080/, then that
 service name might be what you want in HOST, too.)

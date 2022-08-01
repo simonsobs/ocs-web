@@ -9,5 +9,5 @@ EOF
 
 # Run development server...
 PORT=${PORT:=8080}
-HOST=${HOST:=localhost}
+HOST=${HOST:=0.0.0.0}
 npm run serve -- --port $PORT --host $HOST
