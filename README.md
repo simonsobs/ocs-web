@@ -95,6 +95,16 @@ docker run -p 8080:8080 --rm ocs-web
 
 Then browse to http://localhost:8080/
 
+It may be necessary to give the container a specific hostname (with
+`--hostname=...`, and tell the server about it (with `-e HOST=...`):
+
+```
+docker run -p 8080:8080 --rm --hostname=my-ocs-web -e HOST=my-ocs-web ocs-web
+```
+
+(Note that even if the server output tells you to browse to
+`my-ocs-web:8080`, you should browse to `localhost:8080`.)
+
 Here is a docker-compose.yaml that declares a service running the
 ocs-web image:
 ```
@@ -123,6 +133,7 @@ services:
       - 8080:8080
     environment:
       - OCS_ADDRS=My new lab,http://localhost:8080/ws,test_realm
+
 ```
 
 (These variables get appended to .env.local inside the container; if
@@ -143,9 +154,28 @@ the HOST variable;
 ```
 
 (If you are proxying this service and get a "Invalid Host Header"
-message, try to fix it with the HOST variable.  This message means
-that the proxy is forwarding your requests correctly, but the hostname
-you're using in the proxy target does not match the value of HOST
-(default: localhost).  If you are using a docker-compose service name
-in the proxy address, e.g. http://my-ocs-web-service:8080/, then that
-service name might be what you want in HOST, too.)
+message, try to fix it with the HOST variable and the the docker
+"hostname" option.  Here's an example:
+
+```
+version: '2'
+services:
+  ocs-web-1:
+    image: ocs-web
+    environment:
+     - HOST=my-ocs-web
+    hostname: my-ocs-web
+  my-nginx:
+    image: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+     - "8100:80"
+```
+
+The nginx proxy fragment would be something like:
+```
+    location /ocs/ {
+      proxy_pass http://my-ocs-web:8080/;
+    }
+```
