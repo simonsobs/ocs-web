@@ -182,6 +182,10 @@
         :address="address"
         :op_data="ops.broadcast"
       />
+      <OcsProcess
+        :address="address"
+        :op_data="ops.restart_idle"
+      />
 
     </div>
 
@@ -231,6 +235,7 @@
           broadcast: {
             params: {},
           },
+          restart_idle: {},
         }),
         scan_types: ["Constant el"],
         scan_control: {
@@ -285,7 +290,8 @@
 
         let mode = data[prefix + ' mode'];
         let pos = Number(data[prefix + ' current position']);
-        return (window.ocs_bundle.util.pad_decimal(pos.toFixed(4), 3, ' ') +
+
+        return (window.ocs_bundle.util.pad_decimal(pos.toFixed(4), 5, ' ') +
                 ' [' + mode + ']');
       },
     },
