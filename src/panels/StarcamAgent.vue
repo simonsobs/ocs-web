@@ -17,7 +17,7 @@
           v-bind:value="connection_ok">
         </OpReading>
         <h2>Last Reading</h2>
-        <OpReading class="starcam_value"
+        <OpReading
           caption="As of"
           :value="lastVals.oldness">
         </OpReading>
@@ -47,6 +47,10 @@
 
     <!-- Right block -->
     <div class="block_unit">
+      <!-- OcsProcess
+	:address="address"
+	:op_data="ops.acq"  -->
+
       <OcsOpAutofill
         :address="address"
         :ops_parent="ops"
@@ -60,21 +64,22 @@
   let ocs_reg = {};
 
   export default {
-    name: 'GenericAgent',
+    name: 'StarcamAgent',
     props: {
       address: String,
     },
+    inject: ['accessLevel'],
     data: function () {
       return {
         connection_ok: false,
-        ops: {
-	  'acq': {},
-	},
+        ops: ({ //window.ocs_bundle.web.ops_data_init({
+	  acq: {params: {}, name: 'acq'},
+	}),
       }
     },
     computed: {
       lastVals() {
-	if (!this.ops.acq.session || !this.ops.acq.session.data)
+	if (!this.ops.acq || !this.ops.acq.session || !this.ops.acq.session.data)
 	  return {};
 	let d = this.ops.acq.session.data;
 	let u = window.ocs_bundle.util;
@@ -99,7 +104,4 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .starcam_value input {
-    text-align: center;
-  }
 </style>
