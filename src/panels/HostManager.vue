@@ -14,6 +14,14 @@
                  mode="ok"
                  v-bind:value="connection_ok">
         </OpReading>
+        <form v-on:submit.prevent>
+          <div class="ocs_row">
+            <label>Refresh config</label>
+            <button
+              :disabled="accessLevel < 1"
+              @click="refresh_config">Go</button>
+          </div>
+        </form>
         <h2>Managed Agents</h2>
 
         <form class="hm_kids" v-on:submit.prevent>
@@ -92,6 +100,10 @@
         ocs_reg.client.run_task('update', {
             requests:  [[instance_id, updn]]
         });
+      },
+      refresh_config() {
+	  window.ocs_bundle.ui_start_proc(this.address, 'update',
+					  {'reload_config': true});
       },
     },
     mounted() {
