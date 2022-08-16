@@ -52,11 +52,11 @@
           // process lists
           client.scan(() => {
             client.tasks.map(([name]) => {
-              if (!this.ops_parent[name])
+              if (!this.ops_parent[name] || this.ops_parent[name].auto)
                 this.ops_task[name] = {};
             });
             client.procs.map(([name]) => {
-              if (!this.ops_parent[name])
+              if (!this.ops_parent[name] || this.ops_parent[name].auto)
                 this.ops_proc[name] = {};
             });
 

@@ -72,8 +72,10 @@
     data: function () {
       return {
         connection_ok: false,
-        ops: ({ //window.ocs_bundle.web.ops_data_init({
-	  acq: {params: {}, name: 'acq'},
+        ops: window.ocs_bundle.web.ops_data_init({
+	  /* This has to be here to monitor the fields, but "auto" 
+	     will help it get handled by Autofill */
+	  acq: {auto: true},
 	}),
       }
     },
@@ -84,7 +86,8 @@
 	let d = this.ops.acq.session.data;
 	let u = window.ocs_bundle.util;
 	['az', 'alt', 'obs_ra', 'obs_dec'].forEach(k => {
-	  d[k] = u.pad_decimal(d[k].toFixed(6), 4, ' ');
+	  if (d[k])
+	    d[k] = u.pad_decimal(d[k].toFixed(6), 4, ' ');
 	});
 	d.oldness = u.human_timespan(u.timestamp_now() - d['gmt']) + ' ago';
 	return d;
