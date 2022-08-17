@@ -170,6 +170,15 @@
         <OpParam
           caption="az_acc"
           v-model.number="ops.generate_scan.params.acc" />
+        <OpParam
+          caption="num_scans"
+          v-model.number="ops.generate_scan.params.num_scans" />
+        <OpParam
+          caption="num_batches"
+          v-model.number="ops.generate_scan.params.num_batches" />
+        <OpParam
+          caption="batch_size"
+          v-model.number="ops.generate_scan.params.batch_size" />
       </OcsProcess>
 
       <!-- Background processes -->
@@ -227,6 +236,9 @@
               el_endpoint1: 60,
               el_endpoint2: 60,
               el_speed: 1,
+	      num_scans: null,
+	      num_batches: null,
+	      batch_size: null,
             },
           },
           monitor: {
