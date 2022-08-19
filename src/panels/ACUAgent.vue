@@ -11,11 +11,29 @@
           caption="Address"
           v-bind:value="address">
         </OpReading>
-        <OpReading
-          caption="Connection"
-          mode="ok"
-          v-bind:value="connection_ok">
-        </OpReading>
+
+        <OcsLightLine caption="Status">
+          <OcsLight
+            caption="OCS"
+            tip="Status of the connection between ocs-web and OCS crossbar."
+            :value="getIndicator('ocs')"
+          />
+          <OcsLight
+            caption="AGT"
+            tip="Status of the connection between ocs-web and the Agent."
+            :value="connection_ok"
+          />
+          <OcsLight
+            caption="MON"
+            tip="Indicates that the monitor (Status) process appears to be acquiring data properly."
+            :value="getIndicator('monitor')"
+          />
+          <OcsLight
+            caption="BCAST"
+            tip="Indicates that the broadcast (UDP) process appears to be acquiring data properly."
+            :value="getIndicator('broadcast')"
+          />
+        </OcsLightLine>
 
         <h2>Position</h2>
         <OpReading
@@ -323,6 +341,25 @@
 
         return (window.ocs_bundle.util.pad_decimal(pos.toFixed(4), 5, ' ') +
                 ' [' + mode + ']');
+      },
+      getIndicator(name) {
+        switch (name) {
+          case 'ocs':
+            return window.ocs.connection.isConnected;
+          case 'monitor':
+            {
+              let session = this.ops.monitor.session;
+              return (session.status == 'running' ||
+                      session.status == 'starting');
+            }
+          case 'broadcast':
+            {
+              let session = this.ops.broadcast.session;
+              return (session.status == 'running' ||
+                      session.status == 'starting');
+            }
+        }
+        return false;
       },
     },
     computed: {
