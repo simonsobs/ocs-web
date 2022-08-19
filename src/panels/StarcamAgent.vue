@@ -48,8 +48,8 @@
     <!-- Right block -->
     <div class="block_unit">
       <!-- OcsProcess
-	:address="address"
-	:op_data="ops.acq"  -->
+        :address="address"
+        :op_data="ops.acq"  -->
 
       <OcsOpAutofill
         :address="address"
@@ -73,24 +73,24 @@
       return {
         connection_ok: false,
         ops: window.ocs_bundle.web.ops_data_init({
-	  /* This has to be here to monitor the fields, but "auto" 
-	     will help it get handled by Autofill */
-	  acq: {auto: true},
-	}),
+          /* This has to be here to monitor the fields, but "auto" 
+             will help it get handled by Autofill */
+          acq: {auto: true},
+        }),
       }
     },
     computed: {
       lastVals() {
-	if (!this.ops.acq || !this.ops.acq.session || !this.ops.acq.session.data)
-	  return {};
-	let d = this.ops.acq.session.data;
-	let u = window.ocs_bundle.util;
-	['az', 'alt', 'obs_ra', 'obs_dec'].forEach(k => {
-	  if (d[k])
-	    d[k] = u.pad_decimal(d[k].toFixed(6), 4, ' ');
-	});
-	d.oldness = u.human_timespan(u.timestamp_now() - d['gmt']) + ' ago';
-	return d;
+        if (!this.ops.acq || !this.ops.acq.session || !this.ops.acq.session.data)
+          return {};
+        let d = this.ops.acq.session.data;
+        let u = window.ocs_bundle.util;
+        ['az', 'alt', 'obs_ra', 'obs_dec'].forEach(k => {
+          if (d[k])
+            d[k] = u.pad_decimal(d[k].toFixed(6), 4, ' ');
+        });
+        d.oldness = u.human_timespan(u.timestamp_now() - d['gmt']) + ' ago';
+        return d;
       },
     },
     mounted() {

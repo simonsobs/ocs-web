@@ -177,9 +177,9 @@
         <OpParam
           caption="num_scans"
           v-model.number="ops.generate_scan.params.num_scans" />
-	<OpParam
-	  caption="ramp_up"
-	  v-model.number="ops.generate_scan.p[arams.ramp_up" />
+        <OpParam
+          caption="ramp_up"
+          v-model.number="ops.generate_scan.params.ramp_up" />
         <OpParam
           caption="wait_to_start"
           v-model.number="ops.generate_scan.params.wait_to_start" />
@@ -249,12 +249,12 @@
               el_endpoint1: 60,
               el_endpoint2: 60,
               el_speed: 1,
-	      ramp_up: null,
-	      wait_to_start: null,
-	      num_scans: null,
-	      step_time: null,
-	      num_batches: null,
-	      batch_size: null,
+              ramp_up: null,
+              wait_to_start: null,
+              num_scans: null,
+              step_time: null,
+              num_batches: null,
+              batch_size: null,
             },
           },
           monitor: {
@@ -317,8 +317,8 @@
         }
 
         let mode = data[prefix + ' mode'];
-	if (!mode)
-	  mode = data[prefix + ' Mode'];  // LAT 3rd axis
+        if (!mode)
+          mode = data[prefix + ' Mode'];  // LAT 3rd axis
         let pos = Number(data[prefix + ' current position']);
 
         return (window.ocs_bundle.util.pad_decimal(pos.toFixed(4), 5, ' ') +

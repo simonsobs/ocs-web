@@ -102,8 +102,8 @@
         });
       },
       refresh_config() {
-	  window.ocs_bundle.ui_start_proc(this.address, 'update',
-					  {'reload_config': true});
+          window.ocs_bundle.ui_start_proc(this.address, 'update',
+                                          {'reload_config': true});
       },
     },
     mounted() {
