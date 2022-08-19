@@ -96,6 +96,7 @@ When bound to a string variable, set the property "type" equal to "multi".
   }
 
   .indicator_container {
+    width: 100%;
     position: relative;
   }
   .tooltip {
