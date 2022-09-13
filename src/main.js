@@ -16,6 +16,8 @@ import OpSelect       from './components/OpDropdown.vue'
 import ProgressBar    from './components/ProgressBar.vue'
 import OcsOpAutofill  from './components/OcsOpAutofill.vue'
 import OpLocker       from './components/OpLocker.vue'
+import OcsLightLine   from './components/OcsLightLine.vue'
+import OcsLight       from './components/OcsLight.vue'
 
 app
   .component('OcsTask',     OcsTask)
@@ -28,6 +30,8 @@ app
   .component('ProgressBar', ProgressBar)
   .component('OcsOpAutofill', OcsOpAutofill)
   .component('OpLocker',    OpLocker)
+  .component('OcsLightLine', OcsLightLine)
+  .component('OcsLight',    OcsLight)
 ;
 
 // This is needed in vue<3.3 to use computed function with provide/inject

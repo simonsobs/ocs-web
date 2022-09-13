@@ -11,16 +11,17 @@
           caption="Address"
           :value="address">
         </OpReading>
-        <OpReading
-          caption="Connection"
-          mode="ok"
-          :value="connection_ok">
-        </OpReading>
-        <OpReading
-          caption="Recording"
-          mode="ok"
-          :value="ops.record.session.status == 'running'">
-        </OpReading>
+        <OcsLightLine
+          caption="Status">
+          <OcsLight
+            caption="Connected"
+            tip="Indicates whether Agent is connected."
+            :value="connection_ok" />
+          <OcsLight
+            caption="Recording"
+            tip="Indicates whether data acquisition process is running."
+            :value="ops.record.session.status == 'running'" />
+        </OcsLightLine>
         <OpReading
           caption="current_file"
           :value="current_file(1)"

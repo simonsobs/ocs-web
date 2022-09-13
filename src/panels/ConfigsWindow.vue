@@ -13,8 +13,11 @@
             <div class="ocs_row">
               <h2 class="ocs_triple">
                 <a :href="'?ocs=' + config.name">
-                  {{ config.name }} {{ (index == active_index ? '[active]' : '') }}
+                  {{ config.name }}
                 </a>
+                <span v-if="index == active_index">
+                    [active] [{{ (connection_ok) ? 'connected': 'not connected' }}]
+                </span>
               </h2>
             </div>
             <OpParam

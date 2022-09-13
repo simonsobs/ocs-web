@@ -11,11 +11,29 @@
           caption="Address"
           v-bind:value="address">
         </OpReading>
-        <OpReading
-          caption="Connection"
-          mode="ok"
-          v-bind:value="connection_ok">
-        </OpReading>
+
+        <OcsLightLine caption="Status">
+          <OcsLight
+            caption="OCS"
+            tip="Status of the connection between ocs-web and OCS crossbar."
+            :value="getIndicator('ocs')"
+          />
+          <OcsLight
+            caption="AGT"
+            tip="Status of the connection between ocs-web and the Agent."
+            :value="connection_ok"
+          />
+          <OcsLight
+            caption="MON"
+            tip="Indicates that the monitor (Status) process appears to be acquiring data properly."
+            :value="getIndicator('monitor')"
+          />
+          <OcsLight
+            caption="BCAST"
+            tip="Indicates that the broadcast (UDP) process appears to be acquiring data properly."
+            :value="getIndicator('broadcast')"
+          />
+        </OcsLightLine>
 
         <h2>Position</h2>
         <OpReading
@@ -29,6 +47,10 @@
         <OpReading
           caption="Boresight"
           v-bind:value="currentPosAndMode('Boresight')">
+        </OpReading>
+        <OpReading
+          caption="Co-rotator"
+          v-bind:value="currentPosAndMode('3rd axis')">
         </OpReading>
         <OpReading
           caption="Timestamp"
@@ -170,6 +192,24 @@
         <OpParam
           caption="az_acc"
           v-model.number="ops.generate_scan.params.acc" />
+        <OpParam
+          caption="num_scans"
+          v-model.number="ops.generate_scan.params.num_scans" />
+        <OpParam
+          caption="ramp_up"
+          v-model.number="ops.generate_scan.params.ramp_up" />
+        <OpParam
+          caption="wait_to_start"
+          v-model.number="ops.generate_scan.params.wait_to_start" />
+        <OpParam
+          caption="step_time"
+          v-model.number="ops.generate_scan.params.step_time" />
+        <OpParam
+          caption="num_batches"
+          v-model.number="ops.generate_scan.params.num_batches" />
+        <OpParam
+          caption="batch_size"
+          v-model.number="ops.generate_scan.params.batch_size" />
       </OcsProcess>
 
       <!-- Background processes -->
@@ -181,6 +221,10 @@
       <OcsProcess
         :address="address"
         :op_data="ops.broadcast"
+      />
+      <OcsProcess
+        :address="address"
+        :op_data="ops.restart_idle"
       />
 
     </div>
@@ -223,6 +267,13 @@
               el_endpoint1: 60,
               el_endpoint2: 60,
               el_speed: 1,
+	      az_start: 'az_endpoint1',
+              ramp_up: null,
+              wait_to_start: null,
+              num_scans: null,
+              step_time: null,
+              num_batches: null,
+              batch_size: null,
             },
           },
           monitor: {
@@ -231,6 +282,7 @@
           broadcast: {
             params: {},
           },
+          restart_idle: {},
         }),
         scan_types: ["Constant el"],
         scan_control: {
@@ -284,9 +336,31 @@
         }
 
         let mode = data[prefix + ' mode'];
+        if (!mode)
+          mode = data[prefix + ' Mode'];  // LAT 3rd axis
         let pos = Number(data[prefix + ' current position']);
-        return (window.ocs_bundle.util.pad_decimal(pos.toFixed(4), 3, ' ') +
+
+        return (window.ocs_bundle.util.pad_decimal(pos.toFixed(4), 5, ' ') +
                 ' [' + mode + ']');
+      },
+      getIndicator(name) {
+        switch (name) {
+          case 'ocs':
+            return window.ocs.connection.isConnected;
+          case 'monitor':
+            {
+              let session = this.ops.monitor.session;
+              return (session.status == 'running' ||
+                      session.status == 'starting');
+            }
+          case 'broadcast':
+            {
+              let session = this.ops.broadcast.session;
+              return (session.status == 'running' ||
+                      session.status == 'starting');
+            }
+        }
+        return false;
       },
     },
     computed: {

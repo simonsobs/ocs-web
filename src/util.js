@@ -59,12 +59,15 @@ function timestamp_now() {
 
 export
 function pad_decimal(val, places, space) {
+    // Given that the user needs to pass in a string, already,
+    // probably from .toFixed, it seems odd to bother with
+    // finding the location of the .
     let idx = val.indexOf('.');
     if (idx < 0)
         idx = val.length;
     if (!space)
         space = '&nbsp;'
-    return space.repeat(places - idx) + val;
+    return space.repeat(Math.max(places - idx, 0)) + val;
 }
 
 export

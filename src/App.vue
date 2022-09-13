@@ -104,6 +104,7 @@
   // Agent panels - SOCS
   import Lakeshore372Agent from './panels/Lakeshore372Agent.vue';
   import ACUAgent from './panels/ACUAgent.vue';
+  import StarcamAgent from './panels/StarcamAgent.vue';
 
   /* Make a map of components to use in activeComp computed property;
      see
@@ -121,6 +122,7 @@
     /* SOCS */
     'Lakeshore372Agent': Lakeshore372Agent,
     'ACUAgent': ACUAgent,
+    'starcam_Agent': StarcamAgent,
 
   };
   
