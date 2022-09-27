@@ -267,7 +267,7 @@
               el_endpoint1: 60,
               el_endpoint2: 60,
               el_speed: 1,
-	      az_start: 'az_endpoint1',
+              az_start: 'az_endpoint1',
               ramp_up: null,
               wait_to_start: null,
               num_scans: null,
