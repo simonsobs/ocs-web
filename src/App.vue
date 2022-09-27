@@ -25,6 +25,20 @@
       </div>
     </div>
 
+    <!-- Confirmation box -->
+    <div class="fullScreenMask" v-if="userConfirm">
+      <div class="errorModal">
+        <div class="errorModalContent">
+            <h2>Confirm: {{ userConfirm.title }}</h2>
+            <p>{{ userConfirm.text }}</p>
+            <div class="buttonGroup">
+              <button style="width: 200px" @click="confirmOp(true)">Ok</button>
+              <button style="width: 200px" @click="confirmOp(false)">Cancel</button>
+            </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Container for main interface -->
@@ -105,6 +119,7 @@
   import Lakeshore372Agent from './panels/Lakeshore372Agent.vue';
   import ACUAgent from './panels/ACUAgent.vue';
   import StarcamAgent from './panels/StarcamAgent.vue';
+  import PysmurfControllerAgent from './panels/PysmurfController.vue';
 
   /* Make a map of components to use in activeComp computed property;
      see
@@ -123,6 +138,7 @@
     'Lakeshore372Agent': Lakeshore372Agent,
     'ACUAgent': ACUAgent,
     'starcam_Agent': StarcamAgent,
+    'PysmurfController': PysmurfControllerAgent,
 
   };
   
@@ -174,6 +190,7 @@
         configs: configs,
         mainMode: 'config',
         errorInfo: null,
+        userConfirm: null,
         accessLevel: 0,
       }
     },
@@ -241,6 +258,14 @@
       op_error(msg) {
         this.errorInfo = msg;
       },
+      confirmOp(confirm) {
+        if (confirm && this.userConfirm.callback)
+          this.userConfirm.callback();
+        if (!confirm && this.userConfirm.cancel)
+          this.userConfirm.cancel();
+
+        this.userConfirm = null;
+      },
     },
     setup() {
       const { cookies } = useCookies();
@@ -273,6 +298,14 @@
       // Register error handler.
       ocs_bundle.on_error = (msg) => {
         this.op_error(msg);
+      };
+
+      // Get user confirmation for something ...
+      ocs_bundle.ui_confirm = (title, text, callback, cancel) => {
+        this.userConfirm = {title: title,
+                            text: text,
+                            callback: callback,
+                            cancel: cancel};
       };
 
       // Functions that wrap operation start/stop with UI error windows.
@@ -406,6 +439,9 @@
     border: 1px solid #88c;
     background-color: #fff;
     width: 90%;
+  }
+  .buttonGroup button {
+    display: inline-block;
   }
 
   .ocs_dropdown {
