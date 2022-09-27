@@ -242,7 +242,7 @@
           case 'uxm_relock':
             {
               if (this.op_control.band != 'all')
-                params.band = this.op_control.band;
+                params.band = [this.op_control.band];
             }
             break;
         }

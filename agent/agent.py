@@ -68,7 +68,7 @@ class MockingJaygent:
                 op_data['last_update'] = time.time()
                 session.data.update(op_data)
             if time.time() >= exit_time:
-                return True, f'Task {op_name} exited unexpectedly.'
+                return True, f'Task {op_name} exited at the appropriate time.'
             yield dsleep(1)
 
         return False, f'Task {op_name} was aborted.'
