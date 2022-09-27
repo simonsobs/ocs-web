@@ -116,6 +116,7 @@
   import HostManager from './panels/HostManager.vue';
 
   // Agent panels - SOCS
+  import Lakeshore240Agent from './panels/Lakeshore240Agent.vue';
   import Lakeshore372Agent from './panels/Lakeshore372Agent.vue';
   import ACUAgent from './panels/ACUAgent.vue';
   import StarcamAgent from './panels/StarcamAgent.vue';
@@ -135,6 +136,7 @@
     'HostManager': HostManager,
 
     /* SOCS */
+    'Lakeshore240Agent': Lakeshore240Agent,
     'Lakeshore372Agent': Lakeshore372Agent,
     'ACUAgent': ACUAgent,
     'starcam_Agent': StarcamAgent,
