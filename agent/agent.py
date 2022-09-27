@@ -29,6 +29,10 @@ import yaml
 txaio.use_twisted()
 LOG = txaio.make_logger()
 
+DEFAULT_DATA_SETTINGS = {
+    'timestamp_field': 'last_update',
+}
+
 class MockingJaygent:
     def __init__(self, agent):
         self.agent = agent
@@ -41,10 +45,14 @@ class MockingJaygent:
         self.log.info('Process "{op_name}" started with params: {params}', op_name=op_name, params=params)
 
         op_data = op_params.get('data')
+        data_settings = op_params.get('data_settings', {})
+        for k, v in DEFAULT_DATA_SETTINGS.items():
+            if k not in data_settings:
+                data_settings[k] = v
 
         while session.status == 'running':
             if op_data:
-                op_data['last_update'] = time.time()
+                op_data[data_settings['timestamp_field']] = time.time()
                 session.data.update(op_data)
             yield dsleep(1)
 
