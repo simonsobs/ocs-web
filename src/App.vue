@@ -119,6 +119,7 @@
   import Lakeshore240Agent from './panels/Lakeshore240Agent.vue';
   import Lakeshore372Agent from './panels/Lakeshore372Agent.vue';
   import ACUAgent from './panels/ACUAgent.vue';
+  import ibootbarAgent from './panels/ibootbarAgent.vue';
   import StarcamAgent from './panels/StarcamAgent.vue';
   import PysmurfControllerAgent from './panels/PysmurfController.vue';
 
@@ -139,6 +140,7 @@
     'Lakeshore240Agent': Lakeshore240Agent,
     'Lakeshore372Agent': Lakeshore372Agent,
     'ACUAgent': ACUAgent,
+    'ibootbarAgent': ibootbarAgent,
     'starcam_Agent': StarcamAgent,
     'PysmurfController': PysmurfControllerAgent,
 

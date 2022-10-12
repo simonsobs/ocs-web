@@ -1,0 +1,30 @@
+agent_class: 'ibootbarAgent'
+instance_id: 'ibootbar-1'
+processes:
+  acq:
+    data_settings: {
+      'timestamp_field': 'timestamp'
+      }
+    data: {
+      'outletStatus_0': {
+        'status': 1,
+        'name': 'Outlet-1',
+        'description': 'on'},
+      'outletStatus_1': {
+        'status': 1,
+        'name': 'Outlet-2',
+        'description': 'on'},
+      'outletStatus_2': {
+        'status': 1,
+        'name': 'Outlet-3',
+        'description': 'off'},
+      'ibootbar_connection': {
+        'last_attempt': 1656085022.7,
+        'connected': true,
+        },
+      "timestamp": 1601925677.6914878
+    }
+tasks:
+  set_outlet: {}
+  cycle_outlet: {}
+  set_initial_state: {}
