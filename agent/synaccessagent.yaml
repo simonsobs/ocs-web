@@ -2,6 +2,7 @@ agent_class: 'SynaccessAgent'
 instance_id: 'synacc-1'
 processes:
   status_acq:
+    startup: true
     data_settings: {
       'timestamp_field': 'timestamp'
       }

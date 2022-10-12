@@ -2,6 +2,7 @@ agent_class: 'RotationAgent'
 instance_id: 'hwp-rotation-1'
 processes:
   iv_acq:
+    startup: true
     data: {
       'kikusui_volt': 0,
       'kikusui_curr': 0,

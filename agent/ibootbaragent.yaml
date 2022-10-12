@@ -2,6 +2,7 @@ agent_class: 'ibootbarAgent'
 instance_id: 'ibootbar-1'
 processes:
   acq:
+    startup: true
     data_settings: {
       'timestamp_field': 'timestamp'
       }

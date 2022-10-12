@@ -2,6 +2,7 @@ agent_class: 'Lakeshore240Agent'
 instance_id: 'fakeshore-1'
 processes:
   acq:
+    startup: true
     data_settings: {
       'timestamp_field': 'timestamp'
       }

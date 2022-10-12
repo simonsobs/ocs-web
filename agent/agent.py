@@ -122,7 +122,7 @@ if __name__ == '__main__':
     for proc_name, cfg in schema.get('processes', {}).items():
         func = wrap_starter(mocker, proc_name, cfg, mocker._start_proc)
         agent.register_process(proc_name, func, mocker._stop_proc,
-                               blocking=False)
+                               blocking=False, startup=cfg.get('startup', False))
 
     for task_name, cfg in schema.get('tasks', {}).items():
         func = wrap_starter(mocker, task_name, cfg, mocker._start_task)
