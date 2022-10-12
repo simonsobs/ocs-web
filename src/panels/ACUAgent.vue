@@ -516,16 +516,16 @@
    */
 
   .isNormal {
-    background-color: #32cd32;
+    background-color: #4e4;
   }
   .isBad {
-    background-color: #ff8888;
+    background-color: #f88;
   }
   .isActive {
-    background-color: #8888ff;
+    background-color: #88f;
   }
   .isPassive {
-    background-color: #ccccff;
+    background-color: #ccf;
   }
 
 </style>
