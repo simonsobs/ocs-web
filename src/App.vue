@@ -120,6 +120,7 @@
   import Lakeshore372Agent from './panels/Lakeshore372Agent.vue';
   import ACUAgent from './panels/ACUAgent.vue';
   import ibootbarAgent from './panels/ibootbarAgent.vue';
+  import RotationAgent from './panels/RotationAgent.vue';
   import StarcamAgent from './panels/StarcamAgent.vue';
   import SynaccessAgent from './panels/SynaccessAgent.vue';
   import PysmurfControllerAgent from './panels/PysmurfController.vue';
@@ -142,6 +143,7 @@
     'Lakeshore372Agent': Lakeshore372Agent,
     'ACUAgent': ACUAgent,
     'ibootbarAgent': ibootbarAgent,
+    'RotationAgent': RotationAgent,
     'starcam_Agent': StarcamAgent,
     'SynaccessAgent': SynaccessAgent,
     'PysmurfController': PysmurfControllerAgent,

@@ -1,0 +1,25 @@
+agent_class: 'RotationAgent'
+instance_id: 'hwp-rotation-1'
+processes:
+  iv_acq:
+    data: {
+      'kikusui_volt': 0,
+      'kikusui_curr': 0,
+      'last_updated': 1649085992.719602
+    }
+tasks:
+  init_connection: {}
+  tune_stop: {}
+  tune_freq: {}
+  declare_freq: {}
+  set_pid: {}
+  get_freq: {}
+  get_direction: {}
+  set_direction: {}
+  set_scale: {}
+  set_on: {}
+  set_off: {}
+  set_v: {}
+  set_v_lim: {}
+  use_ext: {}
+  ign_ext: {}
