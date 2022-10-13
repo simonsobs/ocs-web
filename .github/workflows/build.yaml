@@ -32,19 +32,19 @@ jobs:
       - name: Build and push the Docker image
         run: |
           # Build image
-          docker build . --file Dockerfile --tag ${IMAGE_NAME}:latest
+          docker build . --file Dockerfile --tag ${REGISTRY}/${IMAGE_NAME}:latest
 
           # Determine tag based on npm version within container
-          export DOCKER_TAG=$(docker run --rm --entrypoint=/usr/local/bin/npm ${IMAGE_NAME}:latest list ocs-web | head -n 1 | cut -d ' ' -f1 | cut -d '@' -f2)
+          export DOCKER_TAG=$(docker run --rm --entrypoint=/usr/local/bin/npm ${REGISTRY}/${IMAGE_NAME}:latest list ocs-web | head -n 1 | cut -d ' ' -f1 | cut -d '@' -f2)
           echo "Docker Tag: ${DOCKER_TAG}"
 
           # Tag image
-          docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${DOCKER_TAG}
+          docker tag ${REGISTRY}/${IMAGE_NAME}:latest ${REGISTRY}/${IMAGE_NAME}:${DOCKER_TAG}
 
           # Push images only on push to main
           if [[ "$PULL_REQUEST" != 'true' ]]; then
-            docker push ${IMAGE_NAME}:latest
-            docker push ${IMAGE_NAME}:${DOCKER_TAG}
+            docker push ${REGISTRY}/${IMAGE_NAME}:latest
+            docker push ${REGISTRY}/${IMAGE_NAME}:${DOCKER_TAG}
           else
             :
           fi
