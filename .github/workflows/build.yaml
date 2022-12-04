@@ -1,0 +1,50 @@
+name: Publish Docker Image to Registry
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: simonsobs/ocs-web
+  PULL_REQUEST: ${{ github.event_name == 'pull_request' }}  # true on PR
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push the Docker image
+        run: |
+          # Build image
+          docker build . --file Dockerfile --tag ${REGISTRY}/${IMAGE_NAME}:latest
+
+          # Determine tag based on npm version within container
+          export DOCKER_TAG=$(docker run --rm --entrypoint=/usr/local/bin/npm ${REGISTRY}/${IMAGE_NAME}:latest list ocs-web | head -n 1 | cut -d ' ' -f1 | cut -d '@' -f2)
+          echo "Docker Tag: ${DOCKER_TAG}"
+
+          # Tag image
+          docker tag ${REGISTRY}/${IMAGE_NAME}:latest ${REGISTRY}/${IMAGE_NAME}:${DOCKER_TAG}
+
+          # Push images only on push to main
+          if [[ "$PULL_REQUEST" != 'true' ]]; then
+            docker push ${REGISTRY}/${IMAGE_NAME}:latest
+            docker push ${REGISTRY}/${IMAGE_NAME}:${DOCKER_TAG}
+          else
+            :
+          fi

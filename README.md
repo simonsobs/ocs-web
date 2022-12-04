@@ -1,5 +1,7 @@
 # ocs-web
 
+[![build](https://img.shields.io/github/workflow/status/simonsobs/ocs-web/Publish%20Docker%20Image%20to%20Registry)](https://github.com/simonsobs/ocs-web/actions/workflows/build.yaml)
+
 ## Background
 
 This is browser-based control panel system for
@@ -85,12 +87,12 @@ development rather than performance.
 
 To build the image and tag it as "ocs-web":
 ```
-docker build -t ocs-web
+docker build -t ocs-web .
 ```
 
 To launch the image as a test:
 ```
-docker run -p 8080:8080 --rm ocs-web
+docker run -p 8080:8080 --rm --env HOST=0.0.0.0 ocs-web
 ```
 
 Then browse to http://localhost:8080/
@@ -132,8 +134,7 @@ services:
     ports:
       - 8080:8080
     environment:
-      - OCS_ADDRS=My new lab,http://localhost:8080/ws,test_realm
-
+      - OCS_ADDRS=My new lab,ws://localhost:8080/ws,test_realm
 ```
 
 (These variables get appended to .env.local inside the container; if
