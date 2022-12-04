@@ -36,5 +36,9 @@ tasks:
   uxm_relock: {}
   take_bgmap: {}
   take_iv: {}
-  take_bias_steps: {}
+  take_bias_steps:
+    data: {
+      # Latest ocs should be able to handle nans.
+      'R': [1., 2., .NAN],
+      }
   take_noise: {}
