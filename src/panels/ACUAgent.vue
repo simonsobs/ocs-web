@@ -214,6 +214,11 @@
 
       <!-- Background processes -->
 
+      <OcsTask
+        :address="address"
+        :op_data="ops.clear_faults"
+      />
+
       <OcsProcess
         :address="address"
         :op_data="ops.monitor"
@@ -283,6 +288,7 @@
             params: {},
           },
           restart_idle: {},
+          clear_faults: {},
         }),
         scan_types: ["Constant el"],
         scan_control: {
@@ -320,20 +326,46 @@
       currentPositions() {
         let data = this.ops.monitor.session.data;
         return {
-          'az': data['Azimuth current position'],
-          'el': data['Elevation current position'],
-          'boresight': data['Boresight current position'],
+          'az': data['StatusDetailed']['Azimuth current position'],
+          'el': data['StatusDetailed']['Elevation current position'],
+          'boresight': data['Status3rdAxis']['Boresight current position'],
         };
       },
       currentPosAndMode(prefix) {
-        let data = this.ops.monitor.session.data;
+        let sdata = this.ops.monitor.session.data;
+        if (!sdata)
+          return '?';
+
+        let data = {};
+
+        switch(prefix) {
+          case 'Timestamp': {
+            data = sdata['StatusDetailed'];
+
+            // Make sure these are defined, because otherwise the
+            // current system time will be printed, and that is is
+            // maximally misleading.
+            if (!data || !data['Year'] || !data['Time'])
+              return '?';
+
+            let year = Math.floor(new Date(data['Year'] + '.01.01').getTime() / 1000);
+            let offset_seconds = Number(data['Time']) * 86400;
+            return window.ocs_bundle.util.get_date_time_string(year + offset_seconds, ' ');
+          }
+          case 'Azimuth':
+          case 'Elevation': {
+            data = sdata['StatusDetailed'];
+            break;
+          }
+          case 'Boresight':
+          case '3rd axis': {
+            data = sdata['Status3rdAxis'];
+            break;
+          }
+        }
+
         if (!data)
           return '?';
-        if (prefix == 'Timestamp') {
-          let year = Math.floor(new Date(data['Year'] + '.01.01').getTime() / 1000);
-          let offset_seconds = Number(data['Time']) * 86400;
-          return window.ocs_bundle.util.get_date_time_string(year + offset_seconds, ' ');
-        }
 
         let mode = data[prefix + ' mode'];
         if (!mode)
@@ -365,10 +397,16 @@
     },
     computed: {
       statusVars() {
-        let data = this.ops.monitor.session.data;
+        let sdata = this.ops.monitor.session.data;
         let annotated = [];
-        if (!data)
+        if (!sdata)
           return annotated;
+
+        let data = {
+          ...sdata['StatusDetailed'],
+          ...sdata['Status3rdAxis'],
+        };
+
         for (const [key, value] of Object.entries(data)) {
           let d = {
             name: key,
