@@ -1,16 +1,21 @@
-FROM node:lts-alpine as build-stage
+# Build
+FROM node:lts-alpine as build
 
 WORKDIR /app
-
-RUN apk add dumb-init
 
 # Install dependencies first
 COPY package*.json ./
 RUN npm install
 
-# Then source
+# Then build dist
 COPY . .
+RUN npm run build
 
-# Run the vue development server.
-EXPOSE 8080
-ENTRYPOINT ["dumb-init", "docker/run.sh"]
+
+# Deploy
+FROM nginx:1.22
+
+COPY --from=build /app/dist /app/dist
+COPY docker/nginx-default.conf.template /etc/nginx/templates/default.conf.template
+
+# Inherit nginx ENTRYPOINT/CMD
