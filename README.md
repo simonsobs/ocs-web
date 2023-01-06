@@ -1,6 +1,6 @@
 # ocs-web
 
-[![build](https://img.shields.io/github/workflow/status/simonsobs/ocs-web/Publish%20Docker%20Image%20to%20Registry)](https://github.com/simonsobs/ocs-web/actions/workflows/build.yaml)
+[![build](https://img.shields.io/github/actions/workflow/status/simonsobs/ocs-web/build.yaml?branch=main)](https://github.com/simonsobs/ocs-web/actions/workflows/build.yaml)
 
 ## Background
 
