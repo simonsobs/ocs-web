@@ -14,6 +14,29 @@ directory:
 
 ``` npm install ```
 
+## config.json
+
+**Move me.**
+
+You can setup OCS configs by editing public/config.json, prior to
+build.  After build, you can alter dist/config.json.
+
+In the nginx docker image, you can mount a config.json to
+/app/dist/config.json.
+
+The schema for config.json is like this::
+
+  {"crossbars": [
+      {"name": "ocs-8001",
+       "url": "ws://localhost:8001/ws",
+       "realm": "test_realm"},
+      {"name": "ocs-8002",
+       "url": "ws://localhost:8002/ws",
+       "realm": "test_realm"}
+      ]
+  }
+
+
 ## Environment variables
 
 Place configuration into `.env.local` before compiling.  (See
