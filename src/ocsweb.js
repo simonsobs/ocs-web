@@ -93,6 +93,10 @@ function setup_configs() {
     });
   }
 
+  if (window.config.crossbars) {
+    window.config.crossbars.map((item) => configs.push(item));
+  }
+
   configs.push(
     {'name': 'custom',
      'url': 'ws://localhost:8001/ws',
