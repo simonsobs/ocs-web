@@ -21,6 +21,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        # Grab tags during checkout
+        with:
+          fetch-depth: 0
 
       - name: Log in to the Container registry
         uses: docker/login-action@v2
@@ -35,7 +38,7 @@ jobs:
           docker build . --file Dockerfile --tag ${REGISTRY}/${IMAGE_NAME}:latest
 
           # Determine tag based on npm version within container
-          export DOCKER_TAG=$(grep -e '"version":' package.json | xargs | cut -d ' ' -f2 | sed 's/,//g')
+          export DOCKER_TAG=$(git describe --tags --always)
           echo "Docker Tag: ${DOCKER_TAG}"
 
           # Tag image
