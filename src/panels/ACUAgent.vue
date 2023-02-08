@@ -135,6 +135,7 @@
       <!-- go_to -->
       <OcsTask
         :address="address"
+        :show_abort="true"
         :op_data="ops.go_to">
         <OpParam
           caption="Az (deg)"
@@ -152,6 +153,7 @@
       <!-- set_boresight -->
       <OcsTask
         :address="address"
+        :show_abort="true"
         :op_data="ops.set_boresight">
         <OpParam
           caption="Angle (deg)"
