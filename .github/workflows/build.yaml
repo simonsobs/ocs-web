@@ -1,6 +1,8 @@
 name: Publish Docker Image to Registry
 
 on:
+  release:
+    types: [ released ]
   push:
     branches: [ "main" ]
   pull_request:
@@ -46,8 +48,14 @@ jobs:
 
           # Push images only on push to main or release
           if [[ "$GITHUB_REF_NAME" = "main" || "$GITHUB_EVENT_NAME" = "release" ]]; then
-            docker push ${REGISTRY}/${IMAGE_NAME}:latest
             docker push ${REGISTRY}/${IMAGE_NAME}:${DOCKER_TAG}
           else
             echo "Skipping docker push; not on 'main' branch or a release."
+          fi
+
+          # Push 'latest' only on release
+          if [[ "$GITHUB_EVENT_NAME" = "release" ]]; then
+            docker push ${REGISTRY}/${IMAGE_NAME}:latest
+          else
+            echo "Not tagging 'latest'; this is not a release."
           fi
