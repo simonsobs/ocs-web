@@ -36,5 +36,29 @@ app
 
 // This is needed in vue<3.3 to use computed function with provide/inject
 app.config.unwrapInjectedRef = true;
-  
-app.mount('#app');
+
+// Pull the config file first, then mount the app.
+fetch("config.json")
+  .then(
+    (response) => response.json(),
+    (response) => {
+      // If you build dist and load in browser at file:// url, that
+      // can cause CORS errors.
+      console.log('ocs-web: config.json could not be loaded -- '
+                + 'probably a CORS issue?');
+      console.log(response);
+      return {};
+    }
+  )
+  .then(
+    (config) => config,
+    () => {
+      console.log("ocs-web: failed to parse config.json.");
+      return {};
+    }
+  )
+  .then(
+    (config) => {
+      window.config = config;
+      app.mount("#app")
+  });

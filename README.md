@@ -1,6 +1,6 @@
 # ocs-web
 
-[![build](https://img.shields.io/github/workflow/status/simonsobs/ocs-web/Publish%20Docker%20Image%20to%20Registry)](https://github.com/simonsobs/ocs-web/actions/workflows/build.yaml)
+[![build](https://img.shields.io/github/actions/workflow/status/simonsobs/ocs-web/build.yaml?branch=main)](https://github.com/simonsobs/ocs-web/actions/workflows/build.yaml)
 
 ## Background
 
@@ -12,41 +12,13 @@ This is browser-based control panel system for
 Run this to fetch all dependencies into the project `node_modules`
 directory:
 
-``` npm install ```
-
-## Environment variables
-
-Place configuration into `.env.local` before compiling.  (See
-https://cli.vuejs.org/guide/mode-and-env.html#environment-variables
-for general info.)
-
-### VUE_APP_OCS_ADDRS
-
-This variable carries zero or more "OCS configs".  Each "OCS config"
-is defined by a name (e.g. "My OCS"; this is only used in this
-application), the URL of the WAMP router's websocket server
-(e.g. "ws://example.com/crossbar"), and the the realm
-(e.g. "ocsrealm").
-
-Each OCS config is constructed by joining those three things together
-with commas; multiple OCS configs are separated by semicolons.  So the
-result should look like this:
-
 ```
-VUE_APP_OCS_ADDRS=My OCS,ws://example.com/crossbar,ocsrealm
+$ npm install
 ```
 
-Here's a multi-config example:
-```
-VUE_APP_OCS_ADDRS=Lab1,ws://localhost:8001/ws,test_realm;Lab2,ws://localhost:8002/ws,test_realm
-```
+## Development
 
-(In addtion to these "static" OCS configs, the "custom" config is
-always available in the interface, and cookies are used to keep a
-user's custom URL and realm saved in their browser.)
-
-## Compiles and hot-reloads for development
-
+### Compiles and hot-reloads for development
 
 ```
 npm run serve
@@ -75,15 +47,77 @@ npm run build
 npm run lint
 ```
 
-### Customize configuration
+### Customize Vue configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 
+## Configuration
+
+There are two ways to configure pre-set crossbar server connections, which
+users can then select in the ocs-web interface. These configurations are not
+strictly required, since there is always a "custom" field, which users can enter
+connection details into. In practice, they are quite useful.
+
+### config.json
+
+You can setup OCS configs by editing `public/config.json`, prior to
+build. After build, you can alter `dist/config.json`.
+
+In the nginx docker image, you can mount a `config.json` to
+`/app/dist/config.json`.
+
+The schema for config.json is like this::
+
+```
+{"crossbars": [
+    {"name": "ocs-8001",
+     "url": "ws://localhost:8001/ws",
+     "realm": "test_realm"},
+    {"name": "ocs-8002",
+     "url": "ws://localhost:8002/ws",
+     "realm": "test_realm"}
+    ]
+}
+```
+
+
+### Environment variables
+
+**Note:** This method isn't supported when using the pre-built docker image.
+
+Place configuration into `.env.local` before building. (See
+https://cli.vuejs.org/guide/mode-and-env.html#environment-variables
+for general info.)
+
+#### `VUE_APP_OCS_ADDRS`
+
+This variable carries zero or more "OCS configs".  Each "OCS config"
+is defined by a name (e.g. "My OCS"; this is only used in this
+application), the URL of the WAMP router's websocket server
+(e.g. "ws://example.com/crossbar/ws"), and the the realm
+(e.g. "ocsrealm").
+
+Each OCS config is constructed by joining those three things together
+with commas; multiple OCS configs are separated by semicolons.  So the
+result should look like this:
+
+```
+VUE_APP_OCS_ADDRS=My OCS,ws://example.com/crossbar/ws,ocsrealm
+```
+
+Here's a multi-config example:
+```
+VUE_APP_OCS_ADDRS=Lab1,ws://localhost:8001/ws,test_realm;Lab2,ws://localhost:8002/ws,test_realm
+```
+
+(In addition to these "static" OCS configs, the "custom" config is
+always available in the interface, and cookies are used to keep a
+user's custom URL and realm saved in their browser.)
+
 ## Docker
 
-The Dockerfile in this directory will produce an image that can launch
-the Vue development server.  This is a choice made to facilitate
-development rather than performance.
+The Dockerfile in this directory will produce an image that serves the built
+product from `npm run build` via an nginx server.
 
 To build the image and tag it as "ocs-web":
 ```
@@ -92,93 +126,22 @@ docker build -t ocs-web .
 
 To launch the image as a test:
 ```
-docker run -p 8080:8080 --rm --env HOST=0.0.0.0 ocs-web
+docker run -p 8080:80 --rm ocs-web
 ```
 
 Then browse to http://localhost:8080/
 
-It may be necessary to give the container a specific hostname (with
-`--hostname=...`, and tell the server about it (with `-e HOST=...`):
-
-```
-docker run -p 8080:8080 --rm --hostname=my-ocs-web -e HOST=my-ocs-web ocs-web
-```
-
-(Note that even if the server output tells you to browse to
-`my-ocs-web:8080`, you should browse to `localhost:8080`.)
-
 Here is a docker-compose.yaml that declares a service running the
-ocs-web image:
+ocs-web image and mounts in a configuration file:
 ```
 version: '2'
 services:
   ocs-web-1:
     image: ocs-web
     ports:
-      - 8080:8080
-```
-
-Below, find a few ways to customize the configuration through
-docker-compose.
-
-### Environment variables
-
-To set any of the VUE_APP_* environment variables described above, add
-them to the docker-compose environment without the VUE_APP_ prefix.
-For example:
-```
-version: '2'
-services:
-  ocs-web-1:
-    image: ocs-web
-    ports:
-      - 8080:8080
-    environment:
-      - OCS_ADDRS=My new lab,ws://localhost:8080/ws,test_realm
-```
-
-(These variables get appended to .env.local inside the container; if
-you bind-mount that file make sure it's readonly.)
-
-To set the port on which OCS is served (inside the container), use the
-PORT variable;
-```
-    environment:
-      - PORT=8200
-```
-
-To set the hostname for which OCS expects to receive connections, use
-the HOST variable;
-```
-    environment:
-      - HOST=my-ocs-web-service
-```
-
-(If you are proxying this service and get a "Invalid Host Header"
-message, try to fix it with the HOST variable and the the docker
-"hostname" option.  Here's an example:
-
-```
-version: '2'
-services:
-  ocs-web-1:
-    image: ocs-web
-    environment:
-     - HOST=my-ocs-web
-    hostname: my-ocs-web
-  my-nginx:
-    image: nginx
+      - 8080:80
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    ports:
-     - "8100:80"
-```
-
-The nginx proxy fragment would be something like:
-```
-    location /ocs/ {
-      proxy_pass http://my-ocs-web:8080/;
-    }
+      - ./config.json:/app/dist/config.json:ro
 ```
 
 # Development tips
