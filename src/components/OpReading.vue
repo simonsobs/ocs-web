@@ -5,7 +5,13 @@ OpReading
 
 This component is intended for displaying status or readings in an
 Agent Panel.  An <input> element is used, but disabled so that user
-can't change the values.  Special 
+can't change the values.
+
+Set the .mode attribute to one of:
+
+- "display": displays .value, with no formatting.
+- "ok": displays OK or ERROR, with colors, depending on bool(.value)
+- "ok_val": displays .value[1], but with color dependent on bool(.value[0])
 
 -->
 
@@ -45,9 +51,11 @@ can't change the values.  Special
       conditionIs(cond) {
         switch(cond) {
           case 'bad':
-            return (this.mode == 'ok' && !this.value);
+            return (this.mode == 'ok' && !this.value) ||
+                   (this.mode == 'ok_val' && !this.value[0]);
           case 'good':
-            return (this.mode == 'ok' && this.value);
+            return (this.mode == 'ok' && this.value) ||
+                   (this.mode == 'ok_val' && this.value[0]);
         }
         return false;
       },
@@ -60,6 +68,8 @@ can't change the values.  Special
           else
             return "ERROR";
         }
+        if (this.mode == "ok_val")
+          return this.value[1];
         return this.value;
       },
     },
