@@ -124,6 +124,7 @@
   import StarcamAgent from './panels/StarcamAgent.vue';
   import SynaccessAgent from './panels/SynaccessAgent.vue';
   import PysmurfControllerAgent from './panels/PysmurfController.vue';
+  import UPSAgent from './panels/UPSAgent.vue';
 
   /* Make a map of components to use in activeComp computed property;
      see
@@ -147,6 +148,7 @@
     'starcam_Agent': StarcamAgent,
     'SynaccessAgent': SynaccessAgent,
     'PysmurfController': PysmurfControllerAgent,
+    'UPSAgent': UPSAgent,
 
   };
   
