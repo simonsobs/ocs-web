@@ -1,6 +1,8 @@
 name: Publish Docker Image to Registry
 
 on:
+  release:
+    types: [ released ]
   push:
     branches: [ "main" ]
   pull_request:
