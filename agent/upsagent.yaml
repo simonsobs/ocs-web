@@ -7,68 +7,66 @@ processes:
       'timestamp_field': 'timestamp'
       }
     data: {
-      'fields': {
-        "upsIdentManufacturer_0": {
-          "status": "Falcon Electric",
-          "description": "Falcon Electric"
-        },
-        "ups_connection": {
-          "last_attempt": 1676334007.9505296,
-          "connected": true
-        },
-        "timestamp": 1676334007.9246283,
-        "upsIdentModel_0": {
-          "status": "SSG3K-2T  ",
-          "description": "SSG3K-2T  "
-        },
-        "upsBatteryStatus_0": {
-          "status": 2,
-          "description": "batteryNormal"
-        },
-        "upsSecondsOnBattery_0": {
-          "status": 0,
-          "description": "0"
-        },
-        "upsEstimatedMinutesRemaining_0": {
-          "status": 0,
-          "description": "0"
-        },
-        "upsEstimatedChargeRemaining_0": {
-          "status": 100,
-          "description": "100"
-        },
-        "upsBatteryVoltage_0": {
-          "status": 136,
-          "description": "136"
-        },
-        "upsBatteryCurrent_0": {
-          "status": 0,
-          "description": "0"
-        },
-        "upsBatteryTemperature_0": {
-          "status": 5,
-          "description": "5"
-        },
-        "upsOutputSource_0": {
-          "status": 3,
-          "description": "normal"
-        },
-        "upsOutputVoltage_1": {
-          "status": 239,
-          "description": "239"
-        },
-        "upsOutputCurrent_1": {
-          "status": 0,
-          "description": "0"
-        },
-        "upsOutputPower_1": {
-          "status": 0,
-          "description": "0"
-        },
-        "upsOutputPercentLoad_1": {
-          "status": 90,
-          "description": "90"
-        }
+      "upsIdentManufacturer_0": {
+        "status": "Falcon Electric",
+        "description": "Falcon Electric"
+      },
+      "ups_connection": {
+        "last_attempt": 1676334007.9505296,
+        "connected": true
+      },
+      "timestamp": 1676334007.9246283,
+      "upsIdentModel_0": {
+        "status": "SSG3K-2T  ",
+        "description": "SSG3K-2T  "
+      },
+      "upsBatteryStatus_0": {
+        "status": 2,
+        "description": "batteryNormal"
+      },
+      "upsSecondsOnBattery_0": {
+        "status": 0,
+        "description": "0"
+      },
+      "upsEstimatedMinutesRemaining_0": {
+        "status": 0,
+        "description": "0"
+      },
+      "upsEstimatedChargeRemaining_0": {
+        "status": 100,
+        "description": "100"
+      },
+      "upsBatteryVoltage_0": {
+        "status": 136,
+        "description": "136"
+      },
+      "upsBatteryCurrent_0": {
+        "status": 0,
+        "description": "0"
+      },
+      "upsBatteryTemperature_0": {
+        "status": 5,
+        "description": "5"
+      },
+      "upsOutputSource_0": {
+        "status": 3,
+        "description": "normal"
+      },
+      "upsOutputVoltage_1": {
+        "status": 239,
+        "description": "239"
+      },
+      "upsOutputCurrent_1": {
+        "status": 0,
+        "description": "0"
+      },
+      "upsOutputPower_1": {
+        "status": 0,
+        "description": "0"
+      },
+      "upsOutputPercentLoad_1": {
+        "status": 90,
+        "description": "90"
       }
     }
 tasks: {}

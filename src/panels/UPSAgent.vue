@@ -105,7 +105,7 @@
         return this.formatData('output');
       },
       recent_ok() {
-        let timestamp = this.ops.acq.session.data?.fields?.timestamp;
+        let timestamp = this.ops.acq.session.data?.timestamp;
         if (timestamp) {
           let dt = window.ocs_bundle.util.timestamp_now() - timestamp;
           return [dt < 90, window.ocs_bundle.util.human_timespan(dt) + ' ago'];
@@ -115,7 +115,7 @@
     },
     methods: {
       formatData(group_name) {
-        let field_data = this.ops.acq.session.data.fields;
+        let field_data = this.ops.acq.session.data;
         let new_data = [];
         if (field_data) {
           this.groups[group_name].fields.forEach(function(field) {
