@@ -7,7 +7,11 @@
           v-if="show_start"
           :disabled="accessLevel < 1"
           @click="start">Start</button>
-        <span></span>
+        <button
+          v-if="show_abort"
+          :disabled="accessLevel < 1"
+          @click="abort">Abort</button>
+        <span v-else></span>
       </div>
 
       <slot></slot>
@@ -37,6 +41,9 @@
       show_start: {
         default: true,
       },
+      show_abort: {
+        default: false,
+      },
     },
     inject: ['accessLevel'],
     computed: {
@@ -54,6 +61,9 @@
     methods: {
       start() {
         window.ocs_bundle.ui_run_task(this.address, this.name, this.op_data.params);
+      },
+      abort() {
+        window.ocs_bundle.ui_abort_task(this.address, this.name);
       },
     },
   }

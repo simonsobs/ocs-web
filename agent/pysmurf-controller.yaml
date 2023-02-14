@@ -1,0 +1,44 @@
+agent_class: 'PysmurfController'
+instance_id: 'fakeSmurf-1'
+processes:
+  check_state:
+    data: {
+      'channel_mask': [0, 1, 2, 5, 6, 7],
+      'downsample_factor': 20,
+      'agg_time': 2.,
+      'open_g3stream': false,
+      'pysmurf_action': 'an_action',
+      'pysmurf_action_timestamp': 1234567890.,
+      'stream_tag': 'these,are,tags',
+      'stream_id': 'stream-id',
+      }
+  stream:
+    data: {}
+tasks:
+  uxm_setup:
+    data: {
+      'timestamps': [('setup_amps', 1651162263.0204525)],
+      'setup_amps_summary': {
+        'success': True,
+        'amp_50k_Id': 15.0,
+        'amp_hemt_Id': 8.0,
+        'amp_50k_Vg': -0.52,
+        'amp_hemt_Vg': -0.829,
+        },
+      'setup_phase_delay': {
+        'bands': [0, 1, 2],
+        'band_delay_us': [.2, .3, .4],
+        },
+      'noise': {
+        'band_medians': [12., 13., 14.],
+      }
+    }
+  uxm_relock: {}
+  take_bgmap: {}
+  take_iv: {}
+  take_bias_steps:
+    data: {
+      # Latest ocs should be able to handle nans.
+      'R': [1., 2., .NAN],
+      }
+  take_noise: {}

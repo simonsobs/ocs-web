@@ -25,6 +25,20 @@
       </div>
     </div>
 
+    <!-- Confirmation box -->
+    <div class="fullScreenMask" v-if="userConfirm">
+      <div class="errorModal">
+        <div class="errorModalContent">
+            <h2>Confirm: {{ userConfirm.title }}</h2>
+            <p>{{ userConfirm.text }}</p>
+            <div class="buttonGroup">
+              <button style="width: 200px" @click="confirmOp(true)">Ok</button>
+              <button style="width: 200px" @click="confirmOp(false)">Cancel</button>
+            </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Container for main interface -->
@@ -102,9 +116,15 @@
   import HostManager from './panels/HostManager.vue';
 
   // Agent panels - SOCS
+  import Lakeshore240Agent from './panels/Lakeshore240Agent.vue';
   import Lakeshore372Agent from './panels/Lakeshore372Agent.vue';
   import ACUAgent from './panels/ACUAgent.vue';
+  import ibootbarAgent from './panels/ibootbarAgent.vue';
+  import RotationAgent from './panels/RotationAgent.vue';
   import StarcamAgent from './panels/StarcamAgent.vue';
+  import SynaccessAgent from './panels/SynaccessAgent.vue';
+  import PysmurfControllerAgent from './panels/PysmurfController.vue';
+  import UPSAgent from './panels/UPSAgent.vue';
 
   /* Make a map of components to use in activeComp computed property;
      see
@@ -120,9 +140,15 @@
     'HostManager': HostManager,
 
     /* SOCS */
+    'Lakeshore240Agent': Lakeshore240Agent,
     'Lakeshore372Agent': Lakeshore372Agent,
     'ACUAgent': ACUAgent,
+    'ibootbarAgent': ibootbarAgent,
+    'RotationAgent': RotationAgent,
     'starcam_Agent': StarcamAgent,
+    'SynaccessAgent': SynaccessAgent,
+    'PysmurfController': PysmurfControllerAgent,
+    'UPSAgent': UPSAgent,
 
   };
   
@@ -174,6 +200,7 @@
         configs: configs,
         mainMode: 'config',
         errorInfo: null,
+        userConfirm: null,
         accessLevel: 0,
       }
     },
@@ -241,6 +268,14 @@
       op_error(msg) {
         this.errorInfo = msg;
       },
+      confirmOp(confirm) {
+        if (confirm && this.userConfirm.callback)
+          this.userConfirm.callback();
+        if (!confirm && this.userConfirm.cancel)
+          this.userConfirm.cancel();
+
+        this.userConfirm = null;
+      },
     },
     setup() {
       const { cookies } = useCookies();
@@ -275,6 +310,14 @@
         this.op_error(msg);
       };
 
+      // Get user confirmation for something ...
+      ocs_bundle.ui_confirm = (title, text, callback, cancel) => {
+        this.userConfirm = {title: title,
+                            text: text,
+                            callback: callback,
+                            cancel: cancel};
+      };
+
       // Functions that wrap operation start/stop with UI error windows.
       ocs_bundle.ui_run_task = (agent_address, op_name, op_params) => {
         window.ocs.get_client(agent_address).run_task(op_name, op_params).then(
@@ -285,6 +328,21 @@
              'op_name': op_name,
              'message': msg})
         );
+      };
+
+      ocs_bundle.ui_abort_task = (agent_address, op_name) => {
+        window.ocs.get_client(agent_address).abort_task(op_name)
+              .then(
+                result => {
+                  if (result[0] != 0) {
+                    let msg = result[1]
+                    window.ocs_bundle.on_error(
+                      {'type': 'op',
+                       'address': agent_address,
+                       'op_name': op_name,
+                       'message': msg});
+                }
+              });
       };
 
       ocs_bundle.ui_start_proc = (agent_address, op_name, op_params) => {
@@ -406,6 +464,9 @@
     border: 1px solid #88c;
     background-color: #fff;
     width: 90%;
+  }
+  .buttonGroup button {
+    display: inline-block;
   }
 
   .ocs_dropdown {

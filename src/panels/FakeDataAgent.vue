@@ -45,6 +45,7 @@
 
       <OcsTask
         :address="address"
+        :show_abort="true"
         :op_data="ops.delay_task">
         <OpParam
           caption="Delay (s)"
@@ -60,6 +61,10 @@
         :op_data="ops.acq"
       />
 
+      <OcsOpAutofill
+        :address="address"
+        :ops_parent="ops"
+      />
     </div>
 
   </div>

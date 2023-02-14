@@ -143,3 +143,12 @@ services:
     volumes:
       - ./config.json:/app/dist/config.json:ro
 ```
+
+# Development tips
+
+## Mocking Jagent
+
+For development in cases where you can't run the real agent, you can
+run a dummy agent with an interface specified in a yaml file.  See the
+docstring header in agent/agent.py, and any yaml definition files in
+that directory for configuration examples.

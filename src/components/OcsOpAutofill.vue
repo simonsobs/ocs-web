@@ -1,12 +1,13 @@
 /* eslint-disable */
 <template>
   <div class="ocs_ui">
-    <i v-if="warn_about_auto">Operations widgets below are automatically instantiated,
-    without any parameter fields.  Some may be usable without
-    parameters while others are not.</i>
+    <i v-if="warn_about_auto">Operations widgets below are
+    automatically instantiated, without any parameter fields.  Some
+    may be usable without parameters while others are not.</i>
     <OcsTask v-for="op in ops_task" v-bind:key="op"
              class="autofilled"
              :address="address"
+             :show_abort="op.show_abort"
              :op_data="op" />
     <OcsProcess v-for="op in ops_proc" v-bind:key="op"
                 :address="address"
@@ -51,9 +52,9 @@
           // Query the API, and use the result to set the task and
           // process lists
           client.scan(() => {
-            client.tasks.map(([name]) => {
+            client.tasks.map(([name, , cfg]) => {
               if (!this.ops_parent[name] || this.ops_parent[name].auto)
-                this.ops_task[name] = {};
+                this.ops_task[name] = {show_abort: cfg.abortable};
             });
             client.procs.map(([name]) => {
               if (!this.ops_parent[name] || this.ops_parent[name].auto)

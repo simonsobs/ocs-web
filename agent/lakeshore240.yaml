@@ -1,0 +1,24 @@
+agent_class: 'Lakeshore240Agent'
+instance_id: 'fakeshore-1'
+processes:
+  acq:
+    startup: true
+    data_settings: {
+      'timestamp_field': 'timestamp'
+      }
+    data: {
+      "fields": {
+        "Channel_1": {"T": 99.26, "V": 99.42},
+        "Channel_2": {"T": 99.54, "V": 101.06},
+        "Channel_3": {"T": 100.11, "V":100.79},
+        "Channel_4": {"T": 98.49, "V": 100.77},
+        "Channel_5": {"T": 97.75, "V": 101.45},
+        "Channel_6": {"T": 99.58, "V": 101.75},
+        "Channel_7": {"T": 98.03, "V": 100.82},
+        "Channel_8": {"T": 101.14, "V":101.01}},
+        "timestamp":1601925677.6914878
+        }
+tasks:
+  init_lakeshore: {}
+  set_values: {}
+  upload_cal_curve: {}
