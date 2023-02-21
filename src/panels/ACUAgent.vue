@@ -50,7 +50,7 @@
         </OpReading>
         <OpReading
           caption="Co-rotator"
-          v-bind:value="currentPosAndMode('3rd axis')">
+          v-bind:value="currentPosAndMode('Corotator')">
         </OpReading>
         <OpReading
           caption="Timestamp"
@@ -330,7 +330,10 @@
         return {
           'az': data['StatusDetailed']['Azimuth current position'],
           'el': data['StatusDetailed']['Elevation current position'],
-          'boresight': data['Status3rdAxis']['Boresight current position'],
+          // In SAT the "3rd axis" is included in StatusDetailed.
+          'boresight': data['StatusDetailed']['Boresight current position'],
+          // In LAT, it is not.
+          'corotator': data['Status3rdAxis']['Boresight current position'],
         };
       },
       currentPosAndMode(prefix) {
@@ -355,12 +358,12 @@
             return window.ocs_bundle.util.get_date_time_string(year + offset_seconds, ' ');
           }
           case 'Azimuth':
-          case 'Elevation': {
+          case 'Elevation':
+          case 'Boresight': {
             data = sdata['StatusDetailed'];
             break;
           }
-          case 'Boresight':
-          case '3rd axis': {
+          case 'Corotator': {
             data = sdata['Status3rdAxis'];
             break;
           }

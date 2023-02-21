@@ -35,6 +35,13 @@
             :caption="chan[0]"
             v-bind:value="chan[1]" />
         </div>
+        <h2>UPS Input</h2>
+        <div v-for="chan in inputData"
+             v-bind:key="chan[0]">
+          <OpReading
+            :caption="chan[0]"
+            v-bind:value="chan[1]" />
+        </div>
       </div>
     </div>
 
@@ -91,6 +98,14 @@
               {key: "upsOutputPercentLoad_1", label: "Load (%)"},
             ],
           },
+          input: {
+            name: "Input",
+            fields: [
+              {key: "upsInputVoltage_1", label: "Voltage"},
+              {key: "upsInputCurrent_1", label: "Current (0.1 A)"},
+              {key: "upsInputTruePower_1", label: "Power (0.1 W)"},
+            ],
+          },
         },
         ops: window.ocs_bundle.web.ops_data_init({
           acq: {},
@@ -103,6 +118,9 @@
       },
       outputData() {
         return this.formatData('output');
+      },
+      inputData() {
+        return this.formatData('input');
       },
       recent_ok() {
         let timestamp = this.ops.acq.session.data?.timestamp;
@@ -120,7 +138,8 @@
         if (field_data) {
           this.groups[group_name].fields.forEach(function(field) {
             let label = field.label ? field.label : field.key;
-            let raw_data = field_data[field.key].description;
+            let data = field_data[field.key];
+            let raw_data = data ? data.description : "?";
             new_data.push([label, raw_data]);
           });
         }
