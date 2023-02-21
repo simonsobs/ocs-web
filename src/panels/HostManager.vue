@@ -54,6 +54,11 @@
       <OcsTask
         :address="address"
         :op_data="ops.update">
+        <div class="ocs_row">
+          <label>Reload Config</label>
+          <input type="checkbox" id="checkbox" v-model="ops.update.params.reload_config"
+                 class="ocs_double" />
+        </div>
       </OcsTask>
 
       <OcsTask
@@ -76,7 +81,9 @@
         children: {},
         ops: window.ocs_bundle.web.ops_data_init({
           'manager': {},
-          'update': {},
+          'update': {
+            params: {reload_config: false},
+          },
           'die': {},
         }),
       }
