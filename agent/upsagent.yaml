@@ -52,6 +52,18 @@ processes:
         "status": 3,
         "description": "normal"
       },
+      "upsInputVoltage_1": {
+        "status": 232,
+        "description": "232"
+      },
+      "upsInputCurrent_1": {
+        "status": 0,
+        "description": "0"
+      },
+      "upsInputTruePower_1": {
+        "status": 0,
+        "description": "0"
+      },
       "upsOutputVoltage_1": {
         "status": 239,
         "description": "239"
