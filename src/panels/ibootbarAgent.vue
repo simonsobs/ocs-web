@@ -128,7 +128,7 @@
           this.outlet_warning = 'No connection to agent!';
           return;
         }
-        if (!session.data || session.status != 'running') {
+        if (!session.data || (session.status != 'running' && session.status != 'starting')) {
           this.outlets = {};
           this.outlet_warning = 'No outlet data -- is acq process running?';
           return;
