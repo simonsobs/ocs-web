@@ -255,7 +255,6 @@
           go_to: {
             params: {az: 180,
                      el: 60,
-                     wait: 1,
                      end_stop: true,
             },
           },
