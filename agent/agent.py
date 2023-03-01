@@ -81,9 +81,10 @@ class MockingJaygent:
 
         return False, f'Task {op_name} was aborted.'
 
+    @inlineCallbacks
     def _abort_task(self, session, params):
         if session.status == 'running':
-            session.set_status('stopping')
+            yield session.set_status('stopping')
 
 def add_agent_args(parser_in=None):
     if parser_in is None:
@@ -127,7 +128,7 @@ if __name__ == '__main__':
     for task_name, cfg in schema.get('tasks', {}).items():
         func = wrap_starter(mocker, task_name, cfg, mocker._start_task)
         agent.register_task(task_name, func,
-                            # abort_func=mocker._abort_task,
+                            aborter=mocker._abort_task,
                             blocking=False)
 
     runner.run(agent, auto_reconnect=True)
