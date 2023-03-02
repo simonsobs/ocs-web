@@ -65,6 +65,7 @@ function get_status_string(session) {
         case 'idle':
         case 'starting':
         case 'running':
+        case 'stopping':
             t = session.status + ' (' + util.human_timespan(ago, 1) + ')';
             break;
         case 'done':
