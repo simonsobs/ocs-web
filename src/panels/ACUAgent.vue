@@ -345,16 +345,13 @@
         switch(prefix) {
           case 'Timestamp': {
             data = sdata['StatusDetailed'];
-
-            // Make sure these are defined, because otherwise the
-            // current system time will be printed, and that is is
-            // maximally misleading.
-            if (!data || !data['Year'] || !data['Time'])
+            if (!data)
               return '?';
-
-            let year = Math.floor(new Date(data['Year'] + '.01.01').getTime() / 1000);
-            let offset_seconds = Number(data['Time']) * 86400;
-            return window.ocs_bundle.util.get_date_time_string(year + offset_seconds, ' ');
+            let timestamp = Date.UTC(data['Year']) / 1000
+                           + Number(data['Time']) * 86400;
+            if (!timestamp)
+              return '?';
+            return window.ocs_bundle.util.get_date_time_string(timestamp, ' ');
           }
           case 'Azimuth':
           case 'Elevation':
