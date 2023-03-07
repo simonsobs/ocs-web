@@ -213,30 +213,39 @@
           v-model.number="ops.generate_scan.params.el_endpoint2" />
         <OpParam
           caption="az_speed"
+          modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.az_speed" />
         <OpParam
           caption="el_speed"
+          modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.el_speed" />
         <OpParam
           caption="az_acc"
+          modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.acc" />
         <OpParam
           caption="num_scans"
+          modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.num_scans" />
         <OpParam
           caption="ramp_up"
+          modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.ramp_up" />
         <OpParam
           caption="wait_to_start"
+          modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.wait_to_start" />
         <OpParam
           caption="step_time"
+          modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.step_time" />
         <OpParam
           caption="num_batches"
+          modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.num_batches" />
         <OpParam
           caption="batch_size"
+          modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.batch_size" />
       </OcsProcess>
 
