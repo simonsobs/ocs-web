@@ -58,6 +58,10 @@ When bound to a string variable, set the property "type" equal to "multi".
           if (this.value)
             return 'good';
           return 'bad';
+        } else if (this.value === true) {
+          return 'good';
+        } else if (this.value === false) {
+          return 'bad';
         }
         return this.value;
       },
@@ -91,7 +95,7 @@ When bound to a string variable, set the property "type" equal to "multi".
     color: #000;
   }
   input.notapplic {
-    background-color: #eee;
+    background-color: #ddd;
     color: #888;
   }
 

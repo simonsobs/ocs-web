@@ -12,7 +12,7 @@
           v-bind:value="address">
         </OpReading>
 
-        <OcsLightLine caption="Status">
+        <OcsLightLine caption="OCS/Agent">
           <OcsLight
             caption="OCS"
             tip="Status of the connection between ocs-web and OCS crossbar."
@@ -21,17 +21,43 @@
           <OcsLight
             caption="AGT"
             tip="Status of the connection between ocs-web and the Agent."
-            :value="connection_ok"
+            :value="getIndicator('agent')"
           />
           <OcsLight
             caption="MON"
-            tip="Indicates that the monitor (Status) process appears to be acquiring data properly."
+            type="multi"
+            tip="Will show green/good when 'monitor' process is running and
+                     acquiring data normally. The health of this process is required
+                     for numerous other indicators."
             :value="getIndicator('monitor')"
           />
           <OcsLight
             caption="BCAST"
-            tip="Indicates that the broadcast (UDP) process appears to be acquiring data properly."
+            type="multi"
+            tip="Will show green/good when 'broadcast' process appears to be
+                     running and acquiring data normally."
             :value="getIndicator('broadcast')"
+          />
+        </OcsLightLine>
+
+        <OcsLightLine caption="ACU/Platform">
+          <OcsLight
+            caption="UNLOCKED"
+            type="multi"
+            tip="Will show green/good when remote control is not locked out (Safe)."
+            :value="getIndicator('safe')"
+          />
+          <OcsLight
+            caption="REMOTE"
+            type="multi"
+            tip="Will show green/good when ACU is in Remote (rather than Local) control mode."
+            :value="getIndicator('remote')"
+          />
+          <OcsLight
+            caption="READY"
+            type="multi"
+            tip="Will show green/good unless ACU expresses a General summary fault."
+            :value="getIndicator('summary')"
           />
         </OcsLightLine>
 
@@ -187,30 +213,39 @@
           v-model.number="ops.generate_scan.params.el_endpoint2" />
         <OpParam
           caption="az_speed"
+          modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.az_speed" />
         <OpParam
           caption="el_speed"
+          modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.el_speed" />
         <OpParam
           caption="az_acc"
+          modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.acc" />
         <OpParam
           caption="num_scans"
+          modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.num_scans" />
         <OpParam
           caption="ramp_up"
+          modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.ramp_up" />
         <OpParam
           caption="wait_to_start"
+          modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.wait_to_start" />
         <OpParam
           caption="step_time"
+          modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.step_time" />
         <OpParam
           caption="num_batches"
+          modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.num_batches" />
         <OpParam
           caption="batch_size"
+          modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.batch_size" />
       </OcsProcess>
 
@@ -345,16 +380,12 @@
         switch(prefix) {
           case 'Timestamp': {
             data = sdata['StatusDetailed'];
-
-            // Make sure these are defined, because otherwise the
-            // current system time will be printed, and that is is
-            // maximally misleading.
-            if (!data || !data['Year'] || !data['Time'])
+            if (!data)
               return '?';
-
-            let year = Math.floor(new Date(data['Year'] + '.01.01').getTime() / 1000);
-            let offset_seconds = Number(data['Time']) * 86400;
-            return window.ocs_bundle.util.get_date_time_string(year + offset_seconds, ' ');
+            let timestamp = this.getTimestamp(data);
+            if (!timestamp)
+              return '?';
+            return window.ocs_bundle.util.get_date_time_string(timestamp, ' ');
           }
           case 'Azimuth':
           case 'Elevation':
@@ -380,23 +411,65 @@
                 ' [' + mode + ']');
       },
       getIndicator(name) {
-        switch (name) {
-          case 'ocs':
-            return window.ocs.connection.isConnected;
-          case 'monitor':
-            {
-              let session = this.ops.monitor.session;
-              return (session.status == 'running' ||
-                      session.status == 'starting');
-            }
-          case 'broadcast':
-            {
-              let session = this.ops.broadcast.session;
-              return (session.status == 'running' ||
-                      session.status == 'starting');
-            }
+        // If OCS is not connected, nothing else can be reported.
+        let ocs_ok = window.ocs.connection.isConnected;
+        if (name == 'ocs')
+          return ocs_ok;
+
+        if (name == 'agent')
+          return this.connection_ok;
+
+        if (!ocs_ok || !this.connection_ok)
+          return 'notapplic';
+
+        // For the UDP broadcast process
+        if (name == 'broadcast') {
+          let brd = this.ops.broadcast.session;
+          if (brd.status != 'running')
+            return false;
+          let brd_time = brd.data['Time'];
+          if (!brd_time || (
+            window.ocs_bundle.util.timestamp_now() - brd_time > 3))
+            return 'warning';
+          return true;
         }
-        return false;
+
+        // Everything else requires the status monitor process
+        let mon = this.ops.monitor.session;
+        let mon_running = mon.status == 'running';
+
+        // check staleness.
+        let detail = mon.data['StatusDetailed'];
+        let mon_time = this.getTimestamp(detail);
+        let mon_stale = !mon_time || (
+          window.ocs_bundle.util.timestamp_now() - mon_time > 3);
+
+        if (name == 'monitor') {
+          if (mon_running && mon_stale)
+            return 'warning';
+          return mon_running;
+        }
+
+        // Everything else requires monitor process to be working.
+        if (!mon_running || mon_stale)
+          return 'notapplic';
+
+        switch (name) {
+          case 'safe':
+              return !detail['Safe'];
+          case 'remote':
+            return detail['ACU in remote mode'];
+          case 'summary':
+              return !detail['General summary fault'];
+        }
+
+        return 'notapplic';
+      },
+      getTimestamp(detail) {
+        // Compute timestamp (s) from 'Year' and 'Time' fields.
+        if (!detail || !detail.Year || !detail.Time)
+          return null;
+        return Date.UTC(detail.Year) / 1000 + Number(detail.Time) * 86400;
       },
     },
     computed: {
