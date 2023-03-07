@@ -13,8 +13,7 @@ This component provides user-editable text fields for an Agent Panel.
     <input class="ocs_double"
            type="text"
            :disabled="modelDisabled == true"
-           :value="modelValue"
-           @input="$emit('update:modelValue', $event.target.value)"
+           v-model="value"
     />
   </div>
 </template>
@@ -30,6 +29,21 @@ This component provides user-editable text fields for an Agent Panel.
         required: false},
       modelValue: {
         required: true},
+      modelType: {},
+    },
+    computed: {
+      value: {
+        get() {
+          return this.modelValue;
+        },
+        set(value) {
+          if (this.modelType == 'blank_to_null') {
+            if (value.trim() == '')
+              value = null;
+          }
+          this.$emit('update:modelValue', value);
+        },
+      }
     },
 }
 </script>
