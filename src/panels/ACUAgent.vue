@@ -96,9 +96,16 @@
             v-model.number="scan_control.az_center"
           />
           <OpParam
-            v-if="scan_control.type == 'Constant el'"
             caption="Azimuth throw"
             v-model.number="scan_control.az_throw"
+          />
+          <OpParam
+            caption="Scan speed"
+            v-model.number="scan_control.az_speed"
+          />
+          <OpParam
+            caption="Mean accel"
+            v-model.number="scan_control.az_acc"
           />
           <div class="ocs_row">
             <label />
@@ -205,6 +212,11 @@
         <OpParam
           caption="az2"
           v-model.number="ops.generate_scan.params.az_endpoint2" />
+        <OpDropdown
+          caption="az start"
+          :options="start_types"
+          v-model="ops.generate_scan.params.az_start"
+        />
         <OpParam
           caption="el1"
           v-model.number="ops.generate_scan.params.el_endpoint1" />
@@ -222,15 +234,11 @@
         <OpParam
           caption="az_acc"
           modelType="blank_to_null"
-          v-model.number="ops.generate_scan.params.acc" />
+          v-model.number="ops.generate_scan.params.az_acc" />
         <OpParam
           caption="num_scans"
           modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.num_scans" />
-        <OpParam
-          caption="ramp_up"
-          modelType="blank_to_null"
-          v-model.number="ops.generate_scan.params.ramp_up" />
         <OpParam
           caption="wait_to_start"
           modelType="blank_to_null"
@@ -239,14 +247,6 @@
           caption="step_time"
           modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.step_time" />
-        <OpParam
-          caption="num_batches"
-          modelType="blank_to_null"
-          v-model.number="ops.generate_scan.params.num_batches" />
-        <OpParam
-          caption="batch_size"
-          modelType="blank_to_null"
-          v-model.number="ops.generate_scan.params.batch_size" />
       </OcsProcess>
 
       <!-- Background processes -->
@@ -304,17 +304,14 @@
               az_endpoint1: 170,
               az_endpoint2: 190,
               az_speed: 1,
-              acc: 1,
+              az_acc: 1,
               el_endpoint1: 60,
               el_endpoint2: 60,
               el_speed: 1,
-              az_start: 'az_endpoint1',
-              ramp_up: null,
-              wait_to_start: null,
+              az_start: 'end',
               num_scans: null,
               step_time: null,
-              num_batches: null,
-              batch_size: null,
+              wait_to_start: null,
             },
           },
           monitor: {
@@ -331,7 +328,10 @@
           type: "Constant el",
           az_center: 180,
           az_throw: 10,
+          az_speed: 1,
+          az_acc: 1,
         },
+        start_types: ["end", "mid"],
         dataset: {
           view: "all",
           filter: "",
@@ -352,12 +352,15 @@
           gs['el_endpoint1'] = pos['el'];
           gs['el_endpoint2'] = pos['el'];
 
+          gs['az_acc'] = p.az_acc;
+          gs['az_speed'] = p.az_speed;
+
           window.ocs_bundle.ui_start_proc(this.address, 'generate_scan',
                                           this.ops.generate_scan.params);
         }
       },
       stopScan() {
-        window.ocs_bundle.ui_run_task(this.address, 'stop_and_clear', {});
+        window.ocs_bundle.ui_stop_proc(this.address, 'generate_scan');
       },
       currentPositions() {
         let data = this.ops.monitor.session.data;
