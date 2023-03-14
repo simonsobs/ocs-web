@@ -414,6 +414,9 @@
                 ' [' + mode + ']');
       },
       getIndicator(name) {
+        let mon_stale_time = 3;  // Seems to be enough
+        let brd_stale_time = 5;  // 3 is not enough.
+
         // If OCS is not connected, nothing else can be reported.
         let ocs_ok = window.ocs.connection.isConnected;
         if (name == 'ocs')
@@ -432,7 +435,7 @@
             return false;
           let brd_time = brd.data['Time'];
           if (!brd_time || (
-            window.ocs_bundle.util.timestamp_now() - brd_time > 3))
+            window.ocs_bundle.util.timestamp_now() - brd_time > brd_stale_time))
             return 'warning';
           return true;
         }
@@ -445,7 +448,7 @@
         let detail = mon.data['StatusDetailed'];
         let mon_time = this.getTimestamp(detail);
         let mon_stale = !mon_time || (
-          window.ocs_bundle.util.timestamp_now() - mon_time > 3);
+          window.ocs_bundle.util.timestamp_now() - mon_time > mon_stale_time);
 
         if (name == 'monitor') {
           if (mon_running && mon_stale)
