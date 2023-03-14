@@ -96,9 +96,16 @@
             v-model.number="scan_control.az_center"
           />
           <OpParam
-            v-if="scan_control.type == 'Constant el'"
             caption="Azimuth throw"
             v-model.number="scan_control.az_throw"
+          />
+          <OpParam
+            caption="Scan speed"
+            v-model.number="scan_control.az_speed"
+          />
+          <OpParam
+            caption="Mean accel"
+            v-model.number="scan_control.az_acc"
           />
           <div class="ocs_row">
             <label />
@@ -321,6 +328,8 @@
           type: "Constant el",
           az_center: 180,
           az_throw: 10,
+          az_speed: 1,
+          az_acc: 1,
         },
         start_types: ["end", "mid"],
         dataset: {
@@ -342,6 +351,9 @@
           let pos = this.currentPositions();
           gs['el_endpoint1'] = pos['el'];
           gs['el_endpoint2'] = pos['el'];
+
+          gs['acc'] = p.az_acc;
+          gs['az_speed'] = p.az_speed;
 
           window.ocs_bundle.ui_start_proc(this.address, 'generate_scan',
                                           this.ops.generate_scan.params);
