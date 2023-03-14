@@ -205,6 +205,11 @@
         <OpParam
           caption="az2"
           v-model.number="ops.generate_scan.params.az_endpoint2" />
+        <OpDropdown
+          caption="az start"
+          :options="start_types"
+          v-model="ops.generate_scan.params.az_start"
+        />
         <OpParam
           caption="el1"
           v-model.number="ops.generate_scan.params.el_endpoint1" />
@@ -228,10 +233,6 @@
           modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.num_scans" />
         <OpParam
-          caption="ramp_up"
-          modelType="blank_to_null"
-          v-model.number="ops.generate_scan.params.ramp_up" />
-        <OpParam
           caption="wait_to_start"
           modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.wait_to_start" />
@@ -239,14 +240,6 @@
           caption="step_time"
           modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.step_time" />
-        <OpParam
-          caption="num_batches"
-          modelType="blank_to_null"
-          v-model.number="ops.generate_scan.params.num_batches" />
-        <OpParam
-          caption="batch_size"
-          modelType="blank_to_null"
-          v-model.number="ops.generate_scan.params.batch_size" />
       </OcsProcess>
 
       <!-- Background processes -->
@@ -308,13 +301,10 @@
               el_endpoint1: 60,
               el_endpoint2: 60,
               el_speed: 1,
-              az_start: 'az_endpoint1',
-              ramp_up: null,
-              wait_to_start: null,
+              az_start: 'end',
               num_scans: null,
               step_time: null,
-              num_batches: null,
-              batch_size: null,
+              wait_to_start: null,
             },
           },
           monitor: {
@@ -332,6 +322,7 @@
           az_center: 180,
           az_throw: 10,
         },
+        start_types: ["end", "mid"],
         dataset: {
           view: "all",
           filter: "",
