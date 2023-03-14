@@ -348,7 +348,7 @@
         }
       },
       stopScan() {
-        window.ocs_bundle.ui_run_task(this.address, 'stop_and_clear', {});
+        window.ocs_bundle.ui_stop_proc(this.address, 'generate_scan');
       },
       currentPositions() {
         let data = this.ops.monitor.session.data;
