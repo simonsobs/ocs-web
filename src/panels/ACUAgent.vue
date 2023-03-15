@@ -105,7 +105,7 @@
           />
           <OpParam
             caption="Mean accel"
-            v-model.number="scan_control.az_acc"
+            v-model.number="scan_control.az_accel"
           />
           <div class="ocs_row">
             <label />
@@ -232,9 +232,9 @@
           modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.el_speed" />
         <OpParam
-          caption="az_acc"
+          caption="az_accel"
           modelType="blank_to_null"
-          v-model.number="ops.generate_scan.params.az_acc" />
+          v-model.number="ops.generate_scan.params.az_accel" />
         <OpParam
           caption="num_scans"
           modelType="blank_to_null"
@@ -304,7 +304,7 @@
               az_endpoint1: 170,
               az_endpoint2: 190,
               az_speed: 1,
-              az_acc: 1,
+              az_accel: 1,
               el_endpoint1: 60,
               el_endpoint2: 60,
               el_speed: 1,
@@ -329,7 +329,7 @@
           az_center: 180,
           az_throw: 10,
           az_speed: 1,
-          az_acc: 1,
+          az_accel: 1,
         },
         start_types: ["end", "mid"],
         dataset: {
@@ -352,7 +352,7 @@
           gs['el_endpoint1'] = pos['el'];
           gs['el_endpoint2'] = pos['el'];
 
-          gs['az_acc'] = p.az_acc;
+          gs['az_accel'] = p.az_accel;
           gs['az_speed'] = p.az_speed;
 
           window.ocs_bundle.ui_start_proc(this.address, 'generate_scan',
