@@ -190,7 +190,7 @@
         :op_data="ops.set_boresight">
         <OpParam
           caption="Angle (deg)"
-          v-model.number="ops.set_boresight.params.b" />
+          v-model.number="ops.set_boresight.params.target" />
         <div class="ocs_row">
           <label>Set mode=Stop at end?</label>
           <input type="checkbox" id="checkbox" v-model="ops.set_boresight.params.end_stop"
@@ -294,7 +294,7 @@
             },
           },
           set_boresight: {
-            params: {b: 0},
+            params: {target: 0},
           },
           stop_and_clear: {
             params: {},
