@@ -1,13 +1,27 @@
 <template>
   <div class="ocs_row">
     <label>{{ caption }}</label>
+
+    <!-- options_style='array' -->
     <select class="ocs_double"
-           :value="modelValue"
-           @input="$emit('update:modelValue', $event.target.value)">
+            :value="modelValue"
+            @input="$emit('update:modelValue', $event.target.value)"
+            v-if="options_style == 'array'">
       <option v-for="opt in options" v-bind:key="opt" v-bind:value="opt">
         {{ opt }}
       </option>
     </select>
+
+    <!-- options_style='object' -->
+    <select class="ocs_double"
+            :value="modelValue"
+            @input="$emit('update:modelValue', $event.target.value)"
+            v-if="options_style == 'object'">
+      <option v-for="(value, key) in options" v-bind:key="key" :value="key">
+        {{ value }}
+      </option>
+    </select>
+
   </div>
 </template>
 
@@ -17,9 +31,13 @@
     props: {
       caption: String,
       options: {
-       type: Array,
-        default() { return [] },
-        required: true
+        default() { return []; },
+        required: true,
+      },
+      options_style: {
+        type: String,
+        default: 'array',
+        required: false,
       },
       modelValue: {
         required: true},
