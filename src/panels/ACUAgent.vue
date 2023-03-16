@@ -61,7 +61,10 @@
           />
         </OcsLightLine>
 
-        <h2>Position</h2>
+        <h2>Pointing</h2>
+        <OpReading
+          caption="Activity"
+          v-bind:value="currentMotion" />
         <OpReading
           caption="Azimuth"
           v-bind:value="currentPosAndMode('Azimuth')">
@@ -83,38 +86,60 @@
           v-bind:value="currentPosAndMode('Timestamp')">
         </OpReading>
 
-        <h2>Scan control</h2>
+        <h2>Motion Control</h2>
         <OpDropdown
           caption="Type"
-          :options="scan_types"
-          v-model="scan_control.type"
+          :options="motion_types"
+          options_style="object"
+          v-model="motion_control.type"
         />
         <form v-on:submit.prevent
-              v-if="scan_control.type == 'Constant el'">
+              v-if="motion_control.type == 'const_el'">
           <OpParam
             caption="Azimuth center"
-            v-model.number="scan_control.az_center"
+            v-model.number="motion_control.az_center"
           />
           <OpParam
             caption="Azimuth throw"
-            v-model.number="scan_control.az_throw"
+            v-model.number="motion_control.az_throw"
           />
           <OpParam
             caption="Scan speed"
-            v-model.number="scan_control.az_speed"
+            v-model.number="motion_control.az_speed"
           />
           <OpParam
             caption="Mean accel"
-            v-model.number="scan_control.az_accel"
+            v-model.number="motion_control.az_accel"
           />
           <div class="ocs_row">
             <label />
             <button
               :disabled="accessLevel < 1"
-              @click="startScan">Start</button>
+              @click="startMotion">Start</button>
             <button
               :disabled="accessLevel < 1"
-              @click="stopScan">Stop</button>
+              @click="stopMotion">Stop</button>
+          </div>
+        </form>
+
+        <form v-on:submit.prevent
+              v-if="motion_control.type == 'goto'">
+          <OpParam
+            caption="Azimuth"
+            v-model.number="motion_control.goto_az"
+          />
+          <OpParam
+            caption="Elevation"
+            v-model.number="motion_control.goto_el"
+          />
+          <div class="ocs_row">
+            <label />
+            <button
+              :disabled="accessLevel < 1"
+              @click="startMotion">Start</button>
+            <button
+              :disabled="accessLevel < 1"
+              @click="stopMotion">Abort</button>
           </div>
         </form>
 
@@ -323,13 +348,20 @@
           restart_idle: {},
           clear_faults: {},
         }),
-        scan_types: ["Constant el"],
-        scan_control: {
-          type: "Constant el",
+        motion_types: {
+          const_el: "Constant el scan",
+          goto: "Go to position",
+        },
+        motion_control: {
+          type: "const_el",
+
           az_center: 180,
           az_throw: 10,
           az_speed: 1,
           az_accel: 1,
+
+          goto_az: 180,
+          goto_el: 60,
         },
         start_types: ["end", "mid"],
         dataset: {
@@ -339,28 +371,60 @@
       }
     },
     methods: {
-      startScan() {
-        // Called from the special scan_control widget.
-        let p = this.scan_control;
-        if (p.type == "Constant el") {
-          // Update the parameters of the generate_scan process.
-          let gs = this.ops.generate_scan.params;
-          gs['az_endpoint1'] = p.az_center - p.az_throw;
-          gs['az_endpoint2'] = p.az_center + p.az_throw;
+      startMotion() {
+        // Called from the special motion_control widget.
+        let p = this.motion_control;
+        switch(p.type) {
+          case "const_el": {
+            // Update the parameters of the generate_scan process.
+            let gs = this.ops.generate_scan.params;
+            gs['az_endpoint1'] = p.az_center - p.az_throw;
+            gs['az_endpoint2'] = p.az_center + p.az_throw;
 
-          let pos = this.currentPositions();
-          gs['el_endpoint1'] = pos['el'];
-          gs['el_endpoint2'] = pos['el'];
+            let pos = this.currentPositions();
+            gs['el_endpoint1'] = pos['el'];
+            gs['el_endpoint2'] = pos['el'];
 
-          gs['az_accel'] = p.az_accel;
-          gs['az_speed'] = p.az_speed;
+            gs['az_accel'] = p.az_accel;
+            gs['az_speed'] = p.az_speed;
 
-          window.ocs_bundle.ui_start_proc(this.address, 'generate_scan',
-                                          this.ops.generate_scan.params);
+            window.ocs_bundle.ui_start_proc(this.address, 'generate_scan',
+                                            this.ops.generate_scan.params);
+            break;
+          }
+          case "goto": {
+            // Update the parameters of the generate_scan process.
+            let gs = this.ops.go_to.params;
+            let pos = this.currentPositions();
+
+            if (!p.goto_az && p.goto_az === '') {
+              gs['az'] = pos['az'];
+            } else {
+              gs['az'] = p.goto_az;
+            }
+            if (!p.goto_el && p.goto_el === '') {
+              gs['el'] = pos['el'];
+            } else {
+              gs['el'] = p.goto_el;
+            }
+
+            window.ocs_bundle.ui_run_task(this.address, 'go_to',
+                                            this.ops.go_to.params);
+            break;
+          }
         }
       },
-      stopScan() {
-        window.ocs_bundle.ui_stop_proc(this.address, 'generate_scan');
+      stopMotion() {
+        // Called from the special motion_control widget.
+        let p = this.motion_control;
+        switch(p.type) {
+          case "const_el":
+            window.ocs_bundle.ui_stop_proc(this.address, 'generate_scan');
+            break;
+          case "goto":
+            window.ocs_bundle.ui_abort_task(this.address, 'go_to');
+            break;
+        }
       },
       currentPositions() {
         let data = this.ops.monitor.session.data;
@@ -479,6 +543,22 @@
       },
     },
     computed: {
+      currentMotion() {
+        // Figure out a string to describe what we're doing now ...
+        let activities = {
+          "Scanning": this.ops.generate_scan.session,
+          "Moving": this.ops.go_to.session,
+          "Setting Boresight": this.ops.set_boresight.session,
+        };
+        let texts = [];
+        for (const [k, v] of Object.entries(activities)) {
+          if (v && v.status && v.status != 'unknown' && v.status != 'done')
+            texts.push(k);
+        }
+        if (!texts.length)
+          return '(idle)';
+        return texts.join(' AND ');
+      },
       statusVars() {
         let sdata = this.ops.monitor.session.data;
         let annotated = [];
