@@ -539,7 +539,7 @@
         // Compute timestamp (s) from 'Year' and 'Time' fields.
         if (!detail || !detail.Year || !detail.Time)
           return null;
-        return Date.UTC(detail.Year) / 1000 + Number(detail.Time) * 86400;
+        return Date.UTC(detail.Year) / 1000 + (Number(detail.Time) - 1) * 86400;
       },
     },
     computed: {
