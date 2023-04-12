@@ -39,6 +39,15 @@
       </div>
     </div>
 
+    <!-- Password config -->
+    <div class="fullScreenMask" v-if="passwordWindow">
+      <div class="errorModal">
+        <div class="errorModalContent">
+          <PasswordConfig :config="passwordWindow" @close="confirmPw()" />
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Container for main interface -->
@@ -109,6 +118,7 @@
   import ConfigsWindow from './panels/ConfigsWindow.vue';
   import GenericAgent from './panels/GenericAgent.vue';
   import AgentList from './components/AgentList.vue';
+  import PasswordConfig from './components/PasswordConfig.vue';
 
   // Agent panels - OCS
   import AggregatorAgent from './panels/AggregatorAgent.vue';
@@ -205,7 +215,9 @@
         mainMode: 'config',
         errorInfo: null,
         userConfirm: null,
+        passwordWindow: null,
         accessLevel: 0,
+        accessEscalation: 0,
       }
     },
     provide() {
@@ -213,13 +225,24 @@
         accessLevel: computed({
           get: () => this.accessLevel,
           set: (v) => {this.accessLevel = v;}
-        })
+        }),
+        accessEscalation: computed({
+          get: () => this.accessEscalation,
+          set: (v) => {
+            window.ocs.passwords.escalation = v;
+            this.accessEscalation = v;
+          }
+        }),
+        activeAgent: computed({
+          get: () => this.active_agent,
+        }),
       }
     },
     components: {
       AgentList,
       MainBrowser,
       ConfigsWindow,
+      PasswordConfig,
     },
     computed: {
       activeComp() {
@@ -279,6 +302,9 @@
           this.userConfirm.cancel();
 
         this.userConfirm = null;
+      },
+      confirmPw() {
+        this.passwordWindow = null;
       },
     },
     setup() {
@@ -382,6 +408,11 @@
                        'message': msg});
                 }
               });
+      };
+
+      ocs_bundle.ui_password_window = (agent_class, instance_id) => {
+        this.passwordWindow = {agent_class: agent_class,
+                               instance_id: instance_id};
       };
 
     },

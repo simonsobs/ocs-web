@@ -16,6 +16,8 @@ import OpSelect       from './components/OpDropdown.vue'
 import ProgressBar    from './components/ProgressBar.vue'
 import OcsOpAutofill  from './components/OcsOpAutofill.vue'
 import OpLocker       from './components/OpLocker.vue'
+import OpPrivs        from './components/OpPrivs.vue'
+import OcsAgentHeader from './components/OcsAgentHeader.vue'
 import OcsLightLine   from './components/OcsLightLine.vue'
 import OcsLight       from './components/OcsLight.vue'
 
@@ -30,9 +32,19 @@ app
   .component('ProgressBar', ProgressBar)
   .component('OcsOpAutofill', OcsOpAutofill)
   .component('OpLocker',    OpLocker)
+  .component('OpPrivs',     OpPrivs)
+  .component('OcsAgentHeader', OcsAgentHeader)
   .component('OcsLightLine', OcsLightLine)
   .component('OcsLight',    OcsLight)
 ;
+
+// Font/icon stuff.
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faLock, faUnlock, faUser, faUserGraduate } from '@fortawesome/free-solid-svg-icons'
+library.add(faLock, faUnlock, faUser, faUserGraduate)
+
+app.component('font-awesome-icon', FontAwesomeIcon);
 
 // This is needed in vue<3.3 to use computed function with provide/inject
 app.config.unwrapInjectedRef = true;

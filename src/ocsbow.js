@@ -5,6 +5,8 @@
 import $ from 'jquery';
 import autobahn from 'autobahn';
 
+let ac = require('./access');
+
 let ocs_bundle;
 
 export function init(ocs_bundle_) {
@@ -35,6 +37,7 @@ export function OCSConnection(url_func, realm_func, addr_root_func)
         requested: false };
 
     this.agent_list = new AgentList(this);
+    this.passwords = new ac.PasswordManager();
 
     this.ready_defer = new autobahn.when.defer();
 }
@@ -246,9 +249,12 @@ export function AgentClient(_ocs, address) {
     this.agent_class = null;
     this.watchers = {};
     this.connection_ok = true;
+    [this.instance_id] = address.split('.').slice(-1);
+    this._index = Object.getPrototypeOf(this).counter++;
 }
 
 AgentClient.prototype = {
+    counter: 0,
 
     // scan
     //
@@ -323,17 +329,19 @@ AgentClient.prototype = {
     // @param params      Object with key-value parameters for the method.
 
     dispatch : function(method, op_name, params) {
-        let client = this;
-        var _p = [method, op_name, params];
-
         // Wrap all API calls to call our onSession handler before
         // returning to the invoking agent.
         var d = new autobahn.when.defer();
-        if (!client.ocs.connection) {
+        if (!this.ocs.connection) {
             d.reject();
             return d.promise;
         }
-        client.ocs.connection.session.call(client.address + '.ops', _p).then(
+
+        var _p = [method, op_name, params];
+        let _kw = {'password':
+                   this.ocs.passwords.get_pass(this.agent_class, this.instance_id, 3)};
+        let client = this;
+        client.ocs.connection.session.call(client.address + '.ops', _p, _kw).then(
             function (args) {
                 // OCS responds with a simple list, args = [exit_code,
                 // message, session].
