@@ -294,6 +294,11 @@
         :op_data="ops.restart_idle"
       />
 
+      <OcsOpAutofill
+        :address="address"
+        :ops_parent="ops"
+      />
+
     </div>
 
   </div>

@@ -1,7 +1,7 @@
 /* eslint-disable */
 <template>
   <div class="ocs_ui">
-    <i v-if="warn_about_auto">Operations widgets below are
+    <i v-if="show_warning">Operations widgets below are
     automatically instantiated, without any parameter fields.  Some
     may be usable without parameters while others are not.</i>
     <OcsTask v-for="op in ops_task" v-bind:key="op"
@@ -35,6 +35,9 @@
       }
     },
     computed: {
+      show_warning() {
+        return this.warn_about_auto && Object.keys(this.ops).length;
+      },
       ops() {
         // Some stuff expects this.ops instead of separate ones ...
         let result = {};
