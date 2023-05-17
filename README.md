@@ -72,13 +72,18 @@ The schema for config.json is like this::
 {"crossbars": [
     {"name": "ocs-8001",
      "url": "ws://localhost:8001/ws",
-     "realm": "test_realm"},
+     "realm": "test_realm",
+     "addr_root": "observatory"},
     {"name": "ocs-8002",
      "url": "ws://localhost:8002/ws",
-     "realm": "test_realm"}
+     "realm": "test_realm",
+     "addr_root": "platform2"}
     ]
 }
 ```
+
+Note that `realm` and `addr_root` are optional, and will default to
+values `test_realm` and `observatory`.
 
 
 ### Environment variables
@@ -94,20 +99,24 @@ for general info.)
 This variable carries zero or more "OCS configs".  Each "OCS config"
 is defined by a name (e.g. "My OCS"; this is only used in this
 application), the URL of the WAMP router's websocket server
-(e.g. "ws://example.com/crossbar/ws"), and the the realm
-(e.g. "ocsrealm").
+(e.g. "ws://example.com/crossbar/ws"), the WAMP realm
+(e.g. "ocsrealm"), and the OCS "address root" (e.g. "observatory").
 
-Each OCS config is constructed by joining those three things together
+Each OCS config is constructed by joining those four things together
 with commas; multiple OCS configs are separated by semicolons.  So the
 result should look like this:
 
 ```
-VUE_APP_OCS_ADDRS=My OCS,ws://example.com/crossbar/ws,ocsrealm
+VUE_APP_OCS_ADDRS=My OCS,ws://example.com/crossbar/ws,ocsrealm,observatory
 ```
+
+(If 3 or fewer tokens are specified, then the address root defaults to
+"observatory"; if only 2 tokens are specified then the realm defaults
+to "test_realm".)
 
 Here's a multi-config example:
 ```
-VUE_APP_OCS_ADDRS=Lab1,ws://localhost:8001/ws,test_realm;Lab2,ws://localhost:8002/ws,test_realm
+VUE_APP_OCS_ADDRS=Lab1,ws://localhost:8001/ws,test_realm;Lab2,ws://localhost:8002/ws,test_realm,platform2
 ```
 
 (In addition to these "static" OCS configs, the "custom" config is

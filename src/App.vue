@@ -184,6 +184,7 @@
   window.ocs = new ocs.OCSConnection(
     function () {return window.ocs_bundle.config.url; },
     function () {return window.ocs_bundle.config.realm; },
+    function () {return window.ocs_bundle.config.addr_root; },
   );
 
   export default {
@@ -291,6 +292,8 @@
               cfg.url = cfg_cookie.url;
             if (cfg_cookie.realm)
               cfg.realm = cfg_cookie.realm;
+            if (cfg_cookie.addr_root)
+              cfg.addr_root = cfg_cookie.addr_root;
           }
         });
       }
