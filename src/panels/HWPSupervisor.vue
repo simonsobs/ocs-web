@@ -53,13 +53,23 @@
         <h2>HWP Summary</h2>
 
         <OpReading
-          caption="PMX Summary"
-          :value="getMonThing('hwp_state', '!pmx_summary')"
+          caption="Spin Control"
+          :value="getMonThing('state', '!state_summary', 'spin_control')"
         />
 
         <OpReading
           caption="PID Summary"
           :value="getMonThing('hwp_state', '!pid_summary')"
+        />
+
+        <OpReading
+          caption="PMX Summary"
+          :value="getMonThing('hwp_state', '!pmx_summary')"
+        />
+
+        <OpReading
+          caption="Encoder Summary"
+          :value="getMonThing('hwp_state', '!encoder_summary')"
         />
 
         <OpReading
@@ -220,18 +230,34 @@
       }
     },
     methods: {
-      getMonThing(k1, k2) {
-        let proc = this.ops.monitor.session.data;
+      getMonThing(k1, k2, parent) {
+        if (!parent)
+          parent = 'monitor';
+
+        let proc = this.ops[parent].session.data;
         if (proc && proc[k1]) {
           switch (k2) {
+            case '!state_summary': {
+              let now = window.ocs_bundle.util.timestamp_now();
+              let oldness = window.ocs_bundle.util.human_timespan(now - proc[k1]['start_time']);
+              return 'state=' + proc[k1]['state_name'] + ', for ' + oldness;
+            }
             case '!pmx_summary': {
               return proc[k1]['pmx_voltage'] + " V / "
                    + proc[k1]['pmx_current'] + " A / "
                    + proc[k1]['pmx_source'];
             }
             case '!pid_summary': {
-              return 'Target ' + proc[k1]['pid_target_freq'] + ' Hz ; '
+              return 'Target ' + proc[k1]['pid_target_freq'] + ' Hz '
+                    + '(dir=' + proc[k1]['pid_direction'] + '); '
                    + 'Current ' + proc[k1]['pid_current_freq'] + ' Hz.';
+            }
+            case '!encoder_summary': {
+              let now = window.ocs_bundle.util.timestamp_now();
+              let oldness = window.ocs_bundle.util.human_timespan(now - proc[k1]['last_quad_time']);
+              return proc[k1]['enc_freq'].toFixed(4) + ' Hz; '
+                   + 'quad=' + proc[k1]['last_quad']
+                   + ', ' + oldness + ' ago';
             }
             case '!ups_summary': {
               return 'On ' + proc[k1]['ups_output_source'] + ' with '

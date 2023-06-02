@@ -64,8 +64,9 @@ processes:
       'pmx_voltage': 1.416,
       'pmx_source': 'VOLT\n',
       'pmx_last_updated': 1685478694.930578,
-      'enc_freq': None,
-      'last_quad': None},
+      'enc_freq': 1.3660419851129803e-06,
+      'last_quad': 0,
+      'last_quad_time': 1685645970.4392657},
      'actions': {'pmx': 'ok', 'gripper': 'ok'}
     }
   spin_control:
@@ -76,8 +77,8 @@ processes:
     data: {
       'state': {
         'traceback': "Traceback (most recent call last):\n  File \"/usr/local/lib/python3.8/dist-packages/socs/agents/hwp_supervisor/agent.py\", line 530, in update\n    run_and_validate(clients.pid.set_off)\nAttributeError: 'OCSClient' object has no attribute 'set_off'\n",
-      'start_time': 1685479676.6555681,
-      'state_name': 'Error',
+        'start_time': 1685479676.6555681,
+        'state_name': 'Error',
       },
       'timestamp': 1685479698.7267675,
     }
