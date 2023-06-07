@@ -50,11 +50,14 @@
                       ib_on: item.description=='on',
                       ib_off: item.description=='off',
                     }"
-              >{{ item.description }}</span>
+              >
+                <span v-if="item.locked">&#128274;</span>
+                {{ item.description }}
+                <span v-if="item.locked">&#128274;</span>              </span>
               <span />
-              <button :disabled="accessLevel < 1" @click="set_target(item.idx, 'on')">on</button>
-              <button :disabled="accessLevel < 1" @click="set_target(item.idx, 'off')">off</button>
-              <button :disabled="accessLevel < 1" @click="set_target(item.idx, 'cycle')">cycle</button>
+              <button :disabled="accessLevel < 1 || item.locked" @click="set_target(item.idx, 'on')">on</button>
+              <button :disabled="accessLevel < 1 || item.locked" @click="set_target(item.idx, 'off')">off</button>
+              <button :disabled="accessLevel < 1 || item.locked" @click="set_target(item.idx, 'cycle')">cycle</button>
             </div>
           </form>
         </div>

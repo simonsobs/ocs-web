@@ -10,10 +10,12 @@ processes:
       'outletStatus_0': {
         'status': 1,
         'name': 'Outlet-1',
+        'locked': true,
         'description': 'on'},
       'outletStatus_1': {
         'status': 1,
         'name': 'Outlet-2',
+        'locked': false,
         'description': 'on'},
       'outletStatus_2': {
         'status': 1,
