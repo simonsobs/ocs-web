@@ -108,14 +108,14 @@
               :disabled="accessLevel < 1"
               @click="quickAction('pmx_off')">Power Off</button>
           </div>
-          <div class="ocs_row">
-            <label>Set Spin Rate (Hz)</label>
-            <input type="text"
-                         v-model="this.ops.pid_to_freq.params.target_freq" />
-            <button
-              :disabled="accessLevel < 1"
-              @click="quickAction('pid_to_freq')">Set</button>
-          </div>
+          <OpParam
+            caption="Set Spin Rate (Hz)"
+            v-model.number="this.ops.pid_to_freq.params.target_freq"
+            modelType="blank_to_null"
+            button="Set"
+            :disabled="accessLevel < 1"
+            @click-button="quickAction('pid_to_freq')"
+          />
         </form>
       </div>
 
