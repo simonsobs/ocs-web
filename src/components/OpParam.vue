@@ -10,11 +10,16 @@ This component provides user-editable text fields for an Agent Panel.
 <template>
   <div class="ocs_row">
     <label>{{ caption }}</label>
-    <input class="ocs_double"
+    <input v-bind:class="{ocs_double: !button}"
            type="text"
            :disabled="modelDisabled == true"
            v-model="value"
     />
+    <button v-if="button"
+            :disabled="disabled"
+            @click="$emit('click-button')">
+      {{ button }}
+    </button>
   </div>
 </template>
 
@@ -23,6 +28,12 @@ This component provides user-editable text fields for an Agent Panel.
     name: 'OpParam',
     props: {
       caption: String,
+      button: {
+        default: false,
+      },
+      disabled: {
+        default: false,
+      },
       modelDisabled: {
         type: Boolean,
         default: false,
