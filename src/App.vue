@@ -1,6 +1,6 @@
 /* eslint-disable */
 <template>
-  <h1>Observatory Control System</h1>
+  <h1>{{ main_title }}</h1>
   <hr />
 
   <!-- Viewport-fixed for unscrollables-->
@@ -192,6 +192,7 @@
     data() {
       let [configs, index] = web.setup_configs();
       return {
+        main_title: 'Observatory Control System',
         active_agent: {
           'comp': null,
           'addr': null,
@@ -307,6 +308,8 @@
       }
       ocs_bundle.config = this.configs[this.config_index];
       window.ocs.start();
+
+      this.main_title = `Observatory Control System - [${ocs_bundle.config.name}]`;
 
       // Register error handler.
       ocs_bundle.on_error = (msg) => {
