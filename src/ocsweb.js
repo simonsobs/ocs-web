@@ -77,32 +77,45 @@ function get_status_string(session) {
     return t;
 }
 
+function clean_config(item) {
+  /** For a crossbar config block, fill in realm and addr_root, if
+   * missing. */
+  if (!item.realm)
+    item.realm = 'test_realm';
+  if (!item.addr_root)
+    item.addr_root = 'observatory';
+  return item;
+}
+
 export
 function setup_configs() {
   let configs = [];
 
   // Decode environment var ... expecting format
-  // "name1,url1,realm1;name2,url2,realm2;..."
+  //   "name1,url1,realm1,addr_root1;name2,url2,realm2,addr_root2;..."
+  // Ok if missing realm or realm and addr_root.
   let addrs = process.env.VUE_APP_OCS_ADDRS;
   if (addrs) {
     addrs.split(';').map(addr => {
-      let [name, url, realm] = addr.split(',');
-      configs.push({
-        name: name,
-        url: url,
-        realm: realm});
+      let item = {};
+      [item.name, item.url, item.realm, item.addr_root] = addr.split(',');
+      configs.push(clean_config(item));
     });
   }
 
+  // Parse entries in the config.json file.
   if (window.config.crossbars) {
-    window.config.crossbars.map((item) => configs.push(item));
+    window.config.crossbars.map((item) => {
+      configs.push(clean_config(item))
+    });
   }
 
+  // Push an editable item with default dev config.
   configs.push(
-    {'name': 'custom',
-     'url': 'ws://localhost:8001/ws',
-     'realm': 'test_realm',
-     'edit': true});
+    clean_config({'name': 'custom',
+                  'url': 'ws://localhost:8001/ws',
+                  'edit': true})
+  );
 
   return [configs, 0];
 }

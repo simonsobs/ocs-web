@@ -27,10 +27,16 @@
               @input="emitConfigChange(index, 'url', $event.target.value)"
             />
             <OpParam
-              caption="Realm"
+              caption="WAMP Realm"
               :modelDisabled="!config.edit"
               :modelValue="config.realm"
-              @input="emitConfigChange()"
+              @input="emitConfigChange(index, 'realm', $event.target.value)"
+            />
+            <OpParam
+              caption="OCS Address Root"
+              :modelDisabled="!config.edit"
+              :modelValue="config.addr_root"
+              @input="emitConfigChange(index, 'addr_root', $event.target.value)"
             />
           </form>
         </div>

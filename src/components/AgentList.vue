@@ -18,9 +18,6 @@
   export default {
     name: 'AgentList',
     props: {
-      prefix: {
-        default: 'observatory.',
-      },
       parent_id: String,
       known_classes: Array,
     },
@@ -29,6 +26,7 @@
         tracked_agents: {},
         alphabetical: [],
         by_class: [],
+        addr_root: 'observatory',
       }
     },
     computed: {
@@ -42,8 +40,9 @@
       },
       update_agent_list(agent_addr, new_state, info) {
         let short = agent_addr;
-        if (short.startsWith(this.prefix))
-          short = short.slice(this.prefix.length);
+        let addr_root = window.ocs.agent_list.connection.addr_root_func();
+        if (addr_root && short.startsWith(addr_root + '.'))
+            short = short.slice(addr_root.length + 1);
         this.tracked_agents[agent_addr] = {
           addr: agent_addr,
           instance_id: short,

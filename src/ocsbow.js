@@ -11,10 +11,11 @@ export function init(ocs_bundle_) {
     ocs_bundle = ocs_bundle_;
 }
 
-export function OCSConnection(url_func, realm_func)
+export function OCSConnection(url_func, realm_func, addr_root_func)
 {
     this.url_func = url_func;
     this.realm_func = realm_func;
+    this.addr_root_func = addr_root_func;
 
     // Hooks; assign handlers with .on(trigger, func).
     this.handlers = {
@@ -47,6 +48,9 @@ OCSConnection.prototype = {
         var this_ocs = this;
         var url = this.url_func();
         var realm = this.realm_func();
+        var addr_root = 'observatory';
+        if (this.addr_root_func)
+            addr_root = this.addr_root_func();
 
         // See connection options at...
         // https://github.com/crossbario/autobahn-js/blob/master/packages/autobahn/lib/connection.js
@@ -67,7 +71,7 @@ OCSConnection.prototype = {
                 this_ocs.handlers.connected();
 
             // Monitor heartbeat feeds to see what Agents are online.
-            c.session.subscribe('observatory..feeds.heartbeat',
+            c.session.subscribe(addr_root + '..feeds.heartbeat',
                                 function (args, kwargs, details) { // eslint-disable-line
                                     var info = args[0][1];
                                     this_ocs.agent_list._heartbeat(info);
