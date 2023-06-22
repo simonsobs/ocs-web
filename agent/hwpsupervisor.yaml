@@ -1,0 +1,89 @@
+agent_class: 'HWPSupervisor'
+instance_id: 'hwp-super-1'
+processes:
+  monitor:
+    startup: true
+    data_settings: {
+      'timestamp_field': 'timestamp'
+      }
+    data: {
+    'timestamp': 1685478695.708813,
+     'monitored_sessions': {'temperature': {'agent_id': 'LSA25B7',
+       'op_name': 'acq',
+       'timestamp': 1685478695.708817,
+       'data': {'fields': {'Channel_1': {'T': 3.0055, 'V': 1.5962},
+         'Channel_2': {'T': 3.1961, 'V': 1.6144},
+         'Channel_3': {'T': 3.8491, 'V': 1.5958},
+         'Channel_4': {'T': 3.671, 'V': 1.6049},
+         'Channel_5': {'T': 0.0, 'V': 3.0391},
+         'Channel_6': {'T': 0.0, 'V': 0.0},
+         'Channel_7': {'T': 0.0, 'V': 0.0},
+         'Channel_8': {'T': 3.8762, 'V': 1.5958}},
+        'timestamp': 1685478695.5608613},
+       'status': 'ok'},
+      'encoder': {'agent_id': 'HBA1',
+       'op_name': 'acq',
+       'timestamp': 1685478695.7649696,
+       'data': {},
+       'status': 'ok'},
+      'pmx': {'agent_id': 'PMX',
+       'op_name': 'acq',
+       'timestamp': 1685478695.820547,
+       'data': {'curr': -0.0033,
+        'volt': 1.416,
+        'source': 'VOLT\n',
+        'last_updated': 1685478694.930578},
+       'status': 'ok'},
+      'pid': {'agent_id': 'hwp-pid',
+       'op_name': 'acq',
+       'timestamp': 1685478695.876245,
+       'data': {'current_freq': 0.016,
+        'target_freq': 3.25,
+        'direction': 0,
+        'last_updated': 1685478693.747795},
+       'status': 'ok'},
+      'ups': {'agent_id': None,
+       'op_name': 'acq',
+       'timestamp': 1685478695.9315987,
+       'data': None,
+       'status': 'no_agent_provided'}},
+     'hwp_state': {'temp': 3.8762,
+      'temp_status': 'ok',
+      'temp_thresh': 50.0,
+      'temp_field': 'Channel_8',
+      'ups_output_source': None,
+      'ups_estimated_minutes_remaining': None,
+      'ups_battery_voltage': None,
+      'ups_battery_current': None,
+      'ups_minutes_remaining_thresh': None,
+      'pid_current_freq': 0.016,
+      'pid_target_freq': 3.25,
+      'pid_direction': 0,
+      'pid_last_updated': 1685478693.747795,
+      'pmx_current': -0.0033,
+      'pmx_voltage': 1.416,
+      'pmx_source': 'VOLT\n',
+      'pmx_last_updated': 1685478694.930578,
+      'enc_freq': 1.3660419851129803e-06,
+      'last_quad': 0,
+      'last_quad_time': 1685645970.4392657},
+     'actions': {'pmx': 'ok', 'gripper': 'ok'}
+    }
+  spin_control:
+    startup: true
+    data_settings: {
+      'timestamp_field': 'timestamp'
+      }
+    data: {
+      'state': {
+        'traceback': "Traceback (most recent call last):\n  File \"/usr/local/lib/python3.8/dist-packages/socs/agents/hwp_supervisor/agent.py\", line 530, in update\n    run_and_validate(clients.pid.set_off)\nAttributeError: 'OCSClient' object has no attribute 'set_off'\n",
+        'start_time': 1685479676.6555681,
+        'state_name': 'Error',
+      },
+      'timestamp': 1685479698.7267675,
+    }
+tasks:
+  brake: {}
+  pid_to_freq: {}
+  set_const_voltage: {}
+  pmx_off: {}
