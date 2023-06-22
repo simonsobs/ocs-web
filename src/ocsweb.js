@@ -20,6 +20,10 @@ function register_panel(comp, callback, dest) {
       comp.connection_ok = conn_ok;
     });
 
+    // Scan for API ... this will run in background; returns a promise.
+    client.scan();
+    //  .then((client) => {console.log('done scan client is', client)});
+
     if (callback)
       callback(client);
     if (dest)
