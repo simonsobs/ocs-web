@@ -44,7 +44,7 @@
     <div class="block_unit">
 
       <OcsTask
-        :address="address"
+        :panel="panel"
         :show_abort="true"
         :op_data="ops.delay_task">
         <OpParam
@@ -57,7 +57,7 @@
       </OcsTask>
 
       <OcsProcess
-        :address="address"
+        :panel="panel"
         :op_data="ops.acq"
       />
 
@@ -71,8 +71,6 @@
 </template>
 
 <script>
-  let ocs_reg = {};
-
   export default {
     name: 'FakeData',
     props: {
@@ -88,6 +86,7 @@
           acq: {},
         }),
         options: [10, 20, 30],
+        panel: {},
       }
     },
     computed: {
@@ -112,10 +111,10 @@
       },
     },
     mounted() {
-      window.ocs_bundle.web.register_panel(this, null, ocs_reg);
+      window.ocs_bundle.web.register_panel(this, null, this.panel);
     },
     beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, ocs_reg.client);
+      window.ocs_bundle.web.unregister_panel(this, this.panel.client);
     },
   }
 </script>
