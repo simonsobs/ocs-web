@@ -62,7 +62,7 @@
       />
 
       <OcsOpAutofill
-        :address="address"
+        :panel="panel"
         :ops_parent="ops"
       />
     </div>
@@ -84,6 +84,7 @@
             params: {delay: 10},
           },
           acq: {},
+          //count: {auto:true},
         }),
         options: [10, 20, 30],
         panel: {},
@@ -111,7 +112,7 @@
       },
     },
     mounted() {
-      window.ocs_bundle.web.register_panel(this, this.panel);
+      this.panel.client_promise = window.ocs_bundle.web.register_panel(this, this.panel);
     },
     beforeUnmount() {
       window.ocs_bundle.web.unregister_panel(this, this.panel.client);

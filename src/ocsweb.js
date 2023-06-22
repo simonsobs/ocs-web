@@ -15,29 +15,58 @@
  */
 export
 function register_panel(comp, dest) {
-
   return window.ocs.ready_defer.promise.then( () => {
-    let client = window.ocs.get_client(comp.address);
-    
-    Object.keys(comp.ops).forEach(k => {
-      client.add_watcher(k, 1.0, (op_name, method, stat, msg, session) => {
-        if(!comp.ops)
-          return;
-        comp.ops[k].session = friendlyize_session(session);
-      });
-    });
 
-    // Subscribe to heartbeat, identify self with agent address.
+    // Get (and stow) an OCSClient.
+    let client = window.ocs.get_client(comp.address);
+    if (dest)
+      dest.client = client;
+    
+    // Subscribe to heartbeat info updates.
     window.ocs.agent_list.subscribe(comp.address, comp.address, (addr, conn_ok) => {
       client.connection_ok = conn_ok;
       comp.connection_ok = conn_ok;
     });
 
-    if (dest)
-      dest.client = client;
-
     // Scan for API ... this will run in background; returns a promise.
-    return client.scan();
+    let p = client.scan().then(client => {
+
+      // Update comp.ops with any tasks / processes that weren't
+      // already mentioned; mark them as auto: true.
+      client.tasks.map(([name, , cfg]) => {
+        if (!comp.ops[name] || comp.ops[name].auto)
+          comp.ops[name] = {
+            name: name,
+            type: 'task',
+            auto: true,
+            params: {},
+            session: friendlyize_session(),
+            show_abort: cfg.abortable};
+      });
+      client.procs.map(([name]) => {
+        if (!comp.ops[name] || comp.ops[name].auto)
+          comp.ops[name] = {
+            name: name,
+            type: 'proc',
+            auto: true,
+            params: {},
+            session: friendlyize_session(),
+          };
+      });
+
+      // Monitor every operation for session updates.
+      Object.keys(comp.ops).forEach(k => {
+        client.add_watcher(k, 1.0, (op_name, method, stat, msg, session) => {
+          if(!comp.ops)
+            return;
+          comp.ops[k].session = friendlyize_session(session);
+        });
+      });
+
+      return client;
+    });
+
+    return p;
   });
 }
 
