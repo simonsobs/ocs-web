@@ -3,7 +3,7 @@ function register_panel(comp, callback, dest) {
   // register a promise that will populate comp.client, then add
   // watchers for every op, then call callback.
 
-  window.ocs.ready_defer.promise.then( () => {
+  return window.ocs.ready_defer.promise.then( () => {
     let client = window.ocs.get_client(comp.address);
     
     Object.keys(comp.ops).forEach(k => {
@@ -20,14 +20,18 @@ function register_panel(comp, callback, dest) {
       comp.connection_ok = conn_ok;
     });
 
-    // Scan for API ... this will run in background; returns a promise.
-    client.scan();
-    //  .then((client) => {console.log('done scan client is', client)});
-
-    if (callback)
-      callback(client);
     if (dest)
       dest.client = client;
+
+    // Scan for API ... this will run in background; returns a promise.
+    let prom = client.scan();
+    if (callback) {
+      prom.then(client => {
+        callback(client);
+        return client;
+      });
+    }
+    return prom;
   });
 }
 

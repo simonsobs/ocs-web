@@ -187,9 +187,9 @@
 
     },
     mounted() {
-      window.ocs_bundle.web.register_panel(this, client => {
-        client.add_watcher('status_acq', 5., this.update_outlet_states);
-      }, ocs_reg);
+      window.ocs_bundle.web.register_panel(this, null, ocs_reg)
+      .then(client =>
+        client.add_watcher('status_acq', 5., this.update_outlet_states));
     },
     beforeUnmount() {
       window.ocs_bundle.web.unregister_panel(this, ocs_reg.client);

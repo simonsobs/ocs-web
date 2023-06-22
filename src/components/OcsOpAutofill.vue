@@ -52,38 +52,32 @@
       },
     },
     mounted() {
-      window.ocs_bundle.web.register_panel(
-        this,
-        client => {
-          // Query the API, and use the result to set the task and
-          // process lists
-          client.scan(() => {
-            client.tasks.map(([name, , cfg]) => {
-              if (!this.ops_parent[name] || this.ops_parent[name].auto)
-                this.ops_task[name] = {show_abort: cfg.abortable};
-            });
-            client.procs.map(([name]) => {
-              if (!this.ops_parent[name] || this.ops_parent[name].auto)
-                this.ops_proc[name] = {};
-            });
+      window.ocs_bundle.web.register_panel(this, null, ocs_reg)
+            .then(client => {
+              client.tasks.map(([name, , cfg]) => {
+                if (!this.ops_parent[name] || this.ops_parent[name].auto)
+                  this.ops_task[name] = {show_abort: cfg.abortable};
+              });
+              client.procs.map(([name]) => {
+                if (!this.ops_parent[name] || this.ops_parent[name].auto)
+                  this.ops_proc[name] = {};
+              });
 
-            // Add watchers; this is normally handled in
-            // register_panel, but before this callback (when ops are not
-            // yet known.
-            [this.ops_task, this.ops_proc].forEach(ops => {
-              window.ocs_bundle.web.ops_data_init(ops);
-              Object.keys(ops).forEach(k => {
-                client.add_watcher(k, 1.0, (op_name, method, stat, msg, session) => {
-                  if(!ops)
-                    return;
-                  ops[k].session =
-                    window.ocs_bundle.web.friendlyize_session(session);
+              // Add watchers; this is normally handled in
+              // register_panel, but before this callback (when ops are not
+              // yet known.
+              [this.ops_task, this.ops_proc].forEach(ops => {
+                window.ocs_bundle.web.ops_data_init(ops);
+                Object.keys(ops).forEach(k => {
+                  client.add_watcher(k, 1.0, (op_name, method, stat, msg, session) => {
+                    if(!ops)
+                      return;
+                    ops[k].session =
+                      window.ocs_bundle.web.friendlyize_session(session);
+                  })
                 })
-              })
+              });
             });
-          })
-        },
-        ocs_reg);
     },
     beforeUnmount() {
       window.ocs_bundle.web.unregister_panel(this, ocs_reg.client);
