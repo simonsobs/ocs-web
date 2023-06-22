@@ -271,7 +271,7 @@ AgentClient.prototype = {
                 // Calling an invalid method address seems to return
                 // null result, rather than raise a catchable.
                 if (!result) {
-                    client.scan_old_api(callback);
+                    console.log('Warning, ' + this.address + ' did not respond to "get_api" call.');
                     return;
                 }
                 // New API.
@@ -281,41 +281,7 @@ AgentClient.prototype = {
                 client.agent_class = result.agent_class;
                 if (callback != null)
                     callback();
-            });
-    },
-
-    scan_old_api : function(callback) {
-        console.log('Warning, ' + this.address + ' does not support "get_api" call.');
-        let client = this;
-        var d = new autobahn.when.defer();
-        var counter = 3;
-        d.promise.then(function() {
-            if (callback != null)
-                callback();
-        });
-        this.ocs.connection.session.call(this.address, ['get_tasks']).then(
-            function(result) {
-                client.tasks = [];
-                if (result != null)
-                    client.tasks = result;
-                if (--counter == 0)
-                    d.resolve();
-            });
-        this.ocs.connection.session.call(this.address, ['get_processes']).then(
-            function(result) {
-                client.procs = [];
-                if (result != null)
-                    client.procs = result;
-                if (--counter == 0)
-                    d.resolve();
-            });
-        this.ocs.connection.session.call(this.address, ['get_feeds']).then(
-            function(result) {
-                client.feeds = [];
-                if (result != null)
-                    client.feeds = result;
-                if (--counter == 0)
-                    d.resolve();
+                return client;
             });
     },
 
