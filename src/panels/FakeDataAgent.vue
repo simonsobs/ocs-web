@@ -111,7 +111,7 @@
       },
     },
     mounted() {
-      window.ocs_bundle.web.register_panel(this, null, this.panel);
+      window.ocs_bundle.web.register_panel(this, this.panel);
     },
     beforeUnmount() {
       window.ocs_bundle.web.unregister_panel(this, this.panel.client);

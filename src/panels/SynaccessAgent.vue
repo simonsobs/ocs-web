@@ -187,7 +187,7 @@
 
     },
     mounted() {
-      window.ocs_bundle.web.register_panel(this, null, ocs_reg)
+      window.ocs_bundle.web.register_panel(this, ocs_reg)
       .then(client =>
         client.add_watcher('status_acq', 5., this.update_outlet_states));
     },

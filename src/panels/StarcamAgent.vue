@@ -94,10 +94,7 @@
       },
     },
     mounted() {
-      window.ocs_bundle.web.register_panel(
-        this,
-        null,
-        ocs_reg);
+      window.ocs_bundle.web.register_panel(this, ocs_reg);
     },
     beforeUnmount() {
       window.ocs_bundle.web.unregister_panel(this, ocs_reg.client);

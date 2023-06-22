@@ -1,7 +1,20 @@
+/** register_panel(comp, dest)
+ *
+ *  Establish an OCSClient for an agent panel; scan the API using the
+ *  client; add session watchers for all operations listed in
+ *  comp.ops; subscribe to AgentList so that connection issues with
+ *  the agent get propagated into comp.connection_ok.
+ *
+ *  Args:
+ *    comp: the component (this) for an Agent panel.
+ *    dest: an object where to store the OCSClient (optional).
+ *
+ *  Returns:
+ *    promise of the OCSClient.
+ *
+ */
 export
-function register_panel(comp, callback, dest) {
-  // register a promise that will populate comp.client, then add
-  // watchers for every op, then call callback.
+function register_panel(comp, dest) {
 
   return window.ocs.ready_defer.promise.then( () => {
     let client = window.ocs.get_client(comp.address);
@@ -24,17 +37,18 @@ function register_panel(comp, callback, dest) {
       dest.client = client;
 
     // Scan for API ... this will run in background; returns a promise.
-    let prom = client.scan();
-    if (callback) {
-      prom.then(client => {
-        callback(client);
-        return client;
-      });
-    }
-    return prom;
+    return client.scan();
   });
 }
 
+/** unregister_panel(comp, client)
+  *
+  * Undo the registrations done by register_panel, namely to unscribe
+  * from AgentList and clear the session watchers.
+  *
+  * The "comp" should be the same component passed to register_panel;
+  * the client should be the client returned by it.
+  */
 export
 function unregister_panel(comp, client) {
   client.clear_watchers();

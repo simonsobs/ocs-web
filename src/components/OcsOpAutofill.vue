@@ -52,7 +52,7 @@
       },
     },
     mounted() {
-      window.ocs_bundle.web.register_panel(this, null, ocs_reg)
+      window.ocs_bundle.web.register_panel(this, ocs_reg)
             .then(client => {
               client.tasks.map(([name, , cfg]) => {
                 if (!this.ops_parent[name] || this.ops_parent[name].auto)

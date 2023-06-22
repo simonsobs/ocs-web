@@ -72,7 +72,6 @@
       ,
     },
     mounted() {
-      //window.ocs_bundle.web.register_panel(this, null, ocs_reg);
       let c = window.ocs;
       c.agent_list.subscribe(this.parent_id, '*', this.update_agent_list);
     },
