@@ -339,6 +339,14 @@
 
       this.main_title = `Observatory Control System - [${ocs_bundle.config.name}]`;
 
+      // Transitional converter -- if client is a string, construct a
+      // client assuming it's the agent address; otherwise assume client.
+      let _get_client = function(client) {
+        if (typeof client === 'string')
+          return window.ocs.get_client(client);
+        return client;
+      };
+
       // Register error handler.
       ocs_bundle.on_error = (msg) => {
         this.op_error(msg);
@@ -353,57 +361,61 @@
       };
 
       // Functions that wrap operation start/stop with UI error windows.
-      ocs_bundle.ui_run_task = (agent_address, op_name, op_params) => {
-        window.ocs.get_client(agent_address).run_task(op_name, op_params).then(
+      ocs_bundle.ui_run_task = (client, op_name, op_params) => {
+        // Temporarily accept "client" to be an agent_address.
+        client = _get_client(client);
+        client.run_task(op_name, op_params).then(
           (msg) => console.log('ok', msg),
           (msg) => window.ocs_bundle.on_error(
             {'type': 'op',
-             'address': agent_address,
+             'address': client.address,
              'op_name': op_name,
              'message': msg})
         );
       };
 
-      ocs_bundle.ui_abort_task = (agent_address, op_name) => {
-        window.ocs.get_client(agent_address).abort_task(op_name)
+      ocs_bundle.ui_abort_task = (client, op_name) => {
+        client = _get_client(client);
+        client.abort_task(op_name)
               .then(
                 result => {
                   if (result[0] != 0) {
                     let msg = result[1]
                     window.ocs_bundle.on_error(
                       {'type': 'op',
-                       'address': agent_address,
+                       'address': client.address,
                        'op_name': op_name,
                        'message': msg});
                 }
               });
       };
 
-      ocs_bundle.ui_start_proc = (agent_address, op_name, op_params) => {
-        window.ocs.get_client(agent_address)
-              .start_proc(op_name, op_params)
+      ocs_bundle.ui_start_proc = (client, op_name, op_params) => {
+        client = _get_client(client);
+        client.start_proc(op_name, op_params)
               .then(
                 result => {
                   if (result[0] != 0) {
                     let msg = result[1]
                     window.ocs_bundle.on_error(
                       {'type': 'op',
-                       'address': agent_address,
+                       'address': client.address,
                        'op_name': op_name,
                        'message': msg});
                   }
               });
       };
 
-      ocs_bundle.ui_stop_proc = (agent_address, op_name) => {
-        window.ocs.get_client(agent_address).stop_proc(op_name)
+      ocs_bundle.ui_stop_proc = (client, op_name) => {
+        client = _get_client(client);
+        client.stop_proc(op_name)
               .then(
                 result => {
                   if (result[0] != 0) {
                     let msg = result[1]
                     window.ocs_bundle.on_error(
                       {'type': 'op',
-                       'address': agent_address,
+                       'address': client.address,
                        'op_name': op_name,
                        'message': msg});
                 }

@@ -6,10 +6,12 @@
     may be usable without parameters while others are not.</i>
     <OcsTask v-for="op in ops_task" v-bind:key="op"
              class="autofilled"
+             :panel="panel"
              :address="address"
              :show_abort="op.show_abort"
              :op_data="op" />
     <OcsProcess v-for="op in ops_proc" v-bind:key="op"
+                :panel="panel"
                 :address="address"
                 :op_data="op" />
   </div>
@@ -21,6 +23,7 @@
   export default {
     name: 'OcsOpAutofill',
     props: {
+      panel: Object,
       address: String,
       ops_parent: Object,
       warn_about_auto: {

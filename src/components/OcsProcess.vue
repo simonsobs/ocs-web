@@ -29,6 +29,7 @@
   export default {
     name: 'OcsProcess',
     props: {
+      panel: Object,
       address: String,
       op_data: Object,
       op_name: String,
@@ -49,11 +50,20 @@
       },
     },
     methods: {
+      // transitional...
+      _get_client_or_address() {
+        let client = this.panel?.client;
+        if (!client)
+          return this.address;
+        return client;
+      },
       start() {
-        window.ocs_bundle.ui_start_proc(this.address, this.name, this.op_data.params);
+        window.ocs_bundle.ui_start_proc(this._get_client_or_address(),
+                                        this.name, this.op_data.params);
       },
       stop() {
-        window.ocs_bundle.ui_stop_proc(this.address, this.name);
+        window.ocs_bundle.ui_stop_proc(this._get_client_or_address(),
+                                       this.name);
       },
     },
   }
