@@ -1,7 +1,5 @@
 // -*- mode: web; web-mode-code-indent-offset: 4; -*-
 
-import $ from 'jquery';
-
 export
 function get_date_time_string(timestamp, joiner) {
     function twodig(x) {
@@ -72,7 +70,5 @@ function pad_decimal(val, places, space) {
 
 export
 function log(msg) {
-    var log = $("#messages");
-    log.html(log.html() + msg + '<br>');
     console.log('(logfunc)', msg);
 }

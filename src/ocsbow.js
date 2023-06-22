@@ -2,7 +2,6 @@
 
 /* eslint-disable */
 
-import $ from 'jquery';
 import autobahn from 'autobahn';
 
 let ac = require('./access');
@@ -185,7 +184,7 @@ AgentList.prototype = {
     },
 
     unsubscribe: function (subscriber) {
-        $.each(this._callbacks, function(agent_addr, cbs) {
+        Object.values(this._callbacks).forEach( (cbs) => {
             delete cbs[subscriber];
         });
     },
@@ -209,23 +208,23 @@ AgentList.prototype = {
     },
 
     _update_states: function() {
-        var key_order = [];
         var AL = this;
-        $.each(AL._data, (k, v) => key_order.push(k)); // eslint-disable-line
+        let key_order = Object.keys(AL._data);
         key_order.sort();
-        $.each(key_order, function(i, x) {
-            var info = AL._data[x];
-            var is_now_ok = (ocs_bundle.util.timestamp_now() - info['last_update'] <= 5);
+
+        key_order.forEach((k) => {
+            let info = AL._data[k];
+            let is_now_ok = (ocs_bundle.util.timestamp_now() - info['last_update'] <= 5);
             // Callbacks on change.
             if (is_now_ok != info.ok) {
                 info.ok = is_now_ok;
-                if (AL._callbacks[x]) {
-                    Object.entries(AL._callbacks[x]).forEach(
-                        ([sub, func]) => func(x, is_now_ok, info));
+                if (AL._callbacks[k]) {
+                    Object.entries(AL._callbacks[k]).forEach(
+                        ([sub, func]) => func(k, is_now_ok, info));
                 }
                 if (AL._callbacks['*']) {
                     Object.entries(AL._callbacks['*']).forEach(
-                        ([sub, func]) => func(x, is_now_ok, info));
+                        ([sub, func]) => func(k, is_now_ok, info));
                 }
             }
         });
@@ -312,8 +311,8 @@ AgentClient.prototype = {
                 // OCS responds with a simple list, args = [exit_code,
                 // message, session].
                 if (client.watchers[op_name])
-                    $.each(client.watchers[op_name].handlers, (i, h) =>
-                           h.f(op_name, method, args[0], args[1], args[2]));
+                    client.watchers[op_name].handlers.forEach(h =>
+                        { h.f(op_name, method, args[0], args[1], args[2]) });
                 d.resolve(args);
             });
         return d.promise;

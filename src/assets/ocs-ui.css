@@ -120,12 +120,6 @@ p.hanging_logmsg {
  * monitor_ui
  */
 
-
-/* Override jquery UI padding of tab container divs. */
-.ui-tabs .ui-tabs-panel {
-    padding: 0px;
-}
-
 /* Grid-based layout -- a 3-column approach, for either:
    label | widget | widget
    label |    big-widget
