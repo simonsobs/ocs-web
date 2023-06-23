@@ -217,7 +217,6 @@
         userConfirm: null,
         passwordWindow: null,
         accessLevel: 0,
-        accessEscalation: 0,
       }
     },
     provide() {
@@ -227,10 +226,9 @@
           set: (v) => {this.accessLevel = v;}
         }),
         accessEscalation: computed({
-          get: () => this.accessEscalation,
+          get: () => window.ocs.passwords.escalation,
           set: (v) => {
             window.ocs.passwords.escalation = v;
-            this.accessEscalation = v;
           }
         }),
         activeAgent: computed({

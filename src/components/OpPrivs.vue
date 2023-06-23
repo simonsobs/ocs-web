@@ -7,13 +7,17 @@ configuration of an access password.
 
 <template>
   <div>
+    <span v-if="accessEscalation == -1" class="tippable" style="color: #eee">
+      <span class="tooltip">Agent does not support password.</span>
+      <font-awesome-icon icon="fa-solid fa-user" />
+    </span>
     <span class="obviously_clickable tippable"
           @click.exact="changeConfig()">
       <span v-if="accessEscalation == 0">
         <span class="tooltip">Basic privileges (no password).</span>
         <font-awesome-icon icon="fa-solid fa-user" />
       </span>
-      <span v-else style="color: #f44">
+      <span v-else-if="accessEscalation > 0" style="color: #f44">
         <span class="tooltip">Escalated privileges enabled.</span>
         <font-awesome-icon icon="fa-solid fa-user-graduate" />
       </span>

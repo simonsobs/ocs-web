@@ -31,6 +31,13 @@ function register_panel(comp, dest) {
     // Scan for API ... this will run in background; returns a promise.
     let p = client.scan().then(client => {
 
+      // If target doesn't support passwords, kill the escalation.
+      if (!client.access_control) {
+        window.ocs.passwords.escalation = -1;
+      } else {
+        window.ocs.passwords.escalation = 0;
+      }
+
       // Update comp.ops with any tasks / processes that weren't
       // already mentioned; mark them as auto: true.
       client.tasks.map(([name, , cfg]) => {

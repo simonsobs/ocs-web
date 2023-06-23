@@ -14,11 +14,11 @@
 
 export function PasswordManager()
 {
-    this.escalation = 0;
+    this.escalation = -1;
     this.passwords = {
         global: '',
         by_class: {},
-        by_instance: {'faker4': 'x'},
+        by_instance: {},
     }
 }
 

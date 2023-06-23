@@ -278,6 +278,7 @@ AgentClient.prototype = {
                 client.procs = result.processes;
                 client.feeds = result.feeds;
                 client.agent_class = result.agent_class;
+                client.access_control = result.access_control;
                 if (callback != null)
                     callback();
                 return client;
@@ -303,8 +304,14 @@ AgentClient.prototype = {
         }
 
         var _p = [method, op_name, params];
-        let _kw = {'password':
-                   this.ocs.passwords.get_pass(this.agent_class, this.instance_id, 3)};
+        let _kw = {};
+
+        // Transitional -- don't provide a password unless API supports it.
+        if (this.access_control) {
+            _kw.password =
+                this.ocs.passwords.get_pass(this.agent_class, this.instance_id, 3);
+        }
+
         let client = this;
         client.ocs.connection.session.call(client.address + '.ops', _p, _kw).then(
             function (args) {
