@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1><slot /> <OpLocker class="spaced" /> <OpPrivs class="spaced" /></h1>
+    <h1><slot /> <OpLocker class="spaced" /> <OpPrivs class="spaced" :panel="panel" /></h1>
   </div>
 </template>
 
@@ -8,7 +8,7 @@
   export default {
     name: 'OcsAgentHeader',
     props: {
-      name: String,
+      panel: Object,
     },
   }
 </script>

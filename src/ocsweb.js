@@ -19,8 +19,11 @@ function register_panel(comp, dest) {
 
     // Get (and stow) an OCSClient.
     let client = window.ocs.get_client(comp.address);
-    if (dest)
+    if (dest) {
       dest.client = client;
+      if (!dest.count)
+        dest.count = 0;
+    }
     
     // Subscribe to heartbeat info updates.
     window.ocs.agent_list.subscribe(comp.address, comp.address, (addr, conn_ok) => {
@@ -30,13 +33,6 @@ function register_panel(comp, dest) {
 
     // Scan for API ... this will run in background; returns a promise.
     let p = client.scan().then(client => {
-
-      // If target doesn't support passwords, kill the escalation.
-      if (!client.access_control) {
-        window.ocs.passwords.escalation = -1;
-      } else {
-        window.ocs.passwords.escalation = 0;
-      }
 
       // Update comp.ops with any tasks / processes that weren't
       // already mentioned; mark them as auto: true.
@@ -69,6 +65,9 @@ function register_panel(comp, dest) {
           comp.ops[k].session = friendlyize_session(session);
         });
       });
+
+      if (dest)
+        dest.count++;
 
       return client;
     });

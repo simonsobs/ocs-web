@@ -208,6 +208,7 @@
         active_agent: {
           'comp': null,
           'addr': null,
+          'escalation': null,
         },
         force_generic: false,
         config_index: index,
@@ -224,12 +225,6 @@
         accessLevel: computed({
           get: () => this.accessLevel,
           set: (v) => {this.accessLevel = v;}
-        }),
-        accessEscalation: computed({
-          get: () => window.ocs.passwords.escalation,
-          set: (v) => {
-            window.ocs.passwords.escalation = v;
-          }
         }),
         activeAgent: computed({
           get: () => this.active_agent,
@@ -420,9 +415,15 @@
               });
       };
 
-      ocs_bundle.ui_password_window = (agent_class, instance_id) => {
-        this.passwordWindow = {agent_class: agent_class,
-                               instance_id: instance_id};
+      ocs_bundle.get_password_settings = () => {
+        return {
+          escalation: this.active_agent.escalation,
+        }
+      };
+
+      ocs_bundle.ui_password_window = () => { //(agent_class, instance_id) => {
+        this.passwordWindow = true; //{agent_class: agent_class,
+        //instance_id: instance_id};
       };
 
     },

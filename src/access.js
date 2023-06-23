@@ -5,16 +5,15 @@
  *
  * In this implementation, special passwords can be set on a
  * per-instance or per-class basis, along with a default password.
- * (This means there isn't really support for level 1 / 2 / 3 access.)
- * In the UI the user will either operate as the basic user (so no
- * password will be provided), or as an escalated user (a password
- * will be provided).
+ * (This means there isn't really support to fine-tune for level 1 / 2
+ * / 3 access.)  In the UI the user will either operate as the basic
+ * user (so no password will be provided), or as an escalated user,
+ * with a password sourced from the PasswordManager instance.
  *
  */
 
 export function PasswordManager()
 {
-    this.escalation = -1;
     this.passwords = {
         global: '',
         by_class: {},
@@ -24,8 +23,6 @@ export function PasswordManager()
 
 PasswordManager.prototype = {
     get_pass: function(agent_class, instance_id) {
-        if (this.escalation == 0)
-            return '';
         if (this.passwords.by_instance[instance_id])
             return this.passwords.by_instance[instance_id];
         if (this.passwords.by_class[agent_class])

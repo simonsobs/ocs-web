@@ -307,7 +307,7 @@ AgentClient.prototype = {
         let _kw = {};
 
         // Transitional -- don't provide a password unless API supports it.
-        if (this.access_control) {
+        if (this.access_control && ocs_bundle.get_password_settings().escalation) {
             _kw.password =
                 this.ocs.passwords.get_pass(this.agent_class, this.instance_id, 3);
         }

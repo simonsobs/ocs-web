@@ -1,26 +1,26 @@
 <!--
-This is a access config icon that connects to App.accessEscalation.
-
-Agent panels can add this anywhere on the page and it will allow for
-configuration of an access password.
+Access Escalation icon -- shows current escalation level and
+can open up the password config window.
 -->
 
 <template>
   <div>
-    <span v-if="accessEscalation == -1" class="tippable" style="color: #eee">
-      <span class="tooltip">Agent does not support password.</span>
-      <font-awesome-icon icon="fa-solid fa-user" />
-    </span>
-    <span class="obviously_clickable tippable"
+    <span v-if="supportsPasswords"
+          class="obviously_clickable tippable"
           @click.exact="changeConfig()">
-      <span v-if="accessEscalation == 0">
+      <span v-if="!activeAgent.escalation">
         <span class="tooltip">Basic privileges (no password).</span>
         <font-awesome-icon icon="fa-solid fa-user" />
       </span>
-      <span v-else-if="accessEscalation > 0" style="color: #f44">
+      <span v-else style="color: #f44">
         <span class="tooltip">Escalated privileges enabled.</span>
         <font-awesome-icon icon="fa-solid fa-user-graduate" />
       </span>
+    </span>
+    <span v-else class="tippable"
+          style="color: #ccc">
+      <span class="tooltip">Agent does not support password.</span>
+      <font-awesome-icon icon="fa-solid fa-user" />
     </span>
   </div>
 </template>
@@ -29,18 +29,24 @@ configuration of an access password.
 
   export default {
     name: 'OpPrivs',
-    inject: ['accessEscalation', 'activeAgent'],
-    methods: {
-      changeConfig() {
-        let ag = this.activeAgent;
-        window.ocs_bundle.ui_password_window(ag.agent_class, ag.instance_id);
+    props: {
+      panel: Object,
+    },
+    inject: ['activeAgent'],
+    computed: {
+      supportsPasswords: {
+        get() {
+          // Check .count, which will increment when new API
+          // new API info arrives.
+          this.panel.count;
+          return this.panel?.client?.access_control;
+        }
       },
     },
-    mounted() {
-      this.accessEscalation = 0;
-    },
-    beforeUnmount() {
-      clearTimeout(this.timer);
+    methods: {
+      changeConfig() {
+        window.ocs_bundle.ui_password_window();
+      },
     },
   }
 </script>
@@ -61,8 +67,6 @@ configuration of an access password.
     padding: 5px 5px;
     border-radius: 6px;
     font-size: 12pt;
-
-    /* Position the tooltip text - see examples below! */
     position: absolute;
     z-index: 1;
   }

@@ -68,7 +68,7 @@
         pwValues: {},
       }
     },
-    inject: ['accessEscalation', 'activeAgent'],
+    inject: ['activeAgent'],
     emits: ["close"],
     methods: {
       confirm(keep) {
@@ -76,9 +76,9 @@
           if (this.usePw == 'yes') {
             window.ocs.passwords.update_pass(
               this.activeAgent, this.pwScope, this.pwValues);
-            this.accessEscalation = 1;
+            this.activeAgent.escalation = 1;
           } else {
-            this.accessEscalation = 0;
+            this.activeAgent.escalation = 0;
           }
         }
         this.$emit('close');
@@ -86,7 +86,7 @@
     },
     mounted() {
       let pws = window.ocs.passwords.get_view(this.activeAgent);
-      if (this.accessEscalation)
+      if (this.activeAgent.escalation)
         this.usePw = 'yes';
       this.pwValues = pws;
       this.pwScope = pws.target;

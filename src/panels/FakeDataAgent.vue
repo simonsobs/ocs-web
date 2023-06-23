@@ -5,7 +5,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <OcsAgentHeader>Fake Data Agent</OcsAgentHeader>
+        <OcsAgentHeader :panel="panel">Fake Data Agent</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"
@@ -87,7 +87,7 @@
           //count: {auto:true},
         }),
         options: [10, 20, 30],
-        panel: {},
+        panel: {count: 0},
       }
     },
     computed: {
@@ -112,7 +112,7 @@
       },
     },
     mounted() {
-      this.panel.client_promise = window.ocs_bundle.web.register_panel(this, this.panel);
+      window.ocs_bundle.web.register_panel(this, this.panel);
     },
     beforeUnmount() {
       window.ocs_bundle.web.unregister_panel(this, this.panel.client);

@@ -5,7 +5,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <OcsAgentHeader>Host Manager</OcsAgentHeader>
+        <OcsAgentHeader :panel="panel">Host Manager</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading caption="Address"
                  v-bind:value="address">
@@ -70,13 +70,12 @@
 </template>
 
 <script>
-  let ocs_reg = {};
-
   export default {
     name: 'HostManager',
     inject: ['accessLevel'],
     data: function () {
       return {
+        panel: {},
         connection_ok: false,
         children: {},
         ops: window.ocs_bundle.web.ops_data_init({
@@ -104,7 +103,7 @@
       },
       set_target(instance_id, updn) {
         this.children[instance_id].target_state = '(' + updn + ')';
-        ocs_reg.client.run_task('update', {
+        this.panel.client.run_task('update', {
             requests:  [[instance_id, updn]]
         });
       },
@@ -114,11 +113,11 @@
       },
     },
     mounted() {
-      window.ocs_bundle.web.register_panel(this, ocs_reg)
+      window.ocs_bundle.web.register_panel(this, this.panel)
             .then(client => {client.add_watcher('manager', 5., this.update_child_states)});
     },
     beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, ocs_reg.client);
+      window.ocs_bundle.web.unregister_panel(this, this.panel.client);
     },
   }
 
