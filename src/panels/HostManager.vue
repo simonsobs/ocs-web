@@ -5,7 +5,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>Host Manager <OpLocker /></h1>
+        <OcsAgentHeader>Host Manager</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading caption="Address"
                  v-bind:value="address">

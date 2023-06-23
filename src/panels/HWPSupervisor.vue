@@ -5,7 +5,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>HWP Supervisor <OpLocker /></h1>
+        <OcsAgentHeader>HWP Supervisor</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"

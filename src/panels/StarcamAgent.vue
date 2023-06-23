@@ -5,7 +5,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>StarcamAgent <OpLocker /></h1>
+        <OcsAgentHeader>StarcamAgent</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"

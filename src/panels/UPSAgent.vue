@@ -4,7 +4,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>UPSAgent <OpLocker /></h1>
+        <OcsAgentHeader>UPSAgent</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"

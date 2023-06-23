@@ -5,7 +5,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>ibootbar Agent <OpLocker /></h1>
+        <OcsAgentHeader>ibootbar Agent</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading caption="Address"
                  v-bind:value="address">

@@ -5,7 +5,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>Generic Control Panel <OpLocker /></h1>
+        <OcsAgentHeader>Generic Control Panel</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"

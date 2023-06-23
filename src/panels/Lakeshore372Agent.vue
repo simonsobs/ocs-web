@@ -5,7 +5,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>Lakeshore372Agent <OpLocker /></h1>
+        <OcsAgentHeader>Lakeshore372Agent</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"

@@ -5,7 +5,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>Synaccess Agent <OpLocker /></h1>
+        <OcsAgentHeader>Synaccess Agent</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading caption="Address"
                  v-bind:value="address">
