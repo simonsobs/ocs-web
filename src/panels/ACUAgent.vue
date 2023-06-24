@@ -1,5 +1,7 @@
 /* eslint-disable */
 <template>
+  <AgentPanelBase />
+
   <div class="block_holder ocs_ui">
 
     <!-- Left block -->
@@ -192,7 +194,6 @@
 
       <!-- go_to -->
       <OcsTask
-        :address="address"
         :show_abort="true"
         :op_data="ops.go_to">
         <OpParam
@@ -210,7 +211,6 @@
 
       <!-- set_boresight -->
       <OcsTask
-        :address="address"
         :show_abort="true"
         :op_data="ops.set_boresight">
         <OpParam
@@ -224,12 +224,10 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.stop_and_clear">
       </OcsTask>
 
       <OcsProcess
-        :address="address"
         :op_data="ops.generate_scan">
         <OpParam
           caption="az1"
@@ -277,25 +275,20 @@
       <!-- Background processes -->
 
       <OcsTask
-        :address="address"
         :op_data="ops.clear_faults"
       />
 
       <OcsProcess
-        :address="address"
         :op_data="ops.monitor"
       />
       <OcsProcess
-        :address="address"
         :op_data="ops.broadcast"
       />
       <OcsProcess
-        :address="address"
         :op_data="ops.restart_idle"
       />
 
       <OcsOpAutofill
-        :address="address"
         :ops_parent="ops"
       />
 
@@ -314,7 +307,6 @@
     data: function () {
       return {
         panel: {},
-        connection_ok: false,
         ops: window.ocs_bundle.web.ops_data_init({
           go_to: {
             params: {az: 180,
@@ -491,9 +483,9 @@
           return ocs_ok;
 
         if (name == 'agent')
-          return this.connection_ok;
+          return this.panel.connection_ok;
 
-        if (!ocs_ok || !this.connection_ok)
+        if (!ocs_ok || !this.panel.connection_ok)
           return 'notapplic';
 
         // For the UDP broadcast process
@@ -656,12 +648,6 @@
         }
         return annotated;
       },
-    },
-    mounted() {
-      window.ocs_bundle.web.register_panel(this, this.panel);
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, this.panel.client);
     },
   }
 </script>

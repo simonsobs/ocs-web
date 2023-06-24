@@ -1,5 +1,7 @@
 /* eslint-disable */
 <template>
+  <AgentPanelBase />
+
   <div class="block_holder ocs_ui">
 
     <!-- Left block -->
@@ -14,7 +16,7 @@
         <OpReading
           caption="Connection"
           mode="ok"
-          v-bind:value="connection_ok">
+          v-bind:value="panel.connection_ok">
         </OpReading>
         <div class="ocs_triple data_table box">
           <div class="data_row header data_column ">
@@ -33,17 +35,14 @@
     <div class="block_unit">
 
       <OcsTask
-        :address="address"
         :op_data="ops.init_lakeshore">
       </OcsTask>
 
       <OcsProcess
-        :address="address"
         :op_data="ops.acq"
       />
 
       <OcsOpAutofill
-        :address="address"
         :ops_parent="ops"
       />
 
@@ -64,7 +63,6 @@
         panel: {},
         extension: 5,
         precision: 3,
-        connection_ok: false,
         ops: window.ocs_bundle.web.ops_data_init({
           init_lakeshore: {},
           acq: {},
@@ -94,14 +92,6 @@
         }
         return new_data;
       },
-    },
-    methods: {
-    },
-    mounted() {
-      window.ocs_bundle.web.register_panel(this, this.panel);
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, this.panel.client);
     },
   }
 </script>

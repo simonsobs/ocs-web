@@ -1,18 +1,20 @@
 /* eslint-disable */
 <template>
+  <AgentPanelBase @clientConnected="startListening()"/>
+
   <div class="block_holder ocs_ui">
 
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <OcsAgentHeader :panel="panel">Host Manager</OcsAgentHeader>
+        <OcsAgentHeader>Host Manager</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading caption="Address"
                  v-bind:value="address">
         </OpReading>
         <OpReading caption="Connection"
                  mode="ok"
-                 v-bind:value="connection_ok">
+                 v-bind:value="panel.connection_ok">
         </OpReading>
         <form v-on:submit.prevent>
           <div class="ocs_row">
@@ -47,12 +49,10 @@
     <!-- Right block -->
     <div class="block_unit">
       <OcsProcess
-        :address="address"
         :op_data="ops.manager">
       </OcsProcess>
 
       <OcsTask
-        :address="address"
         :op_data="ops.update">
         <div class="ocs_row">
           <label>Reload Config</label>
@@ -62,7 +62,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.die">
       </OcsTask>
     </div>
@@ -76,7 +75,6 @@
     data: function () {
       return {
         panel: {},
-        connection_ok: false,
         children: {},
         ops: window.ocs_bundle.web.ops_data_init({
           'manager': {},
@@ -111,13 +109,9 @@
           window.ocs_bundle.ui_start_proc(this.address, 'update',
                                           {'reload_config': true});
       },
-    },
-    mounted() {
-      window.ocs_bundle.web.register_panel(this, this.panel)
-            .then(client => {client.add_watcher('manager', 5., this.update_child_states)});
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, this.panel.client);
+      startListening() {
+        this.panel.client.add_watcher('manager', 5., this.update_child_states);
+      },
     },
   }
 

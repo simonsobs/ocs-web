@@ -1,5 +1,7 @@
 /* eslint-disable */
 <template>
+  <AgentPanelBase />
+
   <div class="block_holder ocs_ui">
 
     <!-- Left block -->
@@ -16,7 +18,7 @@
           <OcsLight
             caption="Connected"
             tip="Indicates whether Agent is connected."
-            :value="connection_ok" />
+            :value="panel.connection_ok" />
           <OcsLight
             caption="Recording"
             tip="Indicates whether data acquisition process is running."
@@ -37,7 +39,6 @@
     <div class="block_unit">
 
       <OcsProcess
-        :address="address"
         :op_data="ops.record">
       </OcsProcess>
 
@@ -55,7 +56,6 @@
     data: function () {
       return {
         panel: {},
-        connection_ok: false,
         ops: window.ocs_bundle.web.ops_data_init({
           record: {}
         }),
@@ -72,15 +72,5 @@
         return cf.split('/').reverse()[0];
       },
     },
-    mounted() {
-      window.ocs_bundle.web.register_panel(this, this.panel);
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, this.panel.client);
-    },
   }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>

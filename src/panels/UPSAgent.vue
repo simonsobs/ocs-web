@@ -1,4 +1,6 @@
 <template>
+  <AgentPanelBase />
+
   <div class="block_holder ocs_ui">
 
     <!-- Left block -->
@@ -13,7 +15,7 @@
         <OpReading
           caption="Connection"
           mode="ok"
-          v-bind:value="connection_ok">
+          v-bind:value="panel.connection_ok">
         </OpReading>
         <OpReading
           caption="Last update"
@@ -49,12 +51,10 @@
     <div class="block_unit">
 
       <OcsProcess
-        :address="address"
         :op_data="ops.acq"
       />
 
       <OcsOpAutofill
-        :address="address"
         :ops_parent="ops"
       />
 
@@ -73,7 +73,6 @@
     data: function () {
       return {
         panel: {},
-        connection_ok: false,
         groups: {
           battery: {
             name: "Battery",
@@ -144,12 +143,6 @@
         }
         return new_data;
       },
-    },
-    mounted() {
-      window.ocs_bundle.web.register_panel(this, this.panel);
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, this.panel.client);
     },
   }
 </script>

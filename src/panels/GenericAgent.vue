@@ -36,7 +36,6 @@ specialized agent panels.
     <!-- Right block -->
     <div class="block_unit">
       <OcsOpAutofill
-        :address="address"
         :ops_parent="ops"
       />
     </div>

@@ -1,6 +1,7 @@
 /* eslint-disable */
 <template>
   <AgentPanelBase />
+
   <div class="block_holder ocs_ui">
     <!-- Left block -->
     <div class="block_unit">

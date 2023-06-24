@@ -1,5 +1,7 @@
 /* eslint-disable */
 <template>
+  <AgentPanelBase />
+
   <div class="block_holder ocs_ui">
 
     <!-- Left block -->
@@ -21,7 +23,7 @@
           <OcsLight
             caption="AGT"
             tip="Status of the connection between ocs-web and the Agent."
-            :value="connection_ok"
+            :value="panel.connection_ok"
           />
           <OcsLight
             caption="STATE"
@@ -127,7 +129,6 @@
 
         <h2>Stream data</h2>
       <OcsProcess
-        :address="address"
         :op_data="ops.stream"
       />
 
@@ -143,44 +144,36 @@
 
       <!-- Foreground processes -->
       <OcsProcess
-        :address="address"
         :op_data="ops.stream"
       />
 
       <!-- Background processes -->
 
       <OcsProcess
-        :address="address"
         :op_data="ops.check_state"
       />
 
       <OcsTask
-        :address="address"
         :op_data="ops.uxm_setup"
       >
       </OcsTask>
       <OcsTask
-        :address="address"
         :op_data="ops.uxm_relock"
       >
       </OcsTask>
       <OcsTask
-        :address="address"
         :op_data="ops.take_bgmap"
       >
       </OcsTask>
       <OcsTask
-        :address="address"
         :op_data="ops.take_iv"
       >
       </OcsTask>
       <OcsTask
-        :address="address"
         :op_data="ops.take_bias_steps"
       >
       </OcsTask>
       <OcsTask
-        :address="address"
         :op_data="ops.take_noise"
       >
         <OpParam
@@ -203,7 +196,6 @@
     data: function () {
       return {
         panel: {},
-        connection_ok: false,
         ops: window.ocs_bundle.web.ops_data_init({
           // tasks
           uxm_setup: {},
@@ -275,14 +267,6 @@
         }
         return false;
       },
-    },
-    computed: {
-    },
-    mounted() {
-      window.ocs_bundle.web.register_panel(this, this.panel);
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, this.panel.client);
     },
   }
 </script>

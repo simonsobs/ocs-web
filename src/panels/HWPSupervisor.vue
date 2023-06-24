@@ -1,5 +1,7 @@
 /* eslint-disable */
 <template>
+  <AgentPanelBase />
+
   <div class="block_holder ocs_ui">
 
     <!-- Left block -->
@@ -127,7 +129,6 @@
 
       <!-- Control tasks -->
       <OcsTask
-        :address="address"
         :op_data="ops.brake">
         <OpParam
           caption="Freq. tol (Hz)"
@@ -142,7 +143,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.pid_to_freq">
         <OpParam
           caption="Spin rate (Hz)"
@@ -162,7 +162,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.pmx_off">
         <OpParam
           caption="Freq. tol (Hz)"
@@ -177,7 +176,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_const_voltage"
       >
         <OpParam
@@ -194,11 +192,9 @@
       <!-- Background processes -->
 
       <OcsProcess
-        :address="address"
         :op_data="ops.monitor"
       />
       <OcsProcess
-        :address="address"
         :op_data="ops.spin_control"
       />
 
@@ -217,7 +213,6 @@
     data: function () {
       return {
         panel: {},
-        connection_ok: false,
         ops: window.ocs_bundle.web.ops_data_init({
           brake: {},
           pid_to_freq: {},
@@ -281,9 +276,9 @@
           return ocs_ok;
 
         if (name == 'agent')
-          return this.connection_ok;
+          return this.panel.connection_ok;
 
-        if (!ocs_ok || !this.connection_ok)
+        if (!ocs_ok || !this.panel.connection_ok)
           return 'notapplic';
 
         if (name == 'monitor' || name == 'spin_control') {
@@ -328,15 +323,5 @@
         return output;
       },
     },
-    mounted() {
-      window.ocs_bundle.web.register_panel(this, this.panel);
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, this.panel.client);
-    },
   }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>

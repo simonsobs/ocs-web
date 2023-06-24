@@ -1,5 +1,7 @@
 /* eslint-disable */
 <template>
+  <AgentPanelBase />
+
   <div class="block_holder ocs_ui">
 
     <!-- Left block -->
@@ -20,7 +22,7 @@
           <OcsLight
             caption="AGT"
             tip="Status of the connection between ocs-web and the Agent."
-            :value="connection_ok"
+            :value="panel.connection_ok"
           />
           <OcsLight
             caption="KIK"
@@ -118,12 +120,10 @@
     <div class="block_unit">
 
       <!-- OcsProcess
-        :address="address"
         :op_data="ops.pid_acq"
       / -->
 
       <OcsTask
-        :address="address"
         :op_data="ops.declare_freq">
         <OpParam
           caption="Freq (rev/s)"
@@ -131,7 +131,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_pid">
         <OpParam
           caption="P (0 - 8)"
@@ -145,7 +144,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_scale">
         <OpParam
           caption="slope (-10 to 10)"
@@ -156,7 +154,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_direction"
       >
         <OpDropdown
@@ -166,7 +163,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_v_lim">
         <OpParam
           caption="Voltage"
@@ -174,7 +170,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_v">
         <OpParam
           caption="Voltage"
@@ -182,7 +177,6 @@
       </OcsTask>
 
       <OcsOpAutofill
-        :address="address"
         :ops_parent="ops"
       />
 
@@ -201,7 +195,6 @@
     data: function () {
       return {
         panel: {},
-        connection_ok: false,
         ops: window.ocs_bundle.web.ops_data_init({
 
           // PID control
@@ -255,15 +248,5 @@
         return false;
       },
     },
-    mounted() {
-      window.ocs_bundle.web.register_panel(this, this.panel);
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, this.panel.client);
-    },
   }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>

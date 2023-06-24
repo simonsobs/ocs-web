@@ -1,5 +1,7 @@
 /* eslint-disable */
 <template>
+  <AgentPanelBase />
+
   <div class="block_holder ocs_ui">
 
     <!-- Left block -->
@@ -14,7 +16,7 @@
         <OpReading
           caption="Connection"
           mode="ok"
-          v-bind:value="connection_ok">
+          v-bind:value="panel.connection_ok">
         </OpReading>
         <h2>Last Reading</h2>
         <OpReading
@@ -48,11 +50,9 @@
     <!-- Right block -->
     <div class="block_unit">
       <!-- OcsProcess
-        :address="address"
         :op_data="ops.acq"  -->
 
       <OcsOpAutofill
-        :address="address"
         :ops_parent="ops"
       />
     </div>
@@ -70,10 +70,10 @@
     data: function () {
       return {
         panel: {},
-        connection_ok: false,
         ops: window.ocs_bundle.web.ops_data_init({
-          /* This has to be here to monitor the fields, but "auto" 
-             will help it get handled by Autofill */
+          /* This has to be here to monitor the fields, but "auto"
+             will help it get handled by Autofill [maybe not true any
+             more -- test me ] */
           acq: {auto: true},
         }),
       }
@@ -92,15 +92,5 @@
         return d;
       },
     },
-    mounted() {
-      window.ocs_bundle.web.register_panel(this, this.panel);
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, this.panel.client);
-    },
   }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>

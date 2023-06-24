@@ -1,5 +1,7 @@
 /* eslint-disable */
 <template>
+  <AgentPanelBase @clientConnected="startListening()"/>
+
   <div class="block_holder ocs_ui">
 
     <!-- Left block -->
@@ -19,7 +21,7 @@
           <OcsLight
             caption="AGT"
             tip="Status of the connection between ocs-web and the Agent."
-            :value="connection_ok"
+            :value="panel.connection_ok"
           />
           <OcsLight
             caption="ACQ"
@@ -30,7 +32,7 @@
 
         <h2>Outlets</h2>
 
-        <div v-if="connection_ok">
+        <div v-if="panel.connection_ok">
           <span id="outlet_warning" v-if="outlet_warning"><b>{{ outlet_warning }}</b></span>
           <form class="ib_kids" v-on:submit.prevent>
             <div class="ib_row ib_header">
@@ -64,12 +66,10 @@
     <!-- Right block -->
     <div class="block_unit">
       <OcsProcess
-        :address="address"
         :op_data="ops.status_acq">
       </OcsProcess>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_outlet">
         <OpParam
           caption="Outlet (1-5)"
@@ -81,7 +81,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.reboot">
         <OpParam
           caption="Outlet (1-5)"
@@ -89,7 +88,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_all">
         <div class="ocs_row">
           <label>Set On</label>
@@ -99,7 +97,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.get_status">
       </OcsTask>
 
@@ -114,7 +111,6 @@
     data: function () {
       return {
         panel: {},
-        connection_ok: false,
         outlet_warning: null,
         outlets: {},
         ops: window.ocs_bundle.web.ops_data_init({
@@ -131,7 +127,7 @@
     },
     methods: {
       update_outlet_states(op_name, method, stat, msg, session) {
-        if (!this.connection_ok) {
+        if (!this.panel.connection_ok) {
           this.outlets = {};
           this.outlet_warning = 'No connection to agent!';
           return;
@@ -183,15 +179,9 @@
         }
         return false;
       },
-
-    },
-    mounted() {
-      window.ocs_bundle.web.register_panel(this, this.panel)
-      .then(client =>
-        client.add_watcher('status_acq', 5., this.update_outlet_states));
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, this.panel.client);
+      startListening() {
+        this.panel.client.add_watcher('status_acq', 5., this.update_outlet_states);
+      },
     },
   }
 
