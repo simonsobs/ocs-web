@@ -23,8 +23,8 @@ function register_panel(comp, dest) {
     // Get (and stow) an OCSClient.
     let client = window.ocs.get_client(comp.address);
     dest.client = client;
-    if (!dest.count)
-      dest.count = 0;
+    if (!dest._slot)
+      dest._slot = 1;
     
     // Subscribe to heartbeat info updates.
     window.ocs.agent_list.subscribe(comp.address, comp.address, (addr, conn_ok) => {
@@ -67,7 +67,8 @@ function register_panel(comp, dest) {
         });
       });
 
-      dest.count++;
+      // Update ._slot to trigger reactive elements watching dest.
+      dest._slot++;
 
       return client;
     });

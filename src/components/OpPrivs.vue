@@ -38,7 +38,7 @@ can open up the password config window.
         get() {
           // Check .count, which will increment when new API
           // new API info arrives.
-          this.panel.count;
+          this.panel._slot;
           return this.panel?.client?.access_control;
         }
       },
