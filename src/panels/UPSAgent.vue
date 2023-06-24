@@ -4,7 +4,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <OcsAgentHeader>UPSAgent</OcsAgentHeader>
+        <OcsAgentHeader :panel="panel">UPSAgent</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"

@@ -5,7 +5,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <OcsAgentHeader>Generic Control Panel</OcsAgentHeader>
+        <OcsAgentHeader :panel="panel">Generic Control Panel</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"

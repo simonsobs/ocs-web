@@ -5,7 +5,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <OcsAgentHeader>ibootbar Agent</OcsAgentHeader>
+        <OcsAgentHeader :panel="panel">ibootbar Agent</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading caption="Address"
                  v-bind:value="address">

@@ -5,7 +5,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <OcsAgentHeader>HWP Supervisor</OcsAgentHeader>
+        <OcsAgentHeader :panel="panel">HWP Supervisor</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"

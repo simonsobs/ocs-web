@@ -5,7 +5,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <OcsAgentHeader>StarcamAgent</OcsAgentHeader>
+        <OcsAgentHeader :panel="panel">StarcamAgent</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"

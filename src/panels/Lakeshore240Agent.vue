@@ -5,7 +5,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <OcsAgentHeader>Lakeshore240Agent</OcsAgentHeader>
+        <OcsAgentHeader :panel="panel">Lakeshore240Agent</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"
