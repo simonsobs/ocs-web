@@ -54,7 +54,9 @@
       _get_client_or_address() {
         let client = this.panel?.client;
         if (!client)
-          return this.address;
+          client = this.address;
+        if (!this.address)
+          client = this.$parent.panel.client;
         return client;
       },
       start() {

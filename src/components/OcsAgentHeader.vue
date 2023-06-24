@@ -1,14 +1,16 @@
 <template>
   <div>
-    <h1><slot /> <OpLocker class="spaced" /> <OpPrivs class="spaced" :panel="panel" /></h1>
+    <h1><slot /> <OpLocker class="spaced" /> <OpPrivs class="spaced" /></h1>
   </div>
 </template>
 
 <script>
   export default {
     name: 'OcsAgentHeader',
-    props: {
-      panel: Object,
+    computed: {
+      panel() {
+        return this.$parent.panel;
+      }
     },
   }
 </script>

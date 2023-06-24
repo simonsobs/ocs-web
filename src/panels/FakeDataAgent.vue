@@ -1,11 +1,11 @@
 /* eslint-disable */
 <template>
+  <AgentPanelBase />
   <div class="block_holder ocs_ui">
-
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <OcsAgentHeader :panel="panel">Fake Data Agent</OcsAgentHeader>
+        <OcsAgentHeader>Fake Data Agent</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"
@@ -14,7 +14,7 @@
         <OpReading
           caption="Connection"
           mode="ok"
-          v-bind:value="connection_ok">
+          v-bind:value="panel.connection_ok">
         </OpReading>
         <OpParam
           caption="Delay Requested"
@@ -44,7 +44,6 @@
     <div class="block_unit">
 
       <OcsTask
-        :panel="panel"
         :show_abort="true"
         :op_data="ops.delay_task">
         <OpParam
@@ -57,12 +56,10 @@
       </OcsTask>
 
       <OcsProcess
-        :panel="panel"
         :op_data="ops.acq"
       />
 
       <OcsOpAutofill
-        :panel="panel"
         :ops_parent="ops"
       />
     </div>
@@ -78,13 +75,11 @@
     },
     data: function () {
       return {
-        connection_ok: false,
         ops: window.ocs_bundle.web.ops_data_init({
           delay_task: {
             params: {delay: 10},
           },
           acq: {},
-          //count: {auto:true},
         }),
         options: [10, 20, 30],
         panel: {},
@@ -110,12 +105,6 @@
         }
         return 0;
       },
-    },
-    mounted() {
-      window.ocs_bundle.web.register_panel(this, this.panel);
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, this.panel.client);
     },
   }
 </script>

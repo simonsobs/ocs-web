@@ -29,11 +29,11 @@ can open up the password config window.
 
   export default {
     name: 'OpPrivs',
-    props: {
-      panel: Object,
-    },
     inject: ['activeAgent'],
     computed: {
+      panel() {
+        return this.$parent.panel;
+      },
       supportsPasswords: {
         get() {
           // Check .count, which will increment when new API

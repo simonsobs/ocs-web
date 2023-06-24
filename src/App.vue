@@ -275,7 +275,6 @@
         this.mainMode = 'agent';
         this.active_agent = v;
         this.force_generic = debug;
-        this.accessLevel = 1;
       },
       setMode(mode) {
         this.mainMode = mode;

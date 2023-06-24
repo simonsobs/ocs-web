@@ -1,11 +1,25 @@
-/* eslint-disable */
+<!--
+
+GenericAgent
+
+This component is activated when a specialized panel does not exist
+for a particular agent class.  It displays the agent address and
+connection status, and then provides generic (parameter-free) controls
+for all tasks and processes detected in the agent.
+
+This code can be used as a template / starting point for implementing
+specialized agent panels.
+
+-->
 <template>
+  <AgentPanelBase />
+
   <div class="block_holder ocs_ui">
 
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <OcsAgentHeader :panel="panel">Generic Control Panel</OcsAgentHeader>
+        <OcsAgentHeader>Generic Control Panel</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"
@@ -14,7 +28,7 @@
         <OpReading
           caption="Connection"
           mode="ok"
-          v-bind:value="connection_ok">
+          v-bind:value="panel.connection_ok">
         </OpReading>
       </div>
     </div>
@@ -39,19 +53,8 @@
     data: function () {
       return {
         panel: {},
-        connection_ok: false,
         ops: {},
       }
     },
-    mounted() {
-      window.ocs_bundle.web.register_panel(this, this.panel);
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, this.panel.client);
-    },
   }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>

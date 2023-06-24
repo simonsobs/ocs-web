@@ -6,6 +6,7 @@ const app = createApp(App);
 
 // Import standard OCS layout things.
 
+import AgentPanelBase from './components/AgentPanelBase.vue'
 import OcsTask        from './components/OcsTask.vue'
 import OcsProcess     from './components/OcsProcess.vue'
 import OpParam        from './components/OpParam.vue'
@@ -22,6 +23,7 @@ import OcsLightLine   from './components/OcsLightLine.vue'
 import OcsLight       from './components/OcsLight.vue'
 
 app
+  .component('AgentPanelBase', AgentPanelBase)
   .component('OcsTask',     OcsTask)
   .component('OcsProcess',  OcsProcess)
   .component('OpParam',     OpParam)

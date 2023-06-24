@@ -8,15 +8,11 @@
       <OcsTask
         v-if="op.auto && op.type == 'task'"
         class="autofilled"
-        :panel="panel"
-        :address="address"
         :show_abort="op.show_abort"
         :op_data="op" />
       <OcsProcess
         v-if="op.auto && op.type == 'proc'"
         class="autofilled"
-        :panel="panel"
-        :address="address"
         :op_data="op" />
     </div>
   </div>
@@ -26,8 +22,6 @@
   export default {
     name: 'OcsOpAutofill',
     props: {
-      panel: Object,
-      address: String,
       ops_parent: Object,
       warn_about_auto: {
         Type: Boolean,
@@ -41,6 +35,9 @@
       }
     },
     computed: {
+      panel() {
+        return this.$parent.panel;
+      },
       show_warning() {
         return this.warn_about_auto && (
           Object.values(this.ops_parent)

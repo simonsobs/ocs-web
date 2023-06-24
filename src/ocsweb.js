@@ -15,20 +15,21 @@
  */
 export
 function register_panel(comp, dest) {
+  if (!dest)
+    dest = comp.panel;
+
   return window.ocs.ready_defer.promise.then( () => {
 
     // Get (and stow) an OCSClient.
     let client = window.ocs.get_client(comp.address);
-    if (dest) {
-      dest.client = client;
-      if (!dest.count)
-        dest.count = 0;
-    }
+    dest.client = client;
+    if (!dest.count)
+      dest.count = 0;
     
     // Subscribe to heartbeat info updates.
     window.ocs.agent_list.subscribe(comp.address, comp.address, (addr, conn_ok) => {
       client.connection_ok = conn_ok;
-      comp.connection_ok = conn_ok;
+      dest.connection_ok = conn_ok;
     });
 
     // Scan for API ... this will run in background; returns a promise.
@@ -66,8 +67,7 @@ function register_panel(comp, dest) {
         });
       });
 
-      if (dest)
-        dest.count++;
+      dest.count++;
 
       return client;
     });
@@ -86,6 +86,8 @@ function register_panel(comp, dest) {
   */
 export
 function unregister_panel(comp, client) {
+  if (!client)
+    client = comp.panel.client;
   client.clear_watchers();
   window.ocs.agent_list.unsubscribe(comp.address, comp.address);
 }
