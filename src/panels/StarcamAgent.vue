@@ -61,8 +61,6 @@
 </template>
 
 <script>
-  let ocs_reg = {};
-
   export default {
     name: 'StarcamAgent',
     props: {
@@ -71,6 +69,7 @@
     inject: ['accessLevel'],
     data: function () {
       return {
+        panel: {},
         connection_ok: false,
         ops: window.ocs_bundle.web.ops_data_init({
           /* This has to be here to monitor the fields, but "auto" 
@@ -94,10 +93,10 @@
       },
     },
     mounted() {
-      window.ocs_bundle.web.register_panel(this, ocs_reg);
+      window.ocs_bundle.web.register_panel(this, this.panel);
     },
     beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, ocs_reg.client);
+      window.ocs_bundle.web.unregister_panel(this, this.panel.client);
     },
   }
 </script>

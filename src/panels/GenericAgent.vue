@@ -31,8 +31,6 @@
 </template>
 
 <script>
-  let ocs_reg = {};
-
   export default {
     name: 'GenericAgent',
     props: {
@@ -40,15 +38,16 @@
     },
     data: function () {
       return {
+        panel: {},
         connection_ok: false,
         ops: {},
       }
     },
     mounted() {
-      window.ocs_bundle.web.register_panel(this, ocs_reg);
+      window.ocs_bundle.web.register_panel(this, this.panel);
     },
     beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, ocs_reg.client);
+      window.ocs_bundle.web.unregister_panel(this, this.panel.client);
     },
   }
 </script>

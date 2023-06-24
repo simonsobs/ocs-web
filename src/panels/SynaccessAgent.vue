@@ -108,13 +108,12 @@
 </template>
 
 <script>
-  let ocs_reg = {};
-
   export default {
     name: 'SynaccessAgent',
     inject: ['accessLevel'],
     data: function () {
       return {
+        panel: {},
         connection_ok: false,
         outlet_warning: null,
         outlets: {},
@@ -163,10 +162,10 @@
       },
       set_target(idx, state) {
         if (state == 'reboot') {
-          ocs_reg.client.run_task('reboot', {
+          this.panel.client.run_task('reboot', {
             outlet: idx + 1});
         } else {
-          ocs_reg.client.run_task('set_outlet', {
+          this.panel.client.run_task('set_outlet', {
             outlet: idx + 1,
             state: state});
         }
@@ -187,12 +186,12 @@
 
     },
     mounted() {
-      window.ocs_bundle.web.register_panel(this, ocs_reg)
+      window.ocs_bundle.web.register_panel(this, this.panel)
       .then(client =>
         client.add_watcher('status_acq', 5., this.update_outlet_states));
     },
     beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, ocs_reg.client);
+      window.ocs_bundle.web.unregister_panel(this, this.panel.client);
     },
   }
 

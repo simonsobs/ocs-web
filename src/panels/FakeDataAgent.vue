@@ -87,7 +87,7 @@
           //count: {auto:true},
         }),
         options: [10, 20, 30],
-        panel: {count: 0},
+        panel: {},
       }
     },
     computed: {

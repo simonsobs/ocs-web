@@ -47,8 +47,6 @@
 </template>
 
 <script>
-  let ocs_reg = {};
-
   export default {
     name: 'FakeData',
     props: {
@@ -56,6 +54,7 @@
     },
     data: function () {
       return {
+        panel: {},
         connection_ok: false,
         ops: window.ocs_bundle.web.ops_data_init({
           record: {}
@@ -74,10 +73,10 @@
       },
     },
     mounted() {
-      window.ocs_bundle.web.register_panel(this, ocs_reg);
+      window.ocs_bundle.web.register_panel(this, this.panel);
     },
     beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, ocs_reg.client);
+      window.ocs_bundle.web.unregister_panel(this, this.panel.client);
     },
   }
 </script>
