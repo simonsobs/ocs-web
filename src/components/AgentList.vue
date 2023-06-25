@@ -1,4 +1,3 @@
-/* eslint-disable */
 <template>
   <div class="ocs_ui">
     <div v-for="k in active_list" v-bind:key="k" class="al_level1">

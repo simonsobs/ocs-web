@@ -1,4 +1,3 @@
-/* eslint-disable */
 <template>
   <h1>Main Browser</h1>
   <div class="block_holder ocs_ui">

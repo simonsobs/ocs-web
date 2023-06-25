@@ -1,4 +1,3 @@
-/* eslint-disable */
 <template>
   <div class="block_holder ocs_ui">
 

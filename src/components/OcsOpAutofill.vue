@@ -1,4 +1,3 @@
-/* eslint-disable */
 <template>
   <div class="ocs_ui">
     <i v-if="show_warning">Operations widgets below are

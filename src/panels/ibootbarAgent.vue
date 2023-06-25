@@ -1,4 +1,3 @@
-/* eslint-disable */
 <template>
   <AgentPanelBase @clientConnected="startListening()"/>
 

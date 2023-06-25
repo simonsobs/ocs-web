@@ -1,4 +1,3 @@
-/* eslint-disable */
 <template>
   <h1>{{ main_title }}</h1>
   <hr />

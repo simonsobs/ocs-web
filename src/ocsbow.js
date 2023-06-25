@@ -1,7 +1,5 @@
 // -*- mode: web; web-mode-code-indent-offset: 4; -*-
 
-/* eslint-disable */
-
 import autobahn from 'autobahn';
 
 let ac = require('./access');
@@ -220,11 +218,11 @@ AgentList.prototype = {
                 info.ok = is_now_ok;
                 if (AL._callbacks[k]) {
                     Object.entries(AL._callbacks[k]).forEach(
-                        ([sub, func]) => func(k, is_now_ok, info));
+                        ([, func]) => func(k, is_now_ok, info));
                 }
                 if (AL._callbacks['*']) {
                     Object.entries(AL._callbacks['*']).forEach(
-                        ([sub, func]) => func(k, is_now_ok, info));
+                        ([, func]) => func(k, is_now_ok, info));
                 }
             }
         });
@@ -353,7 +351,7 @@ AgentClient.prototype = {
                         function (result) {
                             d.resolve(result[1]);
                         },
-                        function (result) {
+                        function () {
                             d.reject('Could not complete wait() request');
                         }
                     );
@@ -361,7 +359,7 @@ AgentClient.prototype = {
                     d.reject(result[1]);
             },
             // start: failure?
-            function (result) {
+            function () {
                 d.reject('Could not issue start() request.')
             }
         );
