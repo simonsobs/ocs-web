@@ -14,14 +14,18 @@
 
 export function PasswordManager()
 {
-    this.passwords = {
-        global: '',
-        by_class: {},
-        by_instance: {},
-    }
+    // Data is carried in this.passwords.
+    this.clear();
 }
 
 PasswordManager.prototype = {
+    clear: function() {
+        this.passwords = {
+            global: '',
+            by_class: {},
+            by_instance: {},
+        }
+    },
     get_pass: function(agent_class, instance_id) {
         if (this.passwords.by_instance[instance_id])
             return this.passwords.by_instance[instance_id];
@@ -60,4 +64,15 @@ PasswordManager.prototype = {
             'instance': this.passwords.by_instance[agent_info.instance_id],
         }
     },
+    to_cookie: function() {
+        return this.passwords;
+    },
+    update_from_cookie: function(v) {
+        if (!v)
+            return;
+        Object.keys(this.passwords).forEach((k) => {
+            if (v[k])
+                this.passwords[k] = v[k];
+        });
+    }
 }

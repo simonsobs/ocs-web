@@ -2,8 +2,6 @@
 
 import autobahn from 'autobahn';
 
-let ac = require('./access');
-
 let ocs_bundle;
 
 export function init(ocs_bundle_) {
@@ -34,7 +32,6 @@ export function OCSConnection(url_func, realm_func, addr_root_func)
         requested: false };
 
     this.agent_list = new AgentList(this);
-    this.passwords = new ac.PasswordManager();
 
     this.ready_defer = new autobahn.when.defer();
 }
@@ -307,7 +304,7 @@ AgentClient.prototype = {
         // Transitional -- don't provide a password unless API supports it.
         if (this.access_control && ocs_bundle.get_password_settings().escalation) {
             _kw.password =
-                this.ocs.passwords.get_pass(this.agent_class, this.instance_id, 3);
+                ocs_bundle.passwords.get_pass(this.agent_class, this.instance_id);
         }
 
         let client = this;

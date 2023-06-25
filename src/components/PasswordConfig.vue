@@ -69,23 +69,24 @@
       }
     },
     inject: ['activeAgent'],
-    emits: ["close"],
+    emits: ["close", "update"],
     methods: {
       confirm(keep) {
         if (keep) {
           if (this.usePw == 'yes') {
-            window.ocs.passwords.update_pass(
+            window.ocs_bundle.passwords.update_pass(
               this.activeAgent, this.pwScope, this.pwValues);
             this.activeAgent.escalation = 1;
           } else {
             this.activeAgent.escalation = 0;
           }
+          this.$emit('update');
         }
         this.$emit('close');
       },
     },
     mounted() {
-      let pws = window.ocs.passwords.get_view(this.activeAgent);
+      let pws = window.ocs_bundle.passwords.get_view(this.activeAgent);
       if (this.activeAgent.escalation)
         this.usePw = 'yes';
       this.pwValues = pws;

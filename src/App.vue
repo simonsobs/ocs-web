@@ -42,7 +42,8 @@
     <div class="fullScreenMask" v-if="passwordWindow">
       <div class="errorModal">
         <div class="errorModalContent">
-          <PasswordConfig :config="passwordWindow" @close="confirmPw()" />
+          <PasswordConfig :config="passwordWindow"
+           @close="confirmPw()" @update="passwordUpdate()" />
         </div>
       </div>
     </div>
@@ -92,6 +93,7 @@
         :active_index="config_index"
         :configs="configs"
         @update:configs="configUpdate"
+        @clearPw="clearPasswords"
       />
       <MainBrowser
         v-if="mainMode=='browse'"
@@ -166,7 +168,8 @@
   let ocs = require('./ocsbow');
   let util = require('./util');
   let web = require('./ocsweb');
-  
+  let access = require('./access');
+
   // Unglobalfy
   var ocs_bundle = {
     ocsbow: ocs,
@@ -259,6 +262,14 @@
             this.reconnect();
         }
       },
+      clearPasswords() {
+        ocs_bundle.passwords.clear();
+        this.passwordUpdate();
+      },
+      passwordUpdate() {
+        let c = "ocsWebPasswords-" + ocs_bundle.config.name;
+        this.cookies.set(c, ocs_bundle.passwords.to_cookie(), "30d");
+      },
       setConfigIndex(index) {
         if (this.config_index != index) {
           // The quiet way ...
@@ -326,6 +337,13 @@
         });
       }
       ocs_bundle.config = this.configs[this.config_index];
+      ocs_bundle.passwords = new access.PasswordManager();
+
+      let pw_cname = "ocsWebPasswords-" + ocs_bundle.config.name;
+      let pw_cookie = this.cookies.get(pw_cname);
+      ocs_bundle.passwords.update_from_cookie(pw_cookie);
+      ocs_bundle.config.passwords_in = true;
+
       window.ocs.start();
 
       this.main_title = `Observatory Control System - [${ocs_bundle.config.name}]`;
