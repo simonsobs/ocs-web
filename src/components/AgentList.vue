@@ -1,4 +1,3 @@
-/* eslint-disable */
 <template>
   <div class="ocs_ui">
     <div v-for="k in active_list" v-bind:key="k" class="al_level1">
@@ -72,7 +71,6 @@
       ,
     },
     mounted() {
-      //window.ocs_bundle.web.register_panel(this, null, ocs_reg);
       let c = window.ocs;
       c.agent_list.subscribe(this.parent_id, '*', this.update_agent_list);
     },

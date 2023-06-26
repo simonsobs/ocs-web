@@ -1,11 +1,12 @@
-/* eslint-disable */
 <template>
+  <AgentPanelBase />
+
   <div class="block_holder ocs_ui">
 
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>Aggregator Agent <OpLocker /></h1>
+        <OcsAgentHeader :panel="panel">Aggregator Agent</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"
@@ -16,7 +17,7 @@
           <OcsLight
             caption="Connected"
             tip="Indicates whether Agent is connected."
-            :value="connection_ok" />
+            :value="panel.connection_ok" />
           <OcsLight
             caption="Recording"
             tip="Indicates whether data acquisition process is running."
@@ -37,7 +38,6 @@
     <div class="block_unit">
 
       <OcsProcess
-        :address="address"
         :op_data="ops.record">
       </OcsProcess>
 
@@ -47,8 +47,6 @@
 </template>
 
 <script>
-  let ocs_reg = {};
-
   export default {
     name: 'FakeData',
     props: {
@@ -56,7 +54,7 @@
     },
     data: function () {
       return {
-        connection_ok: false,
+        panel: {},
         ops: window.ocs_bundle.web.ops_data_init({
           record: {}
         }),
@@ -73,15 +71,5 @@
         return cf.split('/').reverse()[0];
       },
     },
-    mounted() {
-      window.ocs_bundle.web.register_panel(this, null, ocs_reg);
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, ocs_reg.client);
-    },
   }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>

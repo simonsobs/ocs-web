@@ -1,11 +1,11 @@
-/* eslint-disable */
 <template>
-  <div class="block_holder ocs_ui">
+  <AgentPanelBase />
 
+  <div class="block_holder ocs_ui">
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>Fake Data Agent</h1>
+        <OcsAgentHeader>Fake Data Agent</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"
@@ -14,7 +14,7 @@
         <OpReading
           caption="Connection"
           mode="ok"
-          v-bind:value="connection_ok">
+          v-bind:value="panel.connection_ok">
         </OpReading>
         <OpParam
           caption="Delay Requested"
@@ -35,7 +35,7 @@
         </div>
         <OpReading
           caption="Acq Status"
-          :value="ops.acq.status">
+          :value="ops.acq.session.status">
         </OpReading>
       </div>
     </div>
@@ -44,7 +44,6 @@
     <div class="block_unit">
 
       <OcsTask
-        :address="address"
         :show_abort="true"
         :op_data="ops.delay_task">
         <OpParam
@@ -57,12 +56,10 @@
       </OcsTask>
 
       <OcsProcess
-        :address="address"
         :op_data="ops.acq"
       />
 
       <OcsOpAutofill
-        :address="address"
         :ops_parent="ops"
       />
     </div>
@@ -71,8 +68,6 @@
 </template>
 
 <script>
-  let ocs_reg = {};
-
   export default {
     name: 'FakeData',
     props: {
@@ -80,7 +75,6 @@
     },
     data: function () {
       return {
-        connection_ok: false,
         ops: window.ocs_bundle.web.ops_data_init({
           delay_task: {
             params: {delay: 10},
@@ -88,6 +82,7 @@
           acq: {},
         }),
         options: [10, 20, 30],
+        panel: {},
       }
     },
     computed: {
@@ -110,12 +105,6 @@
         }
         return 0;
       },
-    },
-    mounted() {
-      window.ocs_bundle.web.register_panel(this, null, ocs_reg);
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, ocs_reg.client);
     },
   }
 </script>

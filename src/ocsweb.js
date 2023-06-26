@@ -1,34 +1,94 @@
+/** register_panel(comp, dest)
+ *
+ *  Establish an OCSClient for an agent panel; scan the API using the
+ *  client; add session watchers for all operations listed in
+ *  comp.ops; subscribe to AgentList so that connection issues with
+ *  the agent get propagated into comp.connection_ok.
+ *
+ *  Args:
+ *    comp: the component (this) for an Agent panel.
+ *    dest: an object where to store the OCSClient (optional).
+ *
+ *  Returns:
+ *    promise of the OCSClient.
+ *
+ */
 export
-function register_panel(comp, callback, dest) {
-  // register a promise that will populate comp.client, then add
-  // watchers for every op, then call callback.
+function register_panel(comp, dest) {
+  if (!dest)
+    dest = comp.panel;
 
-  window.ocs.ready_defer.promise.then( () => {
+  return window.ocs.ready_defer.promise.then( () => {
+
+    // Get (and stow) an OCSClient.
     let client = window.ocs.get_client(comp.address);
+    dest.client = client;
+    if (!dest._slot)
+      dest._slot = 1;
     
-    Object.keys(comp.ops).forEach(k => {
-      client.add_watcher(k, 1.0, (op_name, method, stat, msg, session) => {
-        if(!comp.ops)
-          return;
-        comp.ops[k].session = friendlyize_session(session);
-      });
-    });
-
-    // Subscribe to heartbeat, identify self with agent address.
+    // Subscribe to heartbeat info updates.
     window.ocs.agent_list.subscribe(comp.address, comp.address, (addr, conn_ok) => {
       client.connection_ok = conn_ok;
-      comp.connection_ok = conn_ok;
+      dest.connection_ok = conn_ok;
     });
 
-    if (callback)
-      callback(client);
-    if (dest)
-      dest.client = client;
+    // Scan for API ... this will run in background; returns a promise.
+    let p = client.scan().then(client => {
+
+      // Update comp.ops with any tasks / processes that weren't
+      // already mentioned; mark them as auto: true.
+      client.tasks.map(([name, , cfg]) => {
+        if (!comp.ops[name] || comp.ops[name].auto)
+          comp.ops[name] = {
+            name: name,
+            type: 'task',
+            auto: true,
+            params: {},
+            session: friendlyize_session(),
+            show_abort: cfg.abortable};
+      });
+      client.procs.map(([name]) => {
+        if (!comp.ops[name] || comp.ops[name].auto)
+          comp.ops[name] = {
+            name: name,
+            type: 'proc',
+            auto: true,
+            params: {},
+            session: friendlyize_session(),
+          };
+      });
+
+      // Monitor every operation for session updates.
+      Object.keys(comp.ops).forEach(k => {
+        client.add_watcher(k, 1.0, (op_name, method, stat, msg, session) => {
+          if(!comp.ops)
+            return;
+          comp.ops[k].session = friendlyize_session(session);
+        });
+      });
+
+      // Update ._slot to trigger reactive elements watching dest.
+      dest._slot++;
+
+      return client;
+    });
+
+    return p;
   });
 }
 
+/** unregister_panel(comp, client)
+  *
+  * Undo the registrations done by register_panel, namely to unscribe
+  * from AgentList and clear the session watchers.
+  *
+  * The "comp" should be the same component passed to register_panel;
+  * the client should be the client returned by it.
+  */
 export
 function unregister_panel(comp, client) {
+  if (!client)
+    client = comp.panel.client;
   client.clear_watchers();
   window.ocs.agent_list.unsubscribe(comp.address, comp.address);
 }

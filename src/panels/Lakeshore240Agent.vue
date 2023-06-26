@@ -1,11 +1,12 @@
-/* eslint-disable */
 <template>
+  <AgentPanelBase />
+
   <div class="block_holder ocs_ui">
 
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>Lakeshore240Agent <OpLocker /></h1>
+        <OcsAgentHeader :panel="panel">Lakeshore240Agent</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"
@@ -14,7 +15,7 @@
         <OpReading
           caption="Connection"
           mode="ok"
-          v-bind:value="connection_ok">
+          v-bind:value="panel.connection_ok">
         </OpReading>
         <div class="ocs_triple data_table box">
           <div class="data_row header data_column ">
@@ -33,17 +34,14 @@
     <div class="block_unit">
 
       <OcsTask
-        :address="address"
         :op_data="ops.init_lakeshore">
       </OcsTask>
 
       <OcsProcess
-        :address="address"
         :op_data="ops.acq"
       />
 
       <OcsOpAutofill
-        :address="address"
         :ops_parent="ops"
       />
 
@@ -53,8 +51,6 @@
 </template>
 
 <script>
-  let ocs_reg = {};
-
   export default {
     name: 'Lakeshore240Agent',
     props: {
@@ -63,9 +59,9 @@
     inject: ['accessLevel'],
     data: function () {
       return {
+        panel: {},
         extension: 5,
         precision: 3,
-        connection_ok: false,
         ops: window.ocs_bundle.web.ops_data_init({
           init_lakeshore: {},
           acq: {},
@@ -95,14 +91,6 @@
         }
         return new_data;
       },
-    },
-    methods: {
-    },
-    mounted() {
-      window.ocs_bundle.web.register_panel(this, null, ocs_reg);
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, ocs_reg.client);
     },
   }
 </script>

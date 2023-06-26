@@ -1,11 +1,25 @@
-/* eslint-disable */
+<!--
+
+GenericAgent
+
+This component is activated when a specialized panel does not exist
+for a particular agent class.  It displays the agent address and
+connection status, and then provides generic (parameter-free) controls
+for all tasks and processes detected in the agent.
+
+This code can be used as a template / starting point for implementing
+specialized agent panels.
+
+-->
 <template>
+  <AgentPanelBase />
+
   <div class="block_holder ocs_ui">
 
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>Generic Control Panel <OpLocker /></h1>
+        <OcsAgentHeader>Generic Control Panel</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"
@@ -14,7 +28,7 @@
         <OpReading
           caption="Connection"
           mode="ok"
-          v-bind:value="connection_ok">
+          v-bind:value="panel.connection_ok">
         </OpReading>
       </div>
     </div>
@@ -22,7 +36,6 @@
     <!-- Right block -->
     <div class="block_unit">
       <OcsOpAutofill
-        :address="address"
         :ops_parent="ops"
       />
     </div>
@@ -31,8 +44,6 @@
 </template>
 
 <script>
-  let ocs_reg = {};
-
   export default {
     name: 'GenericAgent',
     props: {
@@ -40,22 +51,9 @@
     },
     data: function () {
       return {
-        connection_ok: false,
+        panel: {},
         ops: {},
       }
     },
-    mounted() {
-      window.ocs_bundle.web.register_panel(
-        this,
-        null,
-        ocs_reg);
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, ocs_reg.client);
-    },
   }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>

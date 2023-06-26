@@ -1,4 +1,3 @@
-/* eslint-disable */
 <template>
   <h1>{{ main_title }}</h1>
   <hr />
@@ -35,6 +34,16 @@
               <button style="width: 200px" @click="confirmOp(true)">Ok</button>
               <button style="width: 200px" @click="confirmOp(false)">Cancel</button>
             </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Password config -->
+    <div class="fullScreenMask" v-if="passwordWindow">
+      <div class="errorModal">
+        <div class="errorModalContent">
+          <PasswordConfig :config="passwordWindow"
+           @close="confirmPw()" @update="passwordUpdate()" />
         </div>
       </div>
     </div>
@@ -84,6 +93,7 @@
         :active_index="config_index"
         :configs="configs"
         @update:configs="configUpdate"
+        @clearPw="clearPasswords"
       />
       <MainBrowser
         v-if="mainMode=='browse'"
@@ -109,6 +119,7 @@
   import ConfigsWindow from './panels/ConfigsWindow.vue';
   import GenericAgent from './panels/GenericAgent.vue';
   import AgentList from './components/AgentList.vue';
+  import PasswordConfig from './components/PasswordConfig.vue';
 
   // Agent panels - OCS
   import AggregatorAgent from './panels/AggregatorAgent.vue';
@@ -157,7 +168,8 @@
   let ocs = require('./ocsbow');
   let util = require('./util');
   let web = require('./ocsweb');
-  
+  let access = require('./access');
+
   // Unglobalfy
   var ocs_bundle = {
     ocsbow: ocs,
@@ -198,6 +210,7 @@
         active_agent: {
           'comp': null,
           'addr': null,
+          'escalation': null,
         },
         force_generic: false,
         config_index: index,
@@ -205,6 +218,7 @@
         mainMode: 'config',
         errorInfo: null,
         userConfirm: null,
+        passwordWindow: null,
         accessLevel: 0,
       }
     },
@@ -213,13 +227,17 @@
         accessLevel: computed({
           get: () => this.accessLevel,
           set: (v) => {this.accessLevel = v;}
-        })
+        }),
+        activeAgent: computed({
+          get: () => this.active_agent,
+        }),
       }
     },
     components: {
       AgentList,
       MainBrowser,
       ConfigsWindow,
+      PasswordConfig,
     },
     computed: {
       activeComp() {
@@ -244,6 +262,14 @@
             this.reconnect();
         }
       },
+      clearPasswords() {
+        ocs_bundle.passwords.clear();
+        this.passwordUpdate();
+      },
+      passwordUpdate() {
+        let c = "ocsWebPasswords-" + ocs_bundle.config.name;
+        this.cookies.set(c, ocs_bundle.passwords.to_cookie(), "30d");
+      },
       setConfigIndex(index) {
         if (this.config_index != index) {
           // The quiet way ...
@@ -259,7 +285,6 @@
         this.mainMode = 'agent';
         this.active_agent = v;
         this.force_generic = debug;
-        this.accessLevel = 1;
       },
       setMode(mode) {
         this.mainMode = mode;
@@ -279,6 +304,9 @@
           this.userConfirm.cancel();
 
         this.userConfirm = null;
+      },
+      confirmPw() {
+        this.passwordWindow = null;
       },
     },
     setup() {
@@ -309,9 +337,24 @@
         });
       }
       ocs_bundle.config = this.configs[this.config_index];
+      ocs_bundle.passwords = new access.PasswordManager();
+
+      let pw_cname = "ocsWebPasswords-" + ocs_bundle.config.name;
+      let pw_cookie = this.cookies.get(pw_cname);
+      ocs_bundle.passwords.update_from_cookie(pw_cookie);
+      ocs_bundle.config.passwords_in = true;
+
       window.ocs.start();
 
       this.main_title = `Observatory Control System - [${ocs_bundle.config.name}]`;
+
+      // Transitional converter -- if client is a string, construct a
+      // client assuming it's the agent address; otherwise assume client.
+      let _get_client = function(client) {
+        if (typeof client === 'string')
+          return window.ocs.get_client(client);
+        return client;
+      };
 
       // Register error handler.
       ocs_bundle.on_error = (msg) => {
@@ -327,61 +370,76 @@
       };
 
       // Functions that wrap operation start/stop with UI error windows.
-      ocs_bundle.ui_run_task = (agent_address, op_name, op_params) => {
-        window.ocs.get_client(agent_address).run_task(op_name, op_params).then(
+      ocs_bundle.ui_run_task = (client, op_name, op_params) => {
+        // Temporarily accept "client" to be an agent_address.
+        client = _get_client(client);
+        client.run_task(op_name, op_params).then(
           (msg) => console.log('ok', msg),
           (msg) => window.ocs_bundle.on_error(
             {'type': 'op',
-             'address': agent_address,
+             'address': client.address,
              'op_name': op_name,
              'message': msg})
         );
       };
 
-      ocs_bundle.ui_abort_task = (agent_address, op_name) => {
-        window.ocs.get_client(agent_address).abort_task(op_name)
+      ocs_bundle.ui_abort_task = (client, op_name) => {
+        client = _get_client(client);
+        client.abort_task(op_name)
               .then(
                 result => {
                   if (result[0] != 0) {
                     let msg = result[1]
                     window.ocs_bundle.on_error(
                       {'type': 'op',
-                       'address': agent_address,
+                       'address': client.address,
                        'op_name': op_name,
                        'message': msg});
                 }
               });
       };
 
-      ocs_bundle.ui_start_proc = (agent_address, op_name, op_params) => {
-        window.ocs.get_client(agent_address)
-              .start_proc(op_name, op_params)
+      ocs_bundle.ui_start_proc = (client, op_name, op_params) => {
+        client = _get_client(client);
+        client.start_proc(op_name, op_params)
               .then(
                 result => {
                   if (result[0] != 0) {
                     let msg = result[1]
                     window.ocs_bundle.on_error(
                       {'type': 'op',
-                       'address': agent_address,
+                       'address': client.address,
                        'op_name': op_name,
                        'message': msg});
                   }
               });
       };
 
-      ocs_bundle.ui_stop_proc = (agent_address, op_name) => {
-        window.ocs.get_client(agent_address).stop_proc(op_name)
+      ocs_bundle.ui_stop_proc = (client, op_name) => {
+        client = _get_client(client);
+        client.stop_proc(op_name)
               .then(
                 result => {
                   if (result[0] != 0) {
                     let msg = result[1]
                     window.ocs_bundle.on_error(
                       {'type': 'op',
-                       'address': agent_address,
+                       'address': client.address,
                        'op_name': op_name,
                        'message': msg});
                 }
               });
+      };
+
+      ocs_bundle.get_password_settings = () => {
+        return {
+          escalation: this.active_agent.escalation,
+        }
+      };
+
+      ocs_bundle.ui_password_window = () => { //(agent_class, instance_id) => {
+        this.passwordWindow = true; //{agent_class: agent_class,
+        //instance_id: instance_id};
       };
 
     },

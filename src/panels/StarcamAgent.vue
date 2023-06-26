@@ -1,11 +1,12 @@
-/* eslint-disable */
 <template>
+  <AgentPanelBase />
+
   <div class="block_holder ocs_ui">
 
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>StarcamAgent <OpLocker /></h1>
+        <OcsAgentHeader :panel="panel">StarcamAgent</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"
@@ -14,7 +15,7 @@
         <OpReading
           caption="Connection"
           mode="ok"
-          v-bind:value="connection_ok">
+          v-bind:value="panel.connection_ok">
         </OpReading>
         <h2>Last Reading</h2>
         <OpReading
@@ -48,11 +49,9 @@
     <!-- Right block -->
     <div class="block_unit">
       <!-- OcsProcess
-        :address="address"
         :op_data="ops.acq"  -->
 
       <OcsOpAutofill
-        :address="address"
         :ops_parent="ops"
       />
     </div>
@@ -61,8 +60,6 @@
 </template>
 
 <script>
-  let ocs_reg = {};
-
   export default {
     name: 'StarcamAgent',
     props: {
@@ -71,10 +68,11 @@
     inject: ['accessLevel'],
     data: function () {
       return {
-        connection_ok: false,
+        panel: {},
         ops: window.ocs_bundle.web.ops_data_init({
-          /* This has to be here to monitor the fields, but "auto" 
-             will help it get handled by Autofill */
+          /* This has to be here to monitor the fields, but "auto"
+             will help it get handled by Autofill [maybe not true any
+             more -- test me ] */
           acq: {auto: true},
         }),
       }
@@ -93,18 +91,5 @@
         return d;
       },
     },
-    mounted() {
-      window.ocs_bundle.web.register_panel(
-        this,
-        null,
-        ocs_reg);
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, ocs_reg.client);
-    },
   }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>

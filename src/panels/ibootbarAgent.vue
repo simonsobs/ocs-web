@@ -1,11 +1,12 @@
-/* eslint-disable */
 <template>
+  <AgentPanelBase @clientConnected="startListening()"/>
+
   <div class="block_holder ocs_ui">
 
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>ibootbar Agent <OpLocker /></h1>
+        <OcsAgentHeader :panel="panel">ibootbar Agent</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading caption="Address"
                  v-bind:value="address">
@@ -19,7 +20,7 @@
           <OcsLight
             caption="AGT"
             tip="Status of the connection between ocs-web and the Agent."
-            :value="connection_ok"
+            :value="panel.connection_ok"
           />
           <OcsLight
             caption="ACQ"
@@ -30,7 +31,7 @@
 
         <h2>Outlets</h2>
 
-        <div v-if="connection_ok">
+        <div v-if="panel.connection_ok">
           <span id="outlet_warning" v-if="outlet_warning"><b>{{ outlet_warning }}</b></span>
           <form class="ib_kids" v-on:submit.prevent>
             <div class="ib_row ib_header">
@@ -67,12 +68,10 @@
     <!-- Right block -->
     <div class="block_unit">
       <OcsProcess
-        :address="address"
         :op_data="ops.acq">
       </OcsProcess>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_outlet">
         <OpParam
           caption="Outlet (1-8)"
@@ -84,7 +83,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.cycle_outlet">
         <OpParam
           caption="Outlet (1-8)"
@@ -95,7 +93,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_initial_state">
       </OcsTask>
     </div>
@@ -103,14 +100,12 @@
 </template>
 
 <script>
-  let ocs_reg = {};
-
   export default {
     name: 'ibootbarAgent',
     inject: ['accessLevel'],
     data: function () {
       return {
-        connection_ok: false,
+        panel: {},
         outlet_warning: null,
         outlets: {},
         ops: window.ocs_bundle.web.ops_data_init({
@@ -126,7 +121,7 @@
     },
     methods: {
       update_outlet_states(op_name, method, stat, msg, session) {
-        if (!this.connection_ok) {
+        if (!this.panel.connection_ok) {
           this.outlets = {};
           this.outlet_warning = 'No connection to agent!';
           return;
@@ -156,10 +151,10 @@
       },
       set_target(idx, state) {
         if (state == 'cycle') {
-          ocs_reg.client.run_task('cycle_outlet', {
+          this.panel.client.run_task('cycle_outlet', {
             outlet: idx + 1});
         } else {
-          ocs_reg.client.run_task('set_outlet', {
+          this.panel.client.run_task('set_outlet', {
             outlet: idx + 1,
             state: state});
         }
@@ -177,15 +172,9 @@
         }
         return false;
       },
-
-    },
-    mounted() {
-      window.ocs_bundle.web.register_panel(this, client => {
-        client.add_watcher('acq', 5., this.update_outlet_states);
-      }, ocs_reg);
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, ocs_reg.client);
+      startListening() {
+        this.panel.client.add_watcher('acq', 5., this.update_outlet_states);
+      },
     },
   }
 

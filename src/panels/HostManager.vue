@@ -1,18 +1,19 @@
-/* eslint-disable */
 <template>
+  <AgentPanelBase @clientConnected="startListening()"/>
+
   <div class="block_holder ocs_ui">
 
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>Host Manager <OpLocker /></h1>
+        <OcsAgentHeader>Host Manager</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading caption="Address"
                  v-bind:value="address">
         </OpReading>
         <OpReading caption="Connection"
                  mode="ok"
-                 v-bind:value="connection_ok">
+                 v-bind:value="panel.connection_ok">
         </OpReading>
         <form v-on:submit.prevent>
           <div class="ocs_row">
@@ -47,12 +48,10 @@
     <!-- Right block -->
     <div class="block_unit">
       <OcsProcess
-        :address="address"
         :op_data="ops.manager">
       </OcsProcess>
 
       <OcsTask
-        :address="address"
         :op_data="ops.update">
         <div class="ocs_row">
           <label>Reload Config</label>
@@ -62,7 +61,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.die">
       </OcsTask>
     </div>
@@ -70,14 +68,12 @@
 </template>
 
 <script>
-  let ocs_reg = {};
-
   export default {
     name: 'HostManager',
     inject: ['accessLevel'],
     data: function () {
       return {
-        connection_ok: false,
+        panel: {},
         children: {},
         ops: window.ocs_bundle.web.ops_data_init({
           'manager': {},
@@ -104,7 +100,7 @@
       },
       set_target(instance_id, updn) {
         this.children[instance_id].target_state = '(' + updn + ')';
-        ocs_reg.client.run_task('update', {
+        this.panel.client.run_task('update', {
             requests:  [[instance_id, updn]]
         });
       },
@@ -112,14 +108,9 @@
           window.ocs_bundle.ui_start_proc(this.address, 'update',
                                           {'reload_config': true});
       },
-    },
-    mounted() {
-      window.ocs_bundle.web.register_panel(this, client => {
-        client.add_watcher('manager', 5., this.update_child_states);
-      }, ocs_reg);
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, ocs_reg.client);
+      startListening() {
+        this.panel.client.add_watcher('manager', 5., this.update_child_states);
+      },
     },
   }
 

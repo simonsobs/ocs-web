@@ -1,4 +1,3 @@
-/* eslint-disable */
 <template>
   <div class="block_holder ocs_ui">
 
@@ -16,7 +15,7 @@
                   {{ config.name }}
                 </a>
                 <span v-if="index == active_index">
-                    [active] [{{ (connection_ok) ? 'connected': 'not connected' }}]
+                  [active] [{{ (connection_ok) ? 'connected': 'not connected' }}]
                 </span>
               </h2>
             </div>
@@ -38,6 +37,11 @@
               :modelValue="config.addr_root"
               @input="emitConfigChange(index, 'addr_root', $event.target.value)"
             />
+            <div class="ocs_row">
+              <label>Reset passwords</label>
+              <button @click="clearPw(index)"
+               :disabled="index!=active_index">Clear cache</button>
+            </div>
           </form>
         </div>
       </div>
@@ -62,6 +66,9 @@
     methods: {
       emitConfigChange(index, field, value) {
         this.$emit('update:configs', index, field, value);
+      },
+      clearPw() {
+        this.$emit('clearPw');
       },
     },
     mounted() {

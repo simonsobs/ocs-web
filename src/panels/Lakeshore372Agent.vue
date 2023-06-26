@@ -1,11 +1,12 @@
-/* eslint-disable */
 <template>
+  <AgentPanelBase />
+
   <div class="block_holder ocs_ui">
 
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>Lakeshore372Agent <OpLocker /></h1>
+        <OcsAgentHeader :panel="panel">Lakeshore372Agent</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"
@@ -14,7 +15,7 @@
         <OpReading
           caption="Connection"
           mode="ok"
-          v-bind:value="connection_ok">
+          v-bind:value="panel.connection_ok">
         </OpReading>
         <div class="ocs_triple data_table box">
           <div class="data_row header data_column ">
@@ -33,17 +34,14 @@
     <div class="block_unit">
 
       <OcsTask
-        :address="address"
         :op_data="ops.init_lakeshore">
       </OcsTask>
 
       <OcsProcess
-        :address="address"
         :op_data="ops.acq"
       />
 
       <OcsTask
-        :address="address"
         :show_start="false"
         :op_data="ops.set_autoscan">
         <div class="ocs_row">
@@ -58,7 +56,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_active_channel">
         <OpParam
           caption="Channel (int)"
@@ -66,7 +63,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_output_mode">
         <OpDropdown
           caption="Heater"
@@ -79,7 +75,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_pid">
         <OpParam
           caption="P (int)"
@@ -93,7 +88,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_heater_range">
         <OpDropdown
           caption="Heater"
@@ -108,7 +102,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.servo_to_temperature">
         <OpParam
           caption="Temperature (float)"
@@ -116,7 +109,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_heater_output">
         <OpDropdown
           caption="Heater"
@@ -132,7 +124,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_resistance_range">
         <OpParam
           caption="Channel (int)"
@@ -144,7 +135,6 @@
 
       ----
       <OcsTask
-        :address="address"
         :op_data="ops.get_dwell">
         <OpParam
           caption="Channel (int)"
@@ -156,7 +146,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.get_excitation">
         <OpParam
           caption="Channel (int)"
@@ -172,7 +161,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.get_resistance_range">
         <OpParam
           caption="Channel (int)"
@@ -184,7 +172,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.get_still_output">
         <OpReading
           caption="Still Output (%)"
@@ -193,7 +180,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_excitation">
         <OpParam
           caption="Channel (int)"
@@ -204,7 +190,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_excitation_mode">
         <OpParam
           caption="Channel (int)"
@@ -216,7 +201,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_heater_range">
         <OpDropdown
           caption="Heater"
@@ -231,7 +215,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_still_output">
         <OpParam
           caption="Output (%)"
@@ -239,7 +222,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_dwell">
         <OpParam
           caption="Channel (int)"
@@ -250,7 +232,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.enable_control_chan"
         op_name="enable_control_chan/disable_control_chan"
         :show_start="false">
@@ -266,7 +247,6 @@
       </OcsTask>
 
       <OcsOpAutofill
-        :address="address"
         :ops_parent="ops"
       />
 
@@ -276,8 +256,6 @@
 </template>
 
 <script>
-  let ocs_reg = {};
-
   export default {
     name: 'Lakeshore372Agent',
     props: {
@@ -286,9 +264,9 @@
     inject: ['accessLevel'],
     data: function () {
       return {
+        panel: {},
         extension: 5,
         precision: 3,
-        connection_ok: false,
         ops: window.ocs_bundle.web.ops_data_init({
           init_lakeshore: {},
           set_active_channel: {
@@ -358,12 +336,6 @@
         let task = {true: 'enable', false: 'disable'}[on] + '_control_chan';
         window.ocs_bundle.ui_run_task(this.address, task, {});
       },
-    },
-    mounted() {
-      window.ocs_bundle.web.register_panel(this, null, ocs_reg);
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, ocs_reg.client);
     },
   }
 </script>

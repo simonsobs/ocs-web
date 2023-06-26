@@ -1,0 +1,65 @@
+agent_class: 'HostManager'
+instance_id: 'hm-1'
+processes:
+  manager:
+    startup: true
+    data_settings: {
+      'timestamp_field': 'timestamp'
+      }
+    data: {
+      "child_states": [
+        {
+          "next_action": "up",
+          "target_state": "up",
+          "stability": 1,
+          "agent_class": "[docker]",
+          "instance_id": "ocs-aggregator"
+        },
+        {
+          "next_action": "up",
+          "target_state": "up",
+          "stability": 1,
+          "agent_class": "[docker]",
+          "instance_id": "ocs-influx-publisher"
+        },
+        {
+          "next_action": "up",
+          "target_state": "up",
+          "stability": 1,
+          "agent_class": "[docker]",
+          "instance_id": "ocs-registry"
+        },
+        {
+          "next_action": "up",
+          "target_state": "up",
+          "stability": 1,
+          "agent_class": "[docker]",
+          "instance_id": "hk-agent-01"
+        },
+        {
+          "next_action": "up",
+          "target_state": "up",
+          "stability": 1,
+          "agent_class": "[docker]",
+          "instance_id": "ocs-ups-satp-c2-01"
+        },
+        {
+          "next_action": "up",
+          "target_state": "up",
+          "stability": 1,
+          "agent_class": "[docker]",
+          "instance_id": "ocs-ups-satp-c1-01"
+        },
+        {
+          "next_action": "down",
+          "target_state": "down",
+          "stability": 0.9978726211941876,
+          "agent_class": "[docker]",
+          "instance_id": "ocs-latr-pfeiffer-01"
+        }
+      ]
+    }
+  
+tasks:
+  die: {}
+  update: {}

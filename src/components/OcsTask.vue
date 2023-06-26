@@ -33,6 +33,7 @@
     name: 'OcsTask',
     props: {
       address: String,
+      panel: Object,
       op_data: Object,
       op_name: String,
       show_status: {
@@ -59,11 +60,22 @@
     },
     emits: ["op_error"],
     methods: {
+      // transitional...
+      _get_client_or_address() {
+        let client = this.panel?.client;
+        if (!client)
+          client = this.address;
+        if (!this.address)
+          client = this.$parent.panel.client;
+        return client;
+      },
       start() {
-        window.ocs_bundle.ui_run_task(this.address, this.name, this.op_data.params);
+        window.ocs_bundle.ui_run_task(this._get_client_or_address(),
+                                      this.name, this.op_data.params);
       },
       abort() {
-        window.ocs_bundle.ui_abort_task(this.address, this.name);
+        window.ocs_bundle.ui_abort_task(this._get_client_or_address(),
+                                        this.name);
       },
     },
   }

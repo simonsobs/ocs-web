@@ -1,8 +1,5 @@
 // -*- mode: web; web-mode-code-indent-offset: 4; -*-
 
-/* eslint-disable */
-
-import $ from 'jquery';
 import autobahn from 'autobahn';
 
 let ocs_bundle;
@@ -182,7 +179,7 @@ AgentList.prototype = {
     },
 
     unsubscribe: function (subscriber) {
-        $.each(this._callbacks, function(agent_addr, cbs) {
+        Object.values(this._callbacks).forEach( (cbs) => {
             delete cbs[subscriber];
         });
     },
@@ -206,23 +203,23 @@ AgentList.prototype = {
     },
 
     _update_states: function() {
-        var key_order = [];
         var AL = this;
-        $.each(AL._data, (k, v) => key_order.push(k)); // eslint-disable-line
+        let key_order = Object.keys(AL._data);
         key_order.sort();
-        $.each(key_order, function(i, x) {
-            var info = AL._data[x];
-            var is_now_ok = (ocs_bundle.util.timestamp_now() - info['last_update'] <= 5);
+
+        key_order.forEach((k) => {
+            let info = AL._data[k];
+            let is_now_ok = (ocs_bundle.util.timestamp_now() - info['last_update'] <= 5);
             // Callbacks on change.
             if (is_now_ok != info.ok) {
                 info.ok = is_now_ok;
-                if (AL._callbacks[x]) {
-                    Object.entries(AL._callbacks[x]).forEach(
-                        ([sub, func]) => func(x, is_now_ok, info));
+                if (AL._callbacks[k]) {
+                    Object.entries(AL._callbacks[k]).forEach(
+                        ([, func]) => func(k, is_now_ok, info));
                 }
                 if (AL._callbacks['*']) {
                     Object.entries(AL._callbacks['*']).forEach(
-                        ([sub, func]) => func(x, is_now_ok, info));
+                        ([, func]) => func(k, is_now_ok, info));
                 }
             }
         });
@@ -246,9 +243,12 @@ export function AgentClient(_ocs, address) {
     this.agent_class = null;
     this.watchers = {};
     this.connection_ok = true;
+    [this.instance_id] = address.split('.').slice(-1);
+    this._index = Object.getPrototypeOf(this).counter++;
 }
 
 AgentClient.prototype = {
+    counter: 0,
 
     // scan
     //
@@ -265,7 +265,7 @@ AgentClient.prototype = {
                 // Calling an invalid method address seems to return
                 // null result, rather than raise a catchable.
                 if (!result) {
-                    client.scan_old_api(callback);
+                    console.log('Warning, ' + this.address + ' did not respond to "get_api" call.');
                     return;
                 }
                 // New API.
@@ -273,43 +273,10 @@ AgentClient.prototype = {
                 client.procs = result.processes;
                 client.feeds = result.feeds;
                 client.agent_class = result.agent_class;
+                client.access_control = result.access_control;
                 if (callback != null)
                     callback();
-            });
-    },
-
-    scan_old_api : function(callback) {
-        console.log('Warning, ' + this.address + ' does not support "get_api" call.');
-        let client = this;
-        var d = new autobahn.when.defer();
-        var counter = 3;
-        d.promise.then(function() {
-            if (callback != null)
-                callback();
-        });
-        this.ocs.connection.session.call(this.address, ['get_tasks']).then(
-            function(result) {
-                client.tasks = [];
-                if (result != null)
-                    client.tasks = result;
-                if (--counter == 0)
-                    d.resolve();
-            });
-        this.ocs.connection.session.call(this.address, ['get_processes']).then(
-            function(result) {
-                client.procs = [];
-                if (result != null)
-                    client.procs = result;
-                if (--counter == 0)
-                    d.resolve();
-            });
-        this.ocs.connection.session.call(this.address, ['get_feeds']).then(
-            function(result) {
-                client.feeds = [];
-                if (result != null)
-                    client.feeds = result;
-                if (--counter == 0)
-                    d.resolve();
+                return client;
             });
     },
 
@@ -323,23 +290,31 @@ AgentClient.prototype = {
     // @param params      Object with key-value parameters for the method.
 
     dispatch : function(method, op_name, params) {
-        let client = this;
-        var _p = [method, op_name, params];
-
         // Wrap all API calls to call our onSession handler before
         // returning to the invoking agent.
         var d = new autobahn.when.defer();
-        if (!client.ocs.connection) {
+        if (!this.ocs.connection) {
             d.reject();
             return d.promise;
         }
-        client.ocs.connection.session.call(client.address + '.ops', _p).then(
+
+        var _p = [method, op_name, params];
+        let _kw = {};
+
+        // Transitional -- don't provide a password unless API supports it.
+        if (this.access_control && ocs_bundle.get_password_settings().escalation) {
+            _kw.password =
+                ocs_bundle.passwords.get_pass(this.agent_class, this.instance_id);
+        }
+
+        let client = this;
+        client.ocs.connection.session.call(client.address + '.ops', _p, _kw).then(
             function (args) {
                 // OCS responds with a simple list, args = [exit_code,
                 // message, session].
                 if (client.watchers[op_name])
-                    $.each(client.watchers[op_name].handlers, (i, h) =>
-                           h.f(op_name, method, args[0], args[1], args[2]));
+                    client.watchers[op_name].handlers.forEach(h =>
+                        { h.f(op_name, method, args[0], args[1], args[2]) });
                 d.resolve(args);
             });
         return d.promise;
@@ -373,7 +348,7 @@ AgentClient.prototype = {
                         function (result) {
                             d.resolve(result[1]);
                         },
-                        function (result) {
+                        function () {
                             d.reject('Could not complete wait() request');
                         }
                     );
@@ -381,7 +356,7 @@ AgentClient.prototype = {
                     d.reject(result[1]);
             },
             // start: failure?
-            function (result) {
+            function () {
                 d.reject('Could not issue start() request.')
             }
         );

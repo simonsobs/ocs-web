@@ -1,11 +1,12 @@
-/* eslint-disable */
 <template>
+  <AgentPanelBase />
+
   <div class="block_holder ocs_ui">
 
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>HWP Supervisor <OpLocker /></h1>
+        <OcsAgentHeader :panel="panel">HWP Supervisor</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"
@@ -127,7 +128,6 @@
 
       <!-- Control tasks -->
       <OcsTask
-        :address="address"
         :op_data="ops.brake">
         <OpParam
           caption="Freq. tol (Hz)"
@@ -142,7 +142,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.pid_to_freq">
         <OpParam
           caption="Spin rate (Hz)"
@@ -162,7 +161,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.pmx_off">
         <OpParam
           caption="Freq. tol (Hz)"
@@ -177,7 +175,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_const_voltage"
       >
         <OpParam
@@ -194,11 +191,9 @@
       <!-- Background processes -->
 
       <OcsProcess
-        :address="address"
         :op_data="ops.monitor"
       />
       <OcsProcess
-        :address="address"
         :op_data="ops.spin_control"
       />
 
@@ -208,8 +203,6 @@
 </template>
 
 <script>
-  let ocs_reg = {};
-
   export default {
     name: 'HWPSupervisor',
     props: {
@@ -218,7 +211,7 @@
     inject: ['accessLevel'],
     data: function () {
       return {
-        connection_ok: false,
+        panel: {},
         ops: window.ocs_bundle.web.ops_data_init({
           brake: {},
           pid_to_freq: {},
@@ -282,9 +275,9 @@
           return ocs_ok;
 
         if (name == 'agent')
-          return this.connection_ok;
+          return this.panel.connection_ok;
 
-        if (!ocs_ok || !this.connection_ok)
+        if (!ocs_ok || !this.panel.connection_ok)
           return 'notapplic';
 
         if (name == 'monitor' || name == 'spin_control') {
@@ -329,15 +322,5 @@
         return output;
       },
     },
-    mounted() {
-      window.ocs_bundle.web.register_panel(this, null, ocs_reg);
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, ocs_reg.client);
-    },
   }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>

@@ -1,11 +1,12 @@
-/* eslint-disable */
 <template>
+  <AgentPanelBase />
+
   <div class="block_holder ocs_ui">
 
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>HWP Rotation Agent <OpLocker /></h1>
+        <OcsAgentHeader :panel="panel">HWP Rotation Agent</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"
@@ -20,7 +21,7 @@
           <OcsLight
             caption="AGT"
             tip="Status of the connection between ocs-web and the Agent."
-            :value="connection_ok"
+            :value="panel.connection_ok"
           />
           <OcsLight
             caption="KIK"
@@ -118,12 +119,10 @@
     <div class="block_unit">
 
       <!-- OcsProcess
-        :address="address"
         :op_data="ops.pid_acq"
       / -->
 
       <OcsTask
-        :address="address"
         :op_data="ops.declare_freq">
         <OpParam
           caption="Freq (rev/s)"
@@ -131,7 +130,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_pid">
         <OpParam
           caption="P (0 - 8)"
@@ -145,7 +143,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_scale">
         <OpParam
           caption="slope (-10 to 10)"
@@ -156,7 +153,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_direction"
       >
         <OpDropdown
@@ -166,7 +162,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_v_lim">
         <OpParam
           caption="Voltage"
@@ -174,7 +169,6 @@
       </OcsTask>
 
       <OcsTask
-        :address="address"
         :op_data="ops.set_v">
         <OpParam
           caption="Voltage"
@@ -182,7 +176,6 @@
       </OcsTask>
 
       <OcsOpAutofill
-        :address="address"
         :ops_parent="ops"
       />
 
@@ -192,8 +185,6 @@
 </template>
 
 <script>
-  let ocs_reg = {};
-
   export default {
     name: 'RotationAgent',
     props: {
@@ -202,7 +193,7 @@
     inject: ['accessLevel'],
     data: function () {
       return {
-        connection_ok: false,
+        panel: {},
         ops: window.ocs_bundle.web.ops_data_init({
 
           // PID control
@@ -256,15 +247,5 @@
         return false;
       },
     },
-    mounted() {
-      window.ocs_bundle.web.register_panel(this, null, ocs_reg);
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, ocs_reg.client);
-    },
   }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-</style>

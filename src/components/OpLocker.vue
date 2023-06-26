@@ -8,13 +8,22 @@ lock by default.
 
 <template>
   <div>
+    <span v-if="accessLevel == -1"
+          style="color: #888">
+      <font-awesome-icon icon="fa-solid fa-lock" />
+    </span>
     <span v-if="accessLevel == 0"
           class="obviously_clickable"
           @click.exact="unlock(false)"
-          @click.shift="unlock(true)">&#128274;</span>
+          @click.shift="unlock(true)">
+      <font-awesome-icon icon="fa-solid fa-lock" />
+    </span>
     <span v-else
           class="obviously_clickable"
-          @click="lock()">&#128275;</span>
+          style="color: #aa6"
+          @click="lock()">
+      <font-awesome-icon icon="fa-solid fa-unlock" />
+    </span>
   </div>
 </template>
 

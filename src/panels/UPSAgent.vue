@@ -1,10 +1,12 @@
 <template>
+  <AgentPanelBase />
+
   <div class="block_holder ocs_ui">
 
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <h1>UPSAgent <OpLocker /></h1>
+        <OcsAgentHeader :panel="panel">UPSAgent</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"
@@ -13,7 +15,7 @@
         <OpReading
           caption="Connection"
           mode="ok"
-          v-bind:value="connection_ok">
+          v-bind:value="panel.connection_ok">
         </OpReading>
         <OpReading
           caption="Last update"
@@ -49,12 +51,10 @@
     <div class="block_unit">
 
       <OcsProcess
-        :address="address"
         :op_data="ops.acq"
       />
 
       <OcsOpAutofill
-        :address="address"
         :ops_parent="ops"
       />
 
@@ -64,8 +64,6 @@
 </template>
 
 <script>
-  let ocs_reg = {};
-
   export default {
     name: 'UPSAgent',
     props: {
@@ -74,7 +72,7 @@
     inject: ['accessLevel'],
     data: function () {
       return {
-        connection_ok: false,
+        panel: {},
         groups: {
           battery: {
             name: "Battery",
@@ -145,12 +143,6 @@
         }
         return new_data;
       },
-    },
-    mounted() {
-      window.ocs_bundle.web.register_panel(this, null, ocs_reg);
-    },
-    beforeUnmount() {
-      window.ocs_bundle.web.unregister_panel(this, ocs_reg.client);
     },
   }
 </script>
