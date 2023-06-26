@@ -35,7 +35,7 @@
         </div>
         <OpReading
           caption="Acq Status"
-          :value="ops.acq.status">
+          :value="ops.acq.session.status">
         </OpReading>
       </div>
     </div>
