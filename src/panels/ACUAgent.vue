@@ -76,10 +76,12 @@
         </OpReading>
         <OpReading
           caption="Boresight"
+          v-if="platformFeature('boresight')"
           v-bind:value="currentPosAndMode('Boresight')">
         </OpReading>
         <OpReading
           caption="Co-rotator"
+          v-if="platformFeature('corotator')"
           v-bind:value="currentPosAndMode('Corotator')">
         </OpReading>
         <OpReading
@@ -155,7 +157,8 @@
                   <option value="nonnom">Show non-nominal readings</option>
                   <option value="az-only">Show Azimuth</option>
                   <option value="el-only">Show Elevation</option>
-                  <option value="bore-only">Show Boresight</option>
+                  <option value="bore-only" v-if="platformFeature('boresight')">Show Boresight</option>
+                  <option value="3rd-only" v-if="platformFeature('corotator')">Show 3rd axis</option>
                   <option value="other-only">Show Other</option>
                   <option value="nothing" default>Show nothing</option>
                 </select>
@@ -429,8 +432,20 @@
           // In SAT the "3rd axis" is included in StatusDetailed.
           'boresight': data['StatusDetailed']['Boresight current position'],
           // In LAT, it is not.
-          'corotator': data['Status3rdAxis']['Boresight current position'],
+          'corotator': data['Status3rdAxis']['3rd axis current position'],
         };
+      },
+      platformFeature(feature) {
+        let sdata = this.ops.monitor.session.data;
+        if (!sdata || !sdata.PlatformType)
+          return false;
+        switch (feature) {
+          case 'boresight':
+            return sdata.PlatformType == 'satp';
+          case 'corotator':
+            return sdata.PlatformType == 'ccat';
+        }
+        return false;
       },
       currentPosAndMode(prefix) {
         let sdata = this.ops.monitor.session.data;
@@ -457,6 +472,7 @@
           }
           case 'Corotator': {
             data = sdata['Status3rdAxis'];
+            prefix = '3rd axis';
             break;
           }
         }
@@ -582,6 +598,8 @@
             d.props.specialization = 'el-only';
           if (key.includes('Boresight'))
             d.props.specialization = 'bore-only';
+          if (key.includes('3rd axis'))
+            d.props.specialization = '3rd-only';
 
           let test_val = value;
           if (test_val === true || test_val === false)
