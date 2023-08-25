@@ -65,27 +65,33 @@
         <h2>Pointing</h2>
         <OpReading
           caption="Activity"
+          :stale="statusIsStale"
           v-bind:value="currentMotion" />
         <OpReading
           caption="Azimuth"
+          :stale="statusIsStale"
           v-bind:value="currentPosAndMode('Azimuth')">
         </OpReading>
         <OpReading
           caption="Elevation"
+          :stale="statusIsStale"
           v-bind:value="currentPosAndMode('Elevation')">
         </OpReading>
         <OpReading
           caption="Boresight"
           v-if="platformFeature('boresight')"
+          :stale="statusIsStale"
           v-bind:value="currentPosAndMode('Boresight')">
         </OpReading>
         <OpReading
           caption="Co-rotator"
           v-if="platformFeature('corotator')"
+          :stale="statusIsStale"
           v-bind:value="currentPosAndMode('Corotator')">
         </OpReading>
         <OpReading
           caption="Timestamp"
+          :stale="statusIsStale"
           v-bind:value="currentPosAndMode('Timestamp')">
         </OpReading>
 
@@ -664,6 +670,9 @@
           annotated.push(d);
         }
         return annotated;
+      },
+      statusIsStale() {
+        return this.getIndicator('monitor') !== true;
       },
     },
   }
