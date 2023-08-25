@@ -164,7 +164,7 @@
                   <option value="az-only">Show Azimuth</option>
                   <option value="el-only">Show Elevation</option>
                   <option value="bore-only" v-if="platformFeature('boresight')">Show Boresight</option>
-                  <option value="3rd-only" v-if="platformFeature('corotator')">Show 3rd axis</option>
+                  <option value="corot-only" v-if="platformFeature('corotator')">Show Co-Rotator</option>
                   <option value="other-only">Show Other</option>
                   <option value="nothing" default>Show nothing</option>
                 </select>
@@ -437,8 +437,8 @@
           'el': data['StatusDetailed']['Elevation current position'],
           // In SAT the "3rd axis" is included in StatusDetailed.
           'boresight': data['StatusDetailed']['Boresight current position'],
-          // In LAT, it is not.
-          'corotator': data['Status3rdAxis']['3rd axis current position'],
+          // In LAT, it is Status3rdAxis...
+          'corotator': data['Status3rdAxis']['Co-Rotator current position'],
         };
       },
       platformFeature(feature) {
@@ -478,7 +478,7 @@
           }
           case 'Corotator': {
             data = sdata['Status3rdAxis'];
-            prefix = '3rd axis';
+            prefix = 'Co-Rotator';
             break;
           }
         }
@@ -604,8 +604,8 @@
             d.props.specialization = 'el-only';
           if (key.includes('Boresight'))
             d.props.specialization = 'bore-only';
-          if (key.includes('3rd axis'))
-            d.props.specialization = '3rd-only';
+          if (key.includes('Co-Rotator '))  // trailing space skips an e-stop ...
+            d.props.specialization = 'corot-only';
 
           let test_val = value;
           if (test_val === true || test_val === false)
