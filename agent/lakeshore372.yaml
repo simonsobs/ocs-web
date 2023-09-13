@@ -1,0 +1,59 @@
+agent_class: 'Lakeshore372Agent'
+instance_id: 'fakeshore-2'
+processes:
+  acq:
+    startup: true
+    data_settings: {
+      'timestamp_field': [
+        'fields.Channel_03.timestamp',
+        'fields.Channel_04.timestamp',
+        'fields.Channel_07.timestamp',
+        'fields.Channel_08.timestamp',
+        ]
+      }
+    data: {
+      "fields": {
+        "Channel_03": {"T": 100.11, "R":100.79},
+        "Channel_04": {"T": 98.49, "R": 100.77},
+        "Channel_07": {"T": 98.03, "R": 100.82},
+        "Channel_08": {"T": 101.14, "R":101.01}},
+        }
+  custom_pid: {}
+
+tasks:
+  check_temperature_stability: {}
+  disable_control_chan: {}
+  enable_control_chan: {}
+  engage_channel: {}
+  engage_autorage: {}
+  get_dwell:
+    data:
+      dwell_time: 123.
+  get_excitation: {}
+  get_input_setup:
+    data: {
+      "mode": 'voltage',
+      "excitation": 6.32e-05,
+      "excitation_units": 'volts',
+      "autorange": 'on',
+      "range": 2000.0,
+      "csshunt": 'on',
+      "units": 'kelvin',
+      }
+  get_resistance_range: {}
+  get_still_output: {}
+  init_lakeshore: {}
+  input_configfile: {}
+  servo_to_temperature: {}
+  set_active_channel: {}
+  set_autoscan: {}
+  set_calibration_curve: {}
+  set_dwell: {}
+  set_excitation: {}
+  set_excitation_mode: {}
+  set_heater_output: {}
+  set_heater_range: {}
+  set_output_mode: {}
+  set_pid: {}
+  set_resistance_range: {}
+  set_still_output: {}

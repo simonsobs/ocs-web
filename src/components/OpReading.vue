@@ -24,6 +24,7 @@ Set the .mode attribute to one of:
            :class="{
              bad: conditionIs('bad'),
              good: conditionIs('good'), 
+             stale: stale,
              centered: (align == 'center'),
            }" 
            :value="compValue"
@@ -46,6 +47,9 @@ Set the .mode attribute to one of:
         type: String,
         default: "center",
         required: false},
+      stale: {
+        default: false,
+      },
     },
     methods: {
       conditionIs(cond) {
@@ -89,6 +93,10 @@ Set the .mode attribute to one of:
   input.good {
     background-color: #594;
     color: #fff;
+  }
+  input.stale {
+    background-color: #aaa;
+    color: #a99;
   }
   input.centered {
     text-align: center;

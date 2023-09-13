@@ -52,7 +52,18 @@ class MockingJaygent:
 
         while session.status == 'running':
             if op_data:
-                op_data[data_settings['timestamp_field']] = time.time()
+                t = time.time()
+                tfs = data_settings['timestamp_field']
+                if isinstance(tfs, str):
+                    tfs = [tfs]
+                for tf in tfs:
+                    _tf_toks = tf.split('.')
+                    target = op_data
+                    for _tok  in _tf_toks[:-1]:
+                        if not _tok in target:
+                            target[_tok] = {}
+                        target = target[_tok]
+                    target[_tf_toks[-1]] = t
                 session.data.update(op_data)
             yield dsleep(1)
 

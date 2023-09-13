@@ -133,6 +133,40 @@
           v-model.number="ops.set_resistance_range.params.output" />
       </OcsTask>
 
+      <OcsTask
+        :show_start="false"
+        :op_data="ops.engage_channel">
+        <OpParam
+          caption="Channel (int)"
+          v-model.number="ops.engage_channel.params.channel" />
+        <div class="ocs_row">
+          <label>Set</label>
+          <button
+            :disabled="accessLevel < 1"
+            @click="set_engage_channel('on')">Set on</button>
+          <button
+            :disabled="accessLevel < 1"
+            @click="set_engage_channel('off')">Set off</button>
+        </div>
+      </OcsTask>
+
+      <OcsTask
+        :show_start="false"
+        :op_data="ops.engage_autorange">
+        <OpParam
+          caption="Channel (int)"
+          v-model.number="ops.engage_autorange.params.channel" />
+        <div class="ocs_row">
+          <label>Set</label>
+          <button
+            :disabled="accessLevel < 1"
+            @click="set_engage_autorange('on')">Set on</button>
+          <button
+            :disabled="accessLevel < 1"
+            @click="set_engage_autorange('off')">Set off</button>
+        </div>
+      </OcsTask>
+
       ----
       <OcsTask
         :op_data="ops.get_dwell">
@@ -177,6 +211,20 @@
           caption="Still Output (%)"
           :value="ops.get_still_output.session.data.still_heater_still_out">
         </OpReading>
+      </OcsTask>
+
+      <OcsTask
+        :op_data="ops.get_input_setup">
+        <OpParam
+          caption="Channel (int)"
+          v-model.number="ops.get_input_setup.params.channel" />
+        <div v-for="item in Object.entries(ops.get_input_setup.session.data)"
+             v-bind:key="item[0]">
+        <OpReading
+          :caption="item[0]"
+          :value="item[1]">
+        </OpReading>
+        </div>
       </OcsTask>
 
       <OcsTask
@@ -246,6 +294,14 @@
         </div>
       </OcsTask>
 
+      <OcsTask
+        :op_data="ops.input_configfile">
+        <OpParam
+          caption="Filename"
+          v-model="ops.input_configfile.params.configfile"
+          />
+      </OcsTask>
+
       <OcsOpAutofill
         :ops_parent="ops"
       />
@@ -284,6 +340,8 @@
           get_resistance_range: {},
           get_excitation: {},
           get_still_output: {},
+          get_input_setup: {},
+
           servo_to_temperature: {},
           set_excitation: {},
           set_excitation_mode: {},
@@ -298,9 +356,15 @@
           set_dwell: {},
           set_pid: {},
           set_still_output: {},
+
+          engage_channel: {},
+          engage_autorange: {},
+          input_configfile: {},
+
           // Note enable/disable_control_chan handled in single widget.
           enable_control_chan: {},
           disable_control_chan: {},
+
         }),
       }
     },
@@ -335,6 +399,16 @@
       set_control_chan(on) {
         let task = {true: 'enable', false: 'disable'}[on] + '_control_chan';
         window.ocs_bundle.ui_run_task(this.address, task, {});
+      },
+      set_engage_channel(state) {
+        this.ops.engage_channel.params['state'] = state;
+        window.ocs_bundle.ui_run_task(this.address, 'engage_channel',
+                                      this.ops.engage_channel.params);
+      },
+      set_engage_autorange(state) {
+        this.ops.engage_autorange.params['state'] = state;
+        window.ocs_bundle.ui_run_task(this.address, 'engage_autorange',
+                                      this.ops.engage_autorange.params);
       },
     },
   }

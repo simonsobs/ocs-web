@@ -65,25 +65,33 @@
         <h2>Pointing</h2>
         <OpReading
           caption="Activity"
+          :stale="statusIsStale"
           v-bind:value="currentMotion" />
         <OpReading
           caption="Azimuth"
+          :stale="statusIsStale"
           v-bind:value="currentPosAndMode('Azimuth')">
         </OpReading>
         <OpReading
           caption="Elevation"
+          :stale="statusIsStale"
           v-bind:value="currentPosAndMode('Elevation')">
         </OpReading>
         <OpReading
           caption="Boresight"
+          v-if="platformFeature('boresight')"
+          :stale="statusIsStale"
           v-bind:value="currentPosAndMode('Boresight')">
         </OpReading>
         <OpReading
           caption="Co-rotator"
+          v-if="platformFeature('corotator')"
+          :stale="statusIsStale"
           v-bind:value="currentPosAndMode('Corotator')">
         </OpReading>
         <OpReading
           caption="Timestamp"
+          :stale="statusIsStale"
           v-bind:value="currentPosAndMode('Timestamp')">
         </OpReading>
 
@@ -155,7 +163,8 @@
                   <option value="nonnom">Show non-nominal readings</option>
                   <option value="az-only">Show Azimuth</option>
                   <option value="el-only">Show Elevation</option>
-                  <option value="bore-only">Show Boresight</option>
+                  <option value="bore-only" v-if="platformFeature('boresight')">Show Boresight</option>
+                  <option value="corot-only" v-if="platformFeature('corotator')">Show Co-Rotator</option>
                   <option value="other-only">Show Other</option>
                   <option value="nothing" default>Show nothing</option>
                 </select>
@@ -428,9 +437,21 @@
           'el': data['StatusDetailed']['Elevation current position'],
           // In SAT the "3rd axis" is included in StatusDetailed.
           'boresight': data['StatusDetailed']['Boresight current position'],
-          // In LAT, it is not.
-          'corotator': data['Status3rdAxis']['Boresight current position'],
+          // In LAT, it is Status3rdAxis...
+          'corotator': data['Status3rdAxis']['Co-Rotator current position'],
         };
+      },
+      platformFeature(feature) {
+        let sdata = this.ops.monitor.session.data;
+        if (!sdata || !sdata.PlatformType)
+          return false;
+        switch (feature) {
+          case 'boresight':
+            return sdata.PlatformType == 'satp';
+          case 'corotator':
+            return sdata.PlatformType == 'ccat';
+        }
+        return false;
       },
       currentPosAndMode(prefix) {
         let sdata = this.ops.monitor.session.data;
@@ -457,6 +478,7 @@
           }
           case 'Corotator': {
             data = sdata['Status3rdAxis'];
+            prefix = 'Co-Rotator';
             break;
           }
         }
@@ -582,6 +604,8 @@
             d.props.specialization = 'el-only';
           if (key.includes('Boresight'))
             d.props.specialization = 'bore-only';
+          if (key.includes('Co-Rotator '))  // trailing space skips an e-stop ...
+            d.props.specialization = 'corot-only';
 
           let test_val = value;
           if (test_val === true || test_val === false)
@@ -646,6 +670,9 @@
           annotated.push(d);
         }
         return annotated;
+      },
+      statusIsStale() {
+        return this.getIndicator('monitor') !== true;
       },
     },
   }
