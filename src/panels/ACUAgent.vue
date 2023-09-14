@@ -267,6 +267,10 @@
           modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.az_accel" />
         <OpParam
+          caption="az_drift"
+          modelType="blank_to_null"
+          v-model.number="ops.generate_scan.params.az_drift" />
+        <OpParam
           caption="num_scans"
           modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.num_scans" />
@@ -334,6 +338,7 @@
               az_endpoint2: 190,
               az_speed: 1,
               az_accel: 1,
+              az_drift: null,
               el_endpoint1: 60,
               el_endpoint2: 60,
               el_speed: 1,
