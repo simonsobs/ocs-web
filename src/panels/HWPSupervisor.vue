@@ -248,7 +248,7 @@
             case '!encoder_summary': {
               let now = window.ocs_bundle.util.timestamp_now();
               let oldness = window.ocs_bundle.util.human_timespan(now - proc[k1]['last_quad_time']);
-              return proc[k1]['enc_freq'].toFixed(4) + ' Hz; '
+              return (proc[k1]['enc_freq'] === null ? '?' : proc[k1]['enc_freq'].toFixed(4)) + ' Hz; '
                    + 'quad=' + proc[k1]['last_quad']
                    + ', ' + oldness + ' ago';
             }
