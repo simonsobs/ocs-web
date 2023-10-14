@@ -119,7 +119,8 @@
           v-model.number="ops.set_heater_output.params.output" />
         <OpDropdown
           caption="Display"
-          :options="['current', 'power']"
+          :options="['', 'current', 'power']"
+          modelType="blank_to_null"
           v-model="ops.set_heater_output.params.display" />
       </OcsTask>
 
@@ -243,9 +244,9 @@
           caption="Channel (int)"
           v-model.number="ops.set_excitation_mode.params.channel" />
         <OpDropdown
-          caption="Display"
+          caption="Mode"
           :options="['current', 'voltage']"
-          v-model="ops.set_excitation_mode.params.display" />
+          v-model="ops.set_excitation_mode.params.mode" />
       </OcsTask>
 
       <OcsTask
