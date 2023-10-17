@@ -41,6 +41,38 @@
         :op_data="ops.acq"
       />
 
+      <OcsProcess
+        :op_data="ops.custom_pid">
+        <OpDropdown
+          caption="Heater"
+          :options="['sample', 'still']"
+          v-model="ops.custom_pid.params.heater" />
+        <OpParam
+          caption="setpoint"
+          modelType="blank_to_null"
+          v-model.number="ops.custom_pid.params.setpoint" />
+        <OpParam
+          caption="Channel"
+          modelType="blank_to_null"
+          v-model.number="ops.custom_pid.params.channel" />
+        <OpParam
+          caption="P"
+          modelType="blank_to_null"
+          v-model.number="ops.custom_pid.params.P" />
+        <OpParam
+          caption="I"
+          modelType="blank_to_null"
+          v-model.number="ops.custom_pid.params.I" />
+        <OpParam
+          caption="update_time (s)"
+          modelType="blank_to_null"
+          v-model.number="ops.custom_pid.params.update_time" />
+        <OpParam
+          caption="sample_heater_range"
+          modelType="blank_to_null"
+          v-model.number="ops.custom_pid.params.sample_heater_range" />
+      </OcsProcess>
+
       <OcsTask
         :show_start="false"
         :op_data="ops.set_autoscan">
@@ -337,6 +369,7 @@
             },
           },
           acq: {},
+          custom_pid: {},
           get_dwell: {},
           get_resistance_range: {},
           get_excitation: {},
