@@ -7,6 +7,7 @@ processes:
       'timestamp_field': 'timestamp'
       }
     data: {
+      "PlatformType": 'satp',
       "StatusDetailed": {
         "Time": 51.709323698652,
         "Year": 2023,
@@ -34,7 +35,7 @@ processes:
         "Azimuth CW limit: operating": false,
         "Azimuth CW limit: emergency": false,
         "Azimuth CW limit: 2nd emergency": false,
-        "Azimuth summary fault": false,
+        "Azimuth summary fault": true,
         "Azimuth servo failure": false,
         "Azimuth motion error": false,
         "Azimuth brake 1 failure": false,
