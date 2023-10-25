@@ -62,6 +62,18 @@
           />
         </OcsLightLine>
 
+        <OcsLightLine caption="Axis Faults">
+          <template v-for="item in axisFaultLights" v-bind:key="item.name">
+            <OcsLight
+              :caption='item.name'
+              type="multi"
+              :tip="'Will show green/good if not &quot;' + item.key + '&quot;.'"
+              :value="getIndicator('-', item.key)"
+              v-if="!item.feature || platformFeature(item.feature)"
+            />
+          </template>
+        </OcsLightLine>
+
         <h2>Pointing</h2>
         <OpReading
           caption="Activity"
@@ -318,6 +330,29 @@
     inject: ['accessLevel'],
     data: function () {
       return {
+        dev_mode: false,
+        axisFaultLights: [
+          {name: 'El Sum',
+           key: 'Elevation summary fault'},
+          {name: 'El Comp',
+           key: 'Elevation computer disabled'},
+          {name: 'Az Sum',
+           key: 'Azimuth summary fault'},
+          {name: 'Az Comp',
+           key: 'Azimuth computer disabled'},
+          {name: 'BS Sum',
+           key: 'Boresight summary fault',
+           feature: 'boresight'},
+          {name: 'BS Comp',
+           key: 'Boresight computer disabled',
+           feature: 'boresight'},
+          {name: 'CR Sum',
+           key: 'Corotator summary fault',
+           feature: 'corotator'},
+          {name: 'CR Comp',
+           key: 'Corotator computer disabled',
+           feature: 'corotator'},
+        ],
         panel: {},
         ops: window.ocs_bundle.web.ops_data_init({
           go_to: {
@@ -499,7 +534,7 @@
         return (window.ocs_bundle.util.pad_decimal(pos.toFixed(4), 5, ' ') +
                 ' [' + mode + ']');
       },
-      getIndicator(name) {
+      getIndicator(name, mon_key) {
         let mon_stale_time = 3;  // Seems to be enough
         let brd_stale_time = 5;  // 3 is not enough.
 
@@ -536,6 +571,9 @@
         let mon_stale = !mon_time || (
           window.ocs_bundle.util.timestamp_now() - mon_time > mon_stale_time);
 
+        if (this.dev_mode)
+          mon_stale = false;
+
         if (name == 'monitor') {
           if (mon_running && mon_stale)
             return 'warning';
@@ -552,7 +590,11 @@
           case 'remote':
             return detail['ACU in remote mode'];
           case 'summary':
-              return !detail['General summary fault'];
+            return !detail['General summary fault'];
+          case '+':
+            return detail[mon_key] === true;
+          case '-':
+            return detail[mon_key] === false;
         }
 
         return 'notapplic';
