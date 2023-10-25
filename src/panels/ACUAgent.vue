@@ -46,19 +46,19 @@
             caption="UNLOCKED"
             type="multi"
             tip="Will show green/good when remote control is not locked out (Safe)."
-            :value="getIndicator('safe')"
+            :value="getIndicator('-', 'Safe')"
           />
           <OcsLight
             caption="REMOTE"
             type="multi"
             tip="Will show green/good when ACU is in Remote (rather than Local) control mode."
-            :value="getIndicator('remote')"
+            :value="getIndicator('+', 'ACU in remote mode')"
           />
           <OcsLight
             caption="READY"
             type="multi"
             tip="Will show green/good unless ACU expresses a General summary fault."
-            :value="getIndicator('summary')"
+            :value="getIndicator('-', 'General summary fault')"
           />
         </OcsLightLine>
 
@@ -330,7 +330,7 @@
     inject: ['accessLevel'],
     data: function () {
       return {
-        dev_mode: false,
+        dev_mode: false,  // DO NOT COMMIT THIS AS TRUE!
         axisFaultLights: [
           {name: 'El Sum',
            key: 'Elevation summary fault'},
@@ -584,13 +584,9 @@
         if (!mon_running || mon_stale)
           return 'notapplic';
 
+        // You could have short-hands for things ('safe' -> !detail['Safe'])
+        // but in many cases just look up directly in detail, and maybe negate.
         switch (name) {
-          case 'safe':
-              return !detail['Safe'];
-          case 'remote':
-            return detail['ACU in remote mode'];
-          case 'summary':
-            return !detail['General summary fault'];
           case '+':
             return detail[mon_key] === true;
           case '-':
