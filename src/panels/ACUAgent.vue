@@ -74,6 +74,17 @@
           </template>
         </OcsLightLine>
 
+        <OcsLightLine caption="Sun Safety">
+          <template v-for="item in sunSafetyIndicators" v-bind:key="item.name">
+            <OcsLight
+              :caption='item.name'
+              type="multi"
+              :tip="item.tip"
+              :value="item.value"
+            />
+          </template>
+        </OcsLightLine>
+
         <h2>Pointing</h2>
         <OpReading
           caption="Activity"
@@ -107,9 +118,9 @@
           v-bind:value="currentPosAndMode('Timestamp')">
         </OpReading>
 
-        <h2>Motion Control</h2>
+        <h2>Control</h2>
         <OpDropdown
-          caption="Type"
+          caption="Action Type"
           :options="motion_types"
           options_style="object"
           v-model="motion_control.type"
@@ -161,6 +172,41 @@
             <button
               :disabled="accessLevel < 1"
               @click="stopMotion">Abort</button>
+          </div>
+        </form>
+
+        <form v-on:submit.prevent
+              v-if="motion_control.type == 'sun_stuff'">
+          <OpReading
+            caption="Sun position"
+            :stale="statusIsStale"
+            v-bind:value="sunStat('position')">
+          </OpReading>
+          <OpReading
+            caption="Sun distance"
+            :stale="statusIsStale"
+            v-bind:value="sunStat('distance')">
+          </OpReading>
+          <div class="ocs_row">
+            <label>Reset params</label>
+            <button
+              :disabled="accessLevel < 1"
+              @click="sun('reset')">Go</button>
+          </div>
+          <div class="ocs_row">
+            <label>Escape now</label>
+            <button
+              :disabled="accessLevel < 1"
+              @click="sun('escape')">Go</button>
+          </div>
+          <div class="ocs_row">
+            <label>Enable / Disable mins</label>
+            <button
+              :disabled="accessLevel < 1"
+              @click="sun('enable')">Enable</button>
+            <button
+              :disabled="accessLevel < 1"
+              @click="sun('disable', 30)">Disable, 30 mins</button>
           </div>
         </form>
 
@@ -296,6 +342,15 @@
           v-model.number="ops.generate_scan.params.step_time" />
       </OcsProcess>
 
+      <!-- Sun Block -->
+
+      <OcsProcess
+        :op_data="ops.monitor_sun" />
+      <OcsTask
+        :op_data="ops.update_sun" />
+      <OcsTask
+        :op_data="ops.escape_sun_now" />
+
       <!-- Background processes -->
 
       <OcsTask
@@ -391,10 +446,14 @@
           },
           restart_idle: {},
           clear_faults: {},
+          monitor_sun: {},
+          update_sun: {},
+          escape_sun_now: {},
         }),
         motion_types: {
           const_el: "Constant el scan",
           goto: "Go to position",
+          sun_stuff: "Sun Avoidance",
         },
         motion_control: {
           type: "const_el",
@@ -480,6 +539,44 @@
           // In LAT, it is Status3rdAxis...
           'corotator': data['Status3rdAxis']['Co-Rotator current position'],
         };
+      },
+      sun(action, arg1) {
+        switch (action) {
+          case 'reset':
+            window.ocs_bundle.ui_run_task(this.address, 'update_sun',
+                                          {'reset': true});
+            break;
+          case 'escape':
+            window.ocs_bundle.ui_run_task(this.address, 'update_sun',
+                                          {'escape': true});
+            break;
+          case 'disable':
+            window.ocs_bundle.ui_run_task(this.address, 'update_sun',
+                                          {'temporary_disable': arg1 * 60});
+            break;
+          case 'enable':
+            window.ocs_bundle.ui_run_task(this.address, 'update_sun',
+                                          {'enable': true});
+            break;
+        }
+      },
+      sunStat(k) {
+        let data = this.ops.monitor_sun.session.data?.sun_pos;
+        if (!data || !data['sun_azel'])
+          return '?';
+
+        switch(k) {
+          case 'position': {
+            let azel = data['sun_azel'];
+            return 'az=' + azel[0].toFixed(2) + '; el=' + azel[1].toFixed(2);
+          }
+          case 'distance': {
+            let safe_time = window.ocs_bundle.util.human_timespan(
+              data['sun_safe_time']);
+            return 'offset=' + data['sun_dist'].toFixed(2) + ' deg; safe_time=' + safe_time;
+          }
+        }
+        return 'y';
       },
       platformFeature(feature) {
         let sdata = this.ops.monitor.session.data;
@@ -609,6 +706,7 @@
           "Scanning": this.ops.generate_scan.session,
           "Moving": this.ops.go_to.session,
           "Setting Boresight": this.ops.set_boresight.session,
+          "Escaping the Sun": this.ops.escape_sun_now.session,
         };
         let texts = [];
         for (const [k, v] of Object.entries(activities)) {
@@ -716,6 +814,52 @@
       },
       statusIsStale() {
         return this.getIndicator('monitor') !== true;
+      },
+      sunSafetyIndicators() {
+        let summary = this.ops.monitor_sun.session.data?.avoidance;
+        if (!summary)
+          summary = {safety_unknown: true};
+
+        let active = {
+          'name': summary.escape_active ? 'enabled' : 'disabled',
+          'value': summary.escape_active ? 'good' : 'warning',
+        };
+
+        let zone = null;
+        [
+          ['ok', 'good', true],
+          ['unknown', 'bad', summary.safety_unknown],
+          ['warning', 'warning', summary.warning_zone],
+          ['danger', 'bad', summary.danger_zone],
+        ].filter(([,, test]) => test).forEach(([text, state]) => {
+            zone = {name: text, value: state}
+        });
+
+        let pos = this.ops.monitor_sun.session.data?.sun_pos?.sun_azel;
+        let below_horizon = {
+          'name': 'position?',
+          'value': 'bad'};
+        if (pos) {
+          if (pos[1] <= 0)
+            below_horizon = {
+              'name': 'below horizon',
+              'value': 'good'};
+          else {
+            below_horizon = {
+              'name': 'above horizon',
+              'value': 'warning'};
+          }
+        }
+
+        zone['tip'] = 'Indicates if Sun is in the warning or danger zones.';
+        below_horizon['tip'] = 'Indicates if Sun is above (warning) or below (ok) horizon (el=0).';
+        active['tip'] = 'Indicates whether active Sun Avoidance system is enabled.';
+
+        return [
+          zone,
+          below_horizon,
+          active,
+        ];
       },
     },
   }
