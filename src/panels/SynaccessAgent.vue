@@ -75,8 +75,9 @@
           v-model.number="ops.set_outlet.params.outlet" />
         <OpDropdown
           caption="State"
-          :options="['on', 'off']"
-          v-model="ops.set_outlet.params.state" />
+          options_style="object"
+          :options="{true: 'on', false: 'off'}"
+          v-model.boolean="ops.set_outlet.params.on" />
       </OcsTask>
 
       <OcsTask
@@ -88,11 +89,11 @@
 
       <OcsTask
         :op_data="ops.set_all">
-        <div class="ocs_row">
-          <label>Set On</label>
-          <input type="checkbox" id="checkbox" v-model="ops.set_all.params.on"
-           />
-        </div>
+        <OpDropdown
+          caption="State"
+          options_style="object"
+          :options="{true: 'on', false: 'off'}"
+          v-model.boolean="ops.set_all.params.on" />
       </OcsTask>
 
       <OcsTask
@@ -114,7 +115,7 @@
         outlets: {},
         ops: window.ocs_bundle.web.ops_data_init({
           'status_acq': {},
-          'set_outlet': {params: {state: 'off'}},
+          'set_outlet': {params: {}},
           'get_status': {},
           'set_all': {},
           'reboot': {},
@@ -162,7 +163,7 @@
         } else {
           this.panel.client.run_task('set_outlet', {
             outlet: idx + 1,
-            state: state});
+            on: (state == 'on')});
         }
       },
       getIndicator(name) {
