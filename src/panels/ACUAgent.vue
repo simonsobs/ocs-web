@@ -351,6 +351,17 @@
       <OcsTask
         :op_data="ops.escape_sun_now" />
 
+      <!-- Scan / Move parameters -->
+
+      <OcsTask
+        :op_data="ops.set_speed_mode">
+        <OpDropdown
+          caption="mode"
+          :options="speed_modes"
+          v-model="ops.set_speed_mode.params.speed_mode"
+        />
+      </OcsTask>
+
       <!-- Background processes -->
 
       <OcsTask
@@ -438,6 +449,11 @@
               wait_to_start: null,
             },
           },
+          set_speed_mode: {
+            params: {
+              speed_mode: 'high',
+            }
+          },
           monitor: {
             params: {},
           },
@@ -467,6 +483,7 @@
           goto_el: 60,
         },
         start_types: ["end", "mid"],
+        speed_modes: ["high", "low"],
         dataset: {
           view: "all",
           filter: "",
