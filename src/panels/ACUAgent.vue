@@ -833,13 +833,14 @@
         return this.getIndicator('monitor') !== true;
       },
       sunSafetyIndicators() {
-        let summary = this.ops.monitor_sun.session.data?.avoidance;
+        let data = this.ops.monitor_sun.session.data;
+        let summary = data?.avoidance;
         if (!summary)
           summary = {safety_unknown: true};
 
         let active = {
-          'name': summary.escape_active ? 'enabled' : 'disabled',
-          'value': summary.escape_active ? 'good' : 'warning',
+          'name': data.active_avoidance ? 'enabled' : 'disabled',
+          'value': data.active_avoidance ? 'good' : 'warning',
         };
 
         let zone = null;
