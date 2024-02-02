@@ -1,0 +1,25 @@
+agent_class: 'SynaccessAgent'
+instance_id: 'synacc-1'
+processes:
+  status_acq:
+    startup: true
+    data_settings: {
+      'timestamp_field': 'timestamp'
+      }
+    data: {
+      'fields': {
+        'synaccess': {
+          0: 1,
+          1: 0,
+          2: 0,
+          3: 1,
+          4: 0,
+        },
+      },
+      "timestamp": 1601925677.6914878,
+    }
+tasks:
+  set_outlet: {}
+  reboot: {}
+  set_all: {}
+  get_status: {}

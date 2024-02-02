@@ -1,23 +1,29 @@
 agent_class: 'SynaccessAgent'
-instance_id: 'synacc-1'
+instance_id: 'synacc-2'
 processes:
-  status_acq:
+  acq:
     startup: true
     data_settings: {
       'timestamp_field': 'timestamp'
       }
-    data: {
-      'fields': {
-        'synaccess': {
-          0: 1,
-          1: 0,
-          2: 0,
-          3: 1,
-          4: 0,
-        },
-      },
-      "timestamp": 1601925677.6914878,
-    }
+    data:
+      fields:
+        0:
+          status: 1
+          name: OUTLETA
+        1: 
+          status: 1
+          name: OUTLETB
+        2:
+          status: 0
+          name: OUTLETC
+        3:
+          status: 1
+          name: OUTLETD
+        4:
+          status: 0
+          name: OUTLETE
+      timestamp: 1601925677.6914878
 tasks:
   set_outlet: {}
   reboot: {}

@@ -65,6 +65,12 @@
     <!-- Right block -->
     <div class="block_unit">
       <OcsProcess
+        v-if="acq_op_name && acq_op_name=='acq'"
+        :op_data="ops.acq">
+      </OcsProcess>
+
+      <OcsProcess
+        v-if="acq_op_name && acq_op_name=='status_acq'"
         :op_data="ops.status_acq">
       </OcsProcess>
 
@@ -114,12 +120,17 @@
         outlet_warning: null,
         outlets: {},
         ops: window.ocs_bundle.web.ops_data_init({
-          'status_acq': {},
+          'status_acq': {}, // socs <= 0.4.5
+          'acq': {},        // socs >= 0.4.6 (?)
           'set_outlet': {params: {}},
           'get_status': {},
           'set_all': {},
           'reboot': {},
         }),
+        // Transitional ... once we see data from either acq or
+        // status_acq, write that here and start ignoring the other one.
+        // If it is after Jan 1 2025, you can probably remove this generality!
+        acq_op_name: null,
       }
     },
     props: {
@@ -127,6 +138,11 @@
     },
     methods: {
       update_outlet_states(op_name, method, stat, msg, session) {
+        if (this.acq_op_name && (this.acq_op_name != op_name)) {
+          this.panel.client.clear_watchers(op_name);
+          return;
+        }
+
         if (!this.panel.connection_ok) {
           this.outlets = {};
           this.outlet_warning = 'No connection to agent!';
@@ -144,15 +160,34 @@
           return;
         }
 
+        if (!this.acq_op_name)
+          this.acq_op_name = op_name;
+
+        // Process data to look like ibootbar...
         let new_info = {};
-        for (const [sidx, state] of Object.entries(session.data.fields.synaccess)) {
-          let idx = parseInt(sidx);
-          new_info[idx] = {
-            name: 'outlet' + (idx + 1),
-            description: ['off', 'on'][state],
-            idx: idx,
-          };
+
+        if (op_name == 'status_acq') {
+          // Old format
+          for (const [sidx, state] of Object.entries(session.data.fields.synaccess)) {
+            let idx = parseInt(sidx);
+            new_info[idx] = {
+              name: 'outlet' + (idx + 1),
+              description: ['off', 'on'][state],
+              idx: idx,
+            };
+          }
+        } else {
+          // New format
+          [0,1,2,3,4,5,6,7].map( idx => {
+            let v = session.data.fields[idx];
+            if (v) {
+              new_info[idx] = v;
+              new_info[idx].idx = idx;
+              new_info[idx].description = ['off', 'on'][v.status];
+            }
+          });
         }
+
         this.outlets = new_info;
         this.outlet_warning = null;
       },
@@ -172,7 +207,9 @@
             return window.ocs.connection.isConnected;
           case 'acq':
             {
-              let session = this.ops.status_acq.session;
+              if (!this.acq_op_name)
+                return false
+              let session = this.ops[this.acq_op_name].session;
               return (session.status == 'running' ||
                       session.status == 'starting');
             }
@@ -180,7 +217,9 @@
         return false;
       },
       startListening() {
+        // Subscribe to old and new processes for now.
         this.panel.client.add_watcher('status_acq', 5., this.update_outlet_states);
+        this.panel.client.add_watcher('acq', 5., this.update_outlet_states);
       },
     },
   }
