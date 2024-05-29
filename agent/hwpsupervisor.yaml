@@ -65,7 +65,8 @@ processes:
       'pmx_source': 'VOLT\n',
       'pmx_last_updated': 1685478694.930578,
       'enc_freq': 1.3660419851129803e-06,
-      'last_quad': 0,
+      'encoder_last_updated': 1695478694.0,
+      'last_quad': null,
       'last_quad_time': 1685645970.4392657},
      'actions': {'pmx': 'ok', 'gripper': 'ok'}
     }
