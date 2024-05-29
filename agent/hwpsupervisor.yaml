@@ -87,3 +87,6 @@ tasks:
   pid_to_freq: {}
   set_const_voltage: {}
   pmx_off: {}
+  abort_action: {}
+  enable_driver_board: {}
+  disable_driver_board: {}

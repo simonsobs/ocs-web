@@ -117,6 +117,21 @@
             :disabled="accessLevel < 1"
             @click-button="quickAction('pid_to_freq')"
           />
+          <div class="ocs_row">
+            <label>Driver board</label>
+            <button
+              :disabled="accessLevel < 1"
+              @click="quickAction('enable_driver_board')">Enable</button>
+            <button
+              :disabled="accessLevel < 1"
+              @click="quickAction('disable_driver_board')">Disable</button>
+          </div>
+          <div class="ocs_row">
+            <label>Abort Action</label>
+            <button
+              :disabled="accessLevel < 1"
+              @click="quickAction('abort_action')">Abort</button>
+          </div>
         </form>
       </div>
 
@@ -187,6 +202,17 @@
         />
       </OcsTask>
         
+      <OcsTask
+        :op_data="ops.enable_driver_board"
+      />
+
+      <OcsTask
+        :op_data="ops.disable_driver_board"
+      />
+
+      <OcsTask
+        :op_data="ops.abort_action"
+      />
 
       <!-- Background processes -->
 
@@ -195,6 +221,11 @@
       />
       <OcsProcess
         :op_data="ops.spin_control"
+      />
+
+      <!-- etc -->
+      <OcsOpAutofill
+        :ops_parent="ops"
       />
 
     </div>
@@ -217,6 +248,9 @@
           pid_to_freq: {},
           pmx_off: {},
           set_const_voltage: {},
+          enable_driver_board: {},
+          disable_driver_board: {},
+          abort_action: {},
           monitor: {},
           spin_control: {},
         }),
@@ -301,8 +335,10 @@
         return 'notapplic';
       },
       quickAction(name) {
+        // Use ui_start_proc, instead of ui_run_task, since these will
+        // often run for a long time.
         window.ocs_bundle.ui_start_proc(this.address, name,
-                                            this.ops[name].params);
+                                        this.ops[name].params);
       },
     },
     computed: {
