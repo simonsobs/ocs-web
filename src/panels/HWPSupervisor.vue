@@ -55,7 +55,7 @@
 
         <OpReading
           caption="Spin Control"
-          :value="getMonThing('state', '!state_summary', 'spin_control')"
+          :value="getMonThing('current_action', '!state_summary', 'spin_control')"
         />
 
         <OpReading
@@ -271,8 +271,11 @@
           switch (k2) {
             case '!state_summary': {
               let now = window.ocs_bundle.util.timestamp_now();
-              let oldness = window.ocs_bundle.util.human_timespan(now - proc[k1]['start_time']);
-              return 'state=' + proc[k1]['state_name'] + ', for ' + oldness;
+              let action = proc[k1]['cur_state'];
+              let oldness = window.ocs_bundle.util.human_timespan(
+                now - action.start_time);
+              let state_type = action.state_type;
+              return 'state=' + state_type + ', for ' + oldness;
             }
             case '!pmx_summary': {
               return proc[k1]['pmx_voltage'] + " V / "
@@ -286,15 +289,17 @@
             }
             case '!encoder_summary': {
               let now = window.ocs_bundle.util.timestamp_now();
-              let oldness = window.ocs_bundle.util.human_timespan(
-                now - proc[k1]['encoder_last_updated']);
+              let t = proc[k1]['encoder_last_updated'];
+              let oldness = t ? window.ocs_bundle.util.human_timespan(
+                now - t) : '?';
               return (proc[k1]['enc_freq'] === null ? '?' :
                       proc[k1]['enc_freq'].toFixed(4)) + ' Hz, ' + oldness + ' ago';
             }
             case '!quad_summary': {
               let now = window.ocs_bundle.util.timestamp_now();
-              let oldness = window.ocs_bundle.util.human_timespan(
-                now - proc[k1]['last_quad_time']);
+              let t = proc[k1]['last_quad_time'];
+              let oldness = t ? window.ocs_bundle.util.human_timespan(
+                now - t) : '?';
               return 'quad=' + proc[k1]['last_quad']
                    + ', ' + oldness + ' ago';
             }

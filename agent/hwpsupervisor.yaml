@@ -21,12 +21,19 @@ processes:
          'Channel_8': {'T': 3.8762, 'V': 1.5958}},
         'timestamp': 1685478695.5608613},
        'status': 'ok'},
-      'encoder': {'agent_id': 'HBA1',
-       'op_name': 'acq',
-       'timestamp': 1685478695.7649696,
-       'data': {},
-       'status': 'ok'},
-      'pmx': {'agent_id': 'PMX',
+      "encoder": {
+        "agent_id": "hwp-bbb-a1",
+        "op_name": "acq",
+        "timestamp": 1716960145.1703215,
+        "data": {
+          "approx_hwp_freq": 2.1400369842740967,
+          "encoder_last_updated": 1716960144.9961975,
+          "irig_time": 1716960144,
+          "irig_last_updated": 1716960145.0351007
+        },
+        "status": "ok"
+      },
+        'pmx': {'agent_id': 'PMX',
        'op_name': 'acq',
        'timestamp': 1685478695.820547,
        'data': {'curr': -0.0033,
@@ -74,15 +81,24 @@ processes:
     startup: true
     data_settings: {
       'timestamp_field': 'timestamp'
-      }
-    data: {
-      'state': {
-        'traceback': "Traceback (most recent call last):\n  File \"/usr/local/lib/python3.8/dist-packages/socs/agents/hwp_supervisor/agent.py\", line 530, in update\n    run_and_validate(clients.pid.set_off)\nAttributeError: 'OCSClient' object has no attribute 'set_off'\n",
-        'start_time': 1685479676.6555681,
-        'state_name': 'Error',
-      },
-      'timestamp': 1685479698.7267675,
     }
+    data: {
+      "current_action": {
+        "action_id": 0,
+        "completed": true,
+        "success": false,
+        "cur_state": {
+          "state_type": "Idle",
+          "start_time": 1716938343.2922513,
+          "last_update_time": 1716958672.9490674
+        },
+        "state_history": [
+        ]
+      },
+      "action_history": [],
+      "timestamp": 1716958672.9491427
+    }
+
 tasks:
   brake: {}
   pid_to_freq: {}
