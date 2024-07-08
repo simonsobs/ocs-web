@@ -1,6 +1,9 @@
 <template>
-  <h1>{{ main_title }}</h1>
-  <hr />
+  <div class="main_title_bar">
+    <div class="main_title_holder" :style="{backgroundColor: platformColor()}">
+      <h1>{{ main_title }}</h1>
+    </div>
+  </div>
 
   <!-- Viewport-fixed for unscrollables-->
   <div class="viewport">
@@ -55,7 +58,7 @@
 
     <!-- Sidebar -->
     <div class="left_bar">
-      <div class="left_bar_menu box">
+      <div class="left_bar_menu box" :style="{ backgroundColor: platformColor()}">
         <h2>Main</h2>
         <div class="ocs_ui">
           <ul>
@@ -308,6 +311,12 @@
       confirmPw() {
         this.passwordWindow = null;
       },
+      platformColor() {
+        let bgColor = ocs_bundle.config?.styling?.background;
+        if (!bgColor)
+          return '#ccf';
+        return bgColor;
+      },
     },
     setup() {
       const { cookies } = useCookies();
@@ -347,6 +356,8 @@
       window.ocs.start();
 
       this.main_title = `Observatory Control System - [${ocs_bundle.config.name}]`;
+      if (ocs_bundle.config.styling?.banner)
+        this.main_title = ocs_bundle.config.styling.banner;
 
       // Transitional converter -- if client is a string, construct a
       // client assuming it's the agent address; otherwise assume client.
@@ -453,7 +464,10 @@
     -moz-osx-font-smoothing: grayscale;
     text-align: left;
     color: #2c3e50;
-    margin-top: 30px;
+  }
+
+  body {
+    margin: 0px;
   }
 
   .container {
@@ -476,6 +490,24 @@
 
   .left_bar_menu {
     background-color: #ccf;
+  }
+
+  div.main_title_bar {
+    height: 100%;
+    padding: 10px;
+    margin: 0;
+  }
+
+  div.main_title_holder {
+    padding: 10px;
+    margin: 0;
+    border: 3px solid #000;
+  }
+
+  .main_title_bar h1 {
+    font-size: 40px;
+    color: '#fff';
+    white-space: nowrap;
   }
 
   .left_bar_menu > div {

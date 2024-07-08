@@ -11,6 +11,7 @@
           <form v-on:submit.prevent>
             <div class="ocs_row">
               <h2 class="ocs_triple">
+                <div class="sysIcon" :style="{ backgroundColor: bgColor(config) }" />
                 <a :href="'?ocs=' + config.name">
                   {{ config.name }}
                 </a>
@@ -36,6 +37,12 @@
               :modelDisabled="!config.edit"
               :modelValue="config.addr_root"
               @input="emitConfigChange(index, 'addr_root', $event.target.value)"
+            />
+            <OpParam
+              caption="Banner alias"
+              v-if="config.styling?.banner"
+              :modelDisabled="!config.edit"
+              :modelValue="config.styling.banner"
             />
             <div class="ocs_row">
               <label>Reset passwords</label>
@@ -70,6 +77,11 @@
       clearPw() {
         this.$emit('clearPw');
       },
+      bgColor(cfg) {
+        if (cfg.styling?.background)
+          return cfg.styling.background;
+        return '#fff';
+      },
     },
     mounted() {
       let c = window.ocs;
@@ -86,4 +98,12 @@
   .active {
     background-color: #50c878;
   }
+
+  .sysIcon {
+    height: 20px;
+    width: 20px;
+    float: right;
+    border: 1px solid black;
+  }
+
 </style>
