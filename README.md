@@ -85,6 +85,28 @@ The schema for config.json is like this::
 Note that `realm` and `addr_root` are optional, and will default to
 values `test_realm` and `observatory`.
 
+Limited custom skinning can be added to a crossbar configuration.  For
+example:
+
+```
+{"crossbars": [
+    {"name": "ocs-8001",
+     "url": "ws://localhost:8001/ws",
+     "realm": "test_realm",
+     "addr_root": "observatory",
+     "styling": {
+       "banner": "My OCS",
+       "background": "#ff8888"}
+    }
+  ]
+}
+```
+
+The text in `banner` will appear in the top banner bar, instead of a
+string constructed from the "name".  The color specified for
+`background` will be used to fill the top banner bar and the side bar
+(clickable Agent listing).
+
 
 ### Environment variables
 
