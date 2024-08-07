@@ -413,10 +413,10 @@
            key: 'Boresight computer disabled',
            feature: 'boresight'},
           {name: 'CR Sum',
-           key: 'Corotator summary fault',
+           key: 'Co-Rotator summary fault',
            feature: 'corotator'},
           {name: 'CR Comp',
-           key: 'Corotator computer disabled',
+           key: 'Co-Rotator computer disabled',
            feature: 'corotator'},
         ],
         panel: {},
@@ -680,7 +680,11 @@
         let mon_running = mon.status == 'running';
 
         // check staleness.
-        let detail = mon.data['StatusDetailed'];
+        let detail = {
+          ...mon.data['StatusDetailed'],
+          ...mon.data['Status3rdAxis'],
+        };
+
         let mon_time = this.getTimestamp(detail);
         let mon_stale = !mon_time || (
           window.ocs_bundle.util.timestamp_now() - mon_time > mon_stale_time);
@@ -773,6 +777,7 @@
             case 'Azimuth brakes released':
             case 'Elevation brakes released':
             case 'Boresight brakes released':
+            case 'Co-Rotator brakes released':
               d.props.type = 'indicator';
               break;
 
@@ -797,6 +802,7 @@
             case 'Azimuth mode':
             case 'Elevation mode':
             case 'Boresight mode':
+            case 'Co-Rotator mode':
               d.props.type = 'indicator';
               test_val = (test_val != 'Stop')
               break;
@@ -807,6 +813,8 @@
             case 'Elevation power on':
             case 'Boresight axis in stop':
             case 'Boresight power on':
+            case 'Co-Rotator axis in stop':
+            case 'Co-Rotator power on':
             case 'ACU in remote mode':
               d.props.type = 'indicator';
               d.props.inverted = true;
