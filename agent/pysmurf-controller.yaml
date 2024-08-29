@@ -15,6 +15,23 @@ processes:
   stream:
     data: {}
 tasks:
+  abort: {}
+  all_off: {}
+  bias_dets: {}
+  overbias_tes: {}
+  run: {}
+  run_test_func: {}
+  set_biases: {}
+  take_bgmap: {}
+  take_bias_steps:
+    data: {
+      # Latest ocs should be able to handle nans.
+      'R': [1., 2., .NAN],
+      }
+  take_bias_waves: {}
+  take_iv: {}
+  take_noise: {}
+  uxm_relock: {}
   uxm_setup:
     data: {
       'timestamps': [('setup_amps', 1651162263.0204525)],
@@ -33,12 +50,4 @@ tasks:
         'band_medians': [12., 13., 14.],
       }
     }
-  uxm_relock: {}
-  take_bgmap: {}
-  take_iv: {}
-  take_bias_steps:
-    data: {
-      # Latest ocs should be able to handle nans.
-      'R': [1., 2., .NAN],
-      }
-  take_noise: {}
+  zero_biases: {}
