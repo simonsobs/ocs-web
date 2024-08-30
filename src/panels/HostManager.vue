@@ -38,8 +38,8 @@
             <span>{{ item.agent_class }}</span>
             <span class="hm_center">{{ item.next_action }}</span>
             <span class="hm_center">{{ item.target_state }}</span>
-            <button :disabled="accessLevel < 1" @click="set_target(item.instance_id, 'up')">up</button>
-            <button :disabled="accessLevel < 1" @click="set_target(item.instance_id, 'down')">down</button>
+            <button :disabled="accessLevel < 1" @click="set_target(item, 'up')">up</button>
+            <button :disabled="accessLevel < 1" @click="set_target(item, 'down')">down</button>
           </div>
         </form>
       </div>
@@ -74,7 +74,7 @@
     data: function () {
       return {
         panel: {},
-        children: {},
+        children: [],
         ops: window.ocs_bundle.web.ops_data_init({
           'manager': {},
           'update': {
@@ -91,17 +91,23 @@
       update_child_states(op_name, method, stat, msg, session) {
         if (!session.data || session.status != 'running')
           return;
-        let new_info = {};
-        session.data.child_states.map(
-          state => {
-            new_info[state.instance_id] = state;
-        });
-        this.children = new_info;
+
+        function sortKey(state) {
+          return [state.agent_class.toUpperCase(),
+                  state.agent_class,
+                  state.instance_id.toUpperCase(),
+                  state.instance_id];
+        }
+
+        this.children = session.data.child_states
+                               .map(state => [sortKey(state), state])
+                               .toSorted()
+                               .map(([,state]) => state);
       },
-      set_target(instance_id, updn) {
-        this.children[instance_id].target_state = '(' + updn + ')';
+      set_target(child, updn) {
+        child.target_state = '(' + updn + ')';
         this.panel.client.run_task('update', {
-            requests:  [[instance_id, updn]]
+            requests:  [[child.instance_id, updn]]
         });
       },
       refresh_config() {
