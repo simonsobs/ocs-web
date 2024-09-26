@@ -132,6 +132,15 @@
               @click="quickAction('disable_driver_board')">Disable</button>
           </div>
           <div class="ocs_row">
+            <label>Gripper</label>
+            <button
+              :disabled="accessLevel < 1"
+              @click="quickAction('grip_hwp')">Grip</button>
+            <button
+              :disabled="accessLevel < 1"
+              @click="quickAction('ungrip_hwp')">Ungrip</button>
+          </div>
+          <div class="ocs_row">
             <label>Abort Action</label>
             <button
               :disabled="accessLevel < 1"
@@ -258,6 +267,8 @@
           abort_action: {},
           monitor: {},
           spin_control: {},
+          grip_hwp: {},
+          ungrip_hwp: {},
         }),
       }
     },

@@ -107,3 +107,5 @@ tasks:
   abort_action: {}
   enable_driver_board: {}
   disable_driver_board: {}
+  grip_hwp: {}
+  ungrip_hwp: {}
