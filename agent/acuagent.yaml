@@ -8,6 +8,17 @@ processes:
       }
     data: {
       "PlatformType": 'satp',
+      "DefaultScanParams": {
+        "az_speed": 1,
+        "az_accel": 1
+      },
+      "StatusResponseRate": 19.567672060689702,
+      "IgnoredAxes": [
+        "third"
+      ],
+      "NamedPositions": {
+        "home": [180, 40]
+      },
       "StatusDetailed": {
         "Time": 51.709323698652,
         "Year": 2023,
@@ -190,6 +201,7 @@ processes:
   
 tasks:
   go_to: {}
+  go_to_named: {}
   set_boresight: {}
   stop_and_clear: {}
   clear_faults: {}
