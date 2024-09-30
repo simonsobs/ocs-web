@@ -176,6 +176,30 @@
         </form>
 
         <form v-on:submit.prevent
+              v-if="motion_control.type == 'goto_named'">
+          <OpDropdown
+            caption="Position"
+            :options="namedPositionsArray"
+            options_style="object"
+            v-model="motion_control.goto_target"
+          />
+          <div class="ocs_row">
+            <label>Set mode=Stop at end?</label>
+            <input type="checkbox" id="checkbox" v-model="motion_control.goto_target_stop"
+                   class="ocs_double" />
+          </div>
+          <div class="ocs_row">
+            <label />
+            <button
+              :disabled="accessLevel < 1"
+              @click="startMotion">Start</button>
+            <button
+              :disabled="accessLevel < 1"
+              @click="stopMotion">Abort</button>
+          </div>
+        </form>
+
+        <form v-on:submit.prevent
               v-if="motion_control.type == 'sun_stuff'">
           <OpReading
             caption="Sun position"
@@ -460,6 +484,7 @@
           broadcast: {
             params: {},
           },
+          go_to_named: {},
           restart_idle: {},
           clear_faults: {},
           monitor_sun: {},
@@ -469,6 +494,7 @@
         motion_types: {
           const_el: "Constant el scan",
           goto: "Go to position",
+          goto_named: "Go to named",
           sun_stuff: "Sun Avoidance",
         },
         motion_control: {
@@ -481,6 +507,9 @@
 
           goto_az: 180,
           goto_el: 60,
+
+          goto_target: null,
+          goto_target_stop: true,
         },
         start_types: ["end", "mid"],
         speed_modes: ["high", "low"],
@@ -530,6 +559,17 @@
 
             window.ocs_bundle.ui_run_task(this.address, 'go_to',
                                             this.ops.go_to.params);
+            break;
+          }
+          case "goto_named": {
+            // Update the parameters of the generate_scan process.
+            let gs = this.ops.go_to_named.params;
+
+            gs['target'] = p.goto_target;
+            gs['end_stop'] = p.goto_target_stop;
+
+            window.ocs_bundle.ui_run_task(this.address, 'go_to_named',
+                                            this.ops.go_to_named.params);
             break;
           }
         }
@@ -726,6 +766,7 @@
         let activities = {
           "Scanning": this.ops.generate_scan.session,
           "Moving": this.ops.go_to.session,
+          "Moving (Named)": this.ops.go_to_named.session,
           "Setting Boresight": this.ops.set_boresight.session,
           "Escaping the Sun": this.ops.escape_sun_now.session,
         };
@@ -886,6 +927,17 @@
           below_horizon,
           active,
         ];
+      },
+      namedPositionsArray() {
+        let pos_list = this.ops.monitor.session?.data?.NamedPositions;
+        if (!pos_list)
+          return [];
+        let names = {};
+        Object.entries(pos_list).forEach(([k, v]) => {
+          let [az, el] = v;
+          names[k] = `${k} (az=${az},el=${el})`;
+        });
+        return names;
       },
     },
   }
