@@ -60,6 +60,12 @@
             tip="Will show green/good unless ACU expresses a General summary fault."
             :value="getIndicator('-', 'General summary fault')"
           />
+          <OcsLight v-if="platformFeature('shutter')"
+            caption="SHUTTER"
+            type="multi"
+            tip="Will show green/good if shutter is open, otherwise red/bad."
+            :value="getIndicator('Shutter')"
+          />
         </OcsLightLine>
 
         <OcsLightLine caption="Axis Faults">
@@ -121,7 +127,7 @@
         <h2>Control</h2>
         <OpDropdown
           caption="Action Type"
-          :options="motion_types"
+          :options="motion_types[1]"
           options_style="object"
           v-model="motion_control.type"
         />
@@ -232,6 +238,30 @@
               :disabled="accessLevel < 1"
               @click="sun('disable', 30)">Disable, 30 mins</button>
           </div>
+        </form>
+
+        <form v-on:submit.prevent
+              v-if="motion_control.type == 'shutter'">
+          <OpReading
+            caption="State"
+            :stale="statusIsStale"
+            v-bind:value="shutterStats('shutter')">
+          </OpReading>
+          <OpReading
+            caption="Task"
+            :stale="statusIsStale"
+            v-bind:value="shutterStats('task')">
+          </OpReading>
+          <div class="ocs_row">
+            <label>Move Shutter</label>
+            <button
+              :disabled="accessLevel < 1"
+              @click="shutter('open')">Open</button>
+            <button
+              :disabled="accessLevel < 1"
+              @click="shutter('close')">Close</button>
+          </div>
+
         </form>
 
         <h2>Dataset</h2>
@@ -491,12 +521,14 @@
           update_sun: {},
           escape_sun_now: {},
         }),
-        motion_types: {
-          const_el: "Constant el scan",
-          goto: "Go to position",
-          goto_named: "Go to named",
-          sun_stuff: "Sun Avoidance",
-        },
+        motion_types_all: [
+          ["const_el", "Constant el scan"],
+          ["goto", "Go to position"],
+          ["goto_named", "Go to named"],
+          ["sun_stuff", "Sun Avoidance"],
+          ["shutter", "Shutter", "ccat"],
+        ],
+        motion_types: ['?', {}],
         motion_control: {
           type: "const_el",
 
@@ -635,14 +667,58 @@
         }
         return 'y';
       },
+      shutter(action) {
+        window.ocs_bundle.ui_run_task(this.address, 'set_shutter',
+                                      {'action': action});
+      },
+      shutterStats(k) {
+        let data = this.ops.monitor.session.data?.StatusShutter;
+
+        if (!this.platformFeature('shutter'))
+          return 'not supported';
+        if (!data)
+          return 'no_data';
+
+        switch(k) {
+          case 'shutter':
+            if (data['Shutter Moving'])
+              return 'moving';
+            if (data['Shutter Timeout'])
+              return 'timeout!';
+            if (data['Shutter Failure'])
+              return 'failure!';
+            if (data['Shutter Open'] && !data['Shutter Closed'])
+              return 'open';
+            if (!data['Shutter Open'] && data['Shutter Closed'])
+              return 'closed';
+            return 'unknown';
+
+          case 'task': {
+            let status = this.ops.set_shutter?.session?.status;
+            if (!status || status == 'done')
+              return 'idle';
+            return status;
+          }
+        }
+      },
       platformFeature(feature) {
         let sdata = this.ops.monitor.session.data;
         if (!sdata || !sdata.PlatformType)
           return false;
+        if (sdata.PlatformType != this.motion_types[0]) {
+          let new_types = {};
+          this.motion_types_all.forEach(function ([a, b, c]) {
+            if (!c || sdata.PlatformType == c)
+              new_types[a] = b;
+          })
+          this.motion_types = [sdata.PlatformType, new_types];
+        }
         switch (feature) {
           case 'boresight':
             return sdata.PlatformType == 'satp';
           case 'corotator':
+            return sdata.PlatformType == 'ccat';
+          case 'shutter':
             return sdata.PlatformType == 'ccat';
         }
         return false;
@@ -741,6 +817,9 @@
         // Everything else requires monitor process to be working.
         if (!mon_running || mon_stale)
           return 'notapplic';
+
+        if (name == 'Shutter')
+          return this.shutterStats('shutter') == 'open';
 
         // You could have short-hands for things ('safe' -> !detail['Safe'])
         // but in many cases just look up directly in detail, and maybe negate.
@@ -918,15 +997,39 @@
           }
         }
 
+        let sstate = this.shutterStats('shutter');
+        let shutter = {
+          name: sstate,
+          tip: 'Indicates whether LAT shutter is reporting as open or closed.'}
+
+        switch (sstate) {
+          case 'closed':
+            shutter.value = 'good';
+            break;
+          case 'open':
+          case 'moving':
+            shutter.value = 'warning';
+            break;
+          case 'not supported':
+            shutter = null;
+            break;
+          default:
+            shutter.value = 'bad';
+        }
+
         zone['tip'] = 'Indicates if Sun is in the warning or danger zones.';
         below_horizon['tip'] = 'Indicates if Sun is above (warning) or below (ok) horizon (el=0).';
         active['tip'] = 'Indicates whether active Sun Avoidance system is enabled.';
 
-        return [
+        let lights = [
           zone,
           below_horizon,
           active,
         ];
+
+        if (shutter)
+          lights.push(shutter);
+        return lights;
       },
       namedPositionsArray() {
         let pos_list = this.ops.monitor.session?.data?.NamedPositions;
