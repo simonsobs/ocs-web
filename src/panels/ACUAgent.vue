@@ -676,6 +676,8 @@
 
         if (!this.platformFeature('shutter'))
           return 'not supported';
+        if (!data)
+          return 'no_data';
 
         switch(k) {
           case 'shutter':
