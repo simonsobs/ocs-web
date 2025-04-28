@@ -91,6 +91,18 @@
           </template>
         </OcsLightLine>
 
+        <OcsLightLine caption="HWP Interlocks"
+          v-if="platformFeature('hwp')" >
+          <template v-for="item in hwpStats()" v-bind:key="item.label">
+            <OcsLight
+              :caption='item.short'
+              type="multi"
+              :tip="item.tip"
+              :value="item.indicator"
+            />
+          </template>
+        </OcsLightLine>
+
         <h2>Pointing</h2>
         <OpReading
           caption="Activity"
@@ -237,6 +249,26 @@
             <button
               :disabled="accessLevel < 1"
               @click="sun('disable', 30)">Disable, 30 mins</button>
+          </div>
+        </form>
+
+        <form v-on:submit.prevent
+              v-if="motion_control.type == 'hwp_interlock'">
+          <div v-for="item in hwpStats()" :key="item.label">
+            <OpReading
+              :caption="item.label"
+              :stale="statusIsStale"
+              :value="item.value">
+            </OpReading>
+          </div>
+          <div class="ocs_row">
+            <label>Enable / Disable mins</label>
+            <button
+              :disabled="accessLevel < 1"
+              @click="hwp('enable')">Enable</button>
+            <button
+              :disabled="accessLevel < 1"
+              @click="hwp('disable', 30)">Disable</button>
           </div>
         </form>
 
@@ -405,6 +437,13 @@
       <OcsTask
         :op_data="ops.escape_sun_now" />
 
+      <!-- HWP Block -->
+
+      <OcsProcess
+        :op_data="ops.monitor_hwp" />
+      <OcsTask
+        :op_data="ops.update_hwp" />
+
       <!-- Scan / Move parameters -->
 
       <OcsTask
@@ -520,12 +559,15 @@
           monitor_sun: {},
           update_sun: {},
           escape_sun_now: {},
+          monitor_hwp: {},
+          update_hwp: {},
         }),
         motion_types_all: [
           ["const_el", "Constant el scan"],
           ["goto", "Go to position"],
           ["goto_named", "Go to named"],
           ["sun_stuff", "Sun Avoidance"],
+          ["hwp_interlock", "HWP Interlocks", "satp"],
           ["shutter", "Shutter", "ccat"],
         ],
         motion_types: ['?', {}],
@@ -667,6 +709,103 @@
         }
         return 'y';
       },
+      hwp(action) {
+        switch (action) {
+          case 'enable':
+            window.ocs_bundle.ui_run_task(this.address, 'update_hwp',
+                                          {'enable': true});
+            break;
+          case 'disable':
+            window.ocs_bundle.ui_run_task(this.address, 'update_hwp',
+                                          {'enable': false});
+            break;
+        }
+      },
+      hwpStats() {
+        let data = this.ops.monitor_hwp.session.data;
+        let idata = data?.interlocks_config;
+        let sdata = data?.supervisor_data;
+        let adata = data?.allowed;
+
+        let output = [
+          {label: 'HWP Interlock',
+           value: 'disabled',
+           short: 'disabled',
+           tip: 'Green when interlock is enabled; Red when disabled; Yellow if not configured.',
+           indicator: 'warning'},
+          {label: 'HWP State',
+           value: '?',
+           short: 'unknown',
+           tip: 'Green when HWP state is known; yellow otherwise.',
+           indicator: 'warning'},
+          {label: 'Azimuth',
+           key: 'az',
+           value: '*',
+           short: 'az',
+           tip: ('Green (good) if motion for this axis permitted by HWP interlocks; '
+               + 'red (bad) if forbidden by interlocks. Yellow (warning) if motion '
+               + 'would be forbidden, but interlocks are disabled'),
+           indicator: true},
+          {label: 'Elevation',
+           key: 'el',
+           value: '*',
+           short: 'el',
+           tip: '(See az indicator tip.)',
+           indicator: true},
+          {label: 'Boresight',
+           key: 'third',
+           value: '*',
+           short: 'bore',
+           tip: '(See az indicator tip.)',
+           indicator: true},
+        ];
+        if (!data || !idata)
+          return output;
+
+        if (!idata.configured) {
+          output[0].indicator = 'warning';
+          output[0].value = 'unconfigured';
+          output[0].short = 'no conf';
+        }
+
+        if (idata.enabled) {
+          output[0].indicator = true;
+          output[0].value = "enabled";
+          output[0].short = "enabled";
+        }
+
+        if (!sdata)
+          return output;
+
+        output[1].value = sdata['spin_state'] + '/' + sdata['grip_state'];
+        if (!output[1].value.includes('unknown')) {
+          output[1].indicator = true;
+          output[1].short = 'known';
+        }
+
+        if (!adata)
+          return output;
+
+        // Axis info
+        function fmt_r(a) {
+          return 'el=(' + a[0] + ' to ' + a[1] + ')';
+        }
+        output.forEach(function(item) {
+          if (item.key) {
+            if (adata[item.key][0]) {
+              item.value = 'YES - ' + fmt_r(adata[item.key][1]);
+              item.indicator = true;
+            } else if (idata.enabled) {
+              item.value = 'NO';
+              item.indicator = false;
+            } else {
+              item.value = 'NO*';
+              item.indicator = 'warning';
+            }
+          }
+        });
+        return output;
+      },
       shutter(action) {
         window.ocs_bundle.ui_run_task(this.address, 'set_shutter',
                                       {'action': action});
@@ -720,6 +859,8 @@
             return sdata.PlatformType == 'ccat';
           case 'shutter':
             return sdata.PlatformType == 'ccat';
+          case 'hwp':
+            return sdata.PlatformType == 'satp';
         }
         return false;
       },
