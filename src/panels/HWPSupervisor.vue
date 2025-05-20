@@ -303,8 +303,10 @@
               let t = proc[k1]['encoder_last_updated'];
               let oldness = t ? window.ocs_bundle.util.human_timespan(
                 now - t) : '?';
-              return (proc[k1]['enc_freq'] === null ? '?' :
-                      proc[k1]['enc_freq'].toFixed(4)) + ' Hz, ' + oldness + ' ago';
+              let f = proc[k1].enc_freq;
+              return (f || f === 0 || f === 0.) ?
+                     (f.toFixed(4) + ' Hz, ' + oldness + ' ago') :
+                     '?';
             }
             case '!quad_summary': {
               let now = window.ocs_bundle.util.timestamp_now();
