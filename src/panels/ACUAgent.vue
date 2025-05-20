@@ -183,6 +183,11 @@
             v-model.number="motion_control.goto_el"
           />
           <div class="ocs_row">
+            <label>Passive if empty</label>
+            <input type="checkbox" id="checkbox" v-model="motion_control.goto_passive"
+                   class="ocs_double" />
+          </div>
+          <div class="ocs_row">
             <label />
             <button
               :disabled="accessLevel < 1"
@@ -350,9 +355,11 @@
         :op_data="ops.go_to">
         <OpParam
           caption="Az (deg)"
+          modelType="blank_to_null"
           v-model.number="ops.go_to.params.az" />
         <OpParam
           caption="El (deg)"
+          modelType="blank_to_null"
           v-model.number="ops.go_to.params.el" />
         <div class="ocs_row">
           <label>Set mode=Stop at end?</label>
@@ -581,6 +588,7 @@
 
           goto_az: 180,
           goto_el: 60,
+          goto_passive: false,
 
           goto_target: null,
           goto_target_stop: true,
@@ -621,12 +629,20 @@
             let pos = this.currentPositions();
 
             if (!p.goto_az && p.goto_az === '') {
-              gs['az'] = pos['az'];
+              if (p.goto_passive) {
+                gs['az'] = null;
+              } else {
+                gs['az'] = pos['az'];
+              }
             } else {
               gs['az'] = p.goto_az;
             }
             if (!p.goto_el && p.goto_el === '') {
-              gs['el'] = pos['el'];
+              if (p.goto_passive) {
+                gs['el'] = null;
+              } else {
+                gs['el'] = pos['el'];
+              }
             } else {
               gs['el'] = p.goto_el;
             }
