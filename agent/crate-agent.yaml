@@ -1,0 +1,9 @@
+agent_class: 'CrateAgent'
+instance_id: 'crate-agent-1'
+processes:
+  acq:
+    data: {}
+tasks:
+  activate_slot: {}
+  deactivate_slot: {}
+  init_crate: {}
