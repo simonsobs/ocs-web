@@ -140,6 +140,7 @@
   import PysmurfControllerAgent from './panels/PysmurfController.vue';
   import UPSAgent from './panels/UPSAgent.vue';
   import HWPSupervisor from './panels/HWPSupervisor.vue';
+  import CrateAgent from './panels/CrateAgent.vue';
 
   /* Make a map of components to use in activeComp computed property;
      see
@@ -165,6 +166,7 @@
     'PysmurfController': PysmurfControllerAgent,
     'UPSAgent': UPSAgent,
     'HWPSupervisor': HWPSupervisor,
+    'CrateAgent': CrateAgent,
 
   };
   
