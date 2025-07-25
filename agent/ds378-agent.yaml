@@ -1,0 +1,22 @@
+agent_class: 'DS378Agent'
+instance_id: 'ds379-agent-1'
+processes:
+  acq:
+    data_settings:
+      timestamp_field: 'timestamp'
+    data: {
+      "V_sppl": 11.9,
+      "T_int": 18.3,
+      "Relay_1": 0,
+      "Relay_2": 1,
+      "Relay_3": 1,
+      "Relay_4": 0,
+      "Relay_5": 0,
+      "Relay_6": 0,
+      "Relay_7": 0,
+      "Relay_8": 0,
+      "timestamp": 1753456175.6230648
+    }
+tasks:
+  get_relays: {}
+  set_relay: {}
