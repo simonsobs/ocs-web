@@ -141,6 +141,7 @@
   import UPSAgent from './panels/UPSAgent.vue';
   import HWPSupervisor from './panels/HWPSupervisor.vue';
   import CrateAgent from './panels/CrateAgent.vue';
+  import DS378Agent from './panels/DS378.vue';
 
   /* Make a map of components to use in activeComp computed property;
      see
@@ -167,6 +168,7 @@
     'UPSAgent': UPSAgent,
     'HWPSupervisor': HWPSupervisor,
     'CrateAgent': CrateAgent,
+    'DS378Agent': DS378Agent,
 
   };
   
