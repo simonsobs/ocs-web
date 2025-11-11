@@ -60,6 +60,37 @@
           v-model="op_control.type"
         />
 
+        <!-- Standard -->
+        <form v-on:submit.prevent
+              v-if="op_control.type == 'Standard'">
+
+          <div class="ocs_row">
+            <label class="ocs_double">
+              Restart RSSI (restart_rssi)
+            </label>
+            <button
+              :disabled="accessLevel < 1"
+              @click="startOp('restart_rssi')">Start</button>
+          </div>
+          <div class="ocs_row">
+            <label class="ocs_double">
+              Relock all bands (uxm_relock)
+            </label>
+            <button
+              :disabled="accessLevel < 1"
+              @click="startOp('uxm_relock')">Start</button>
+          </div>
+          <div class="ocs_row">
+            <label class="ocs_double">
+              Stop streaming (stream.stop)
+            </label>
+            <button
+              :disabled="accessLevel < 1"
+              @click="stopStream()">Stop</button>
+          </div>
+
+        </form>
+
         <!-- Readout -->
         <form v-on:submit.prevent
               v-if="op_control.type == 'Readout'">
@@ -72,11 +103,11 @@
 
           <div class="ocs_row">
             <label class="ocs_double">
-              Full setup (uxm_setup)
+              Restart RSSI (restart_rssi)
             </label>
             <button
               :disabled="accessLevel < 1"
-              @click="startOp('uxm_setup')">Start</button>
+              @click="startOp('restart_rssi')">Start</button>
           </div>
           <div class="ocs_row">
             <label class="ocs_double">
@@ -85,6 +116,14 @@
             <button
               :disabled="accessLevel < 1"
               @click="startOp('uxm_relock')">Start</button>
+          </div>
+          <div class="ocs_row">
+            <label class="ocs_double">
+              Full setup (uxm_setup)
+            </label>
+            <button
+              :disabled="accessLevel < 1"
+              @click="startOp('uxm_setup')">Start</button>
           </div>
 
         </form>
@@ -166,12 +205,6 @@
           </div>
         </form>
 
-        <h2>Stream data</h2>
-      <OcsProcess
-        :op_data="ops.stream"
-      />
-
-
       </div>
 
     </div>
@@ -181,12 +214,18 @@
 
       <i>The controls below do not request confirmation before starting!</i>
 
-      <!-- Foreground processes -->
+      <!-- Common ops -->
+
       <OcsProcess
         :op_data="ops.stream"
+        :block_start="true"
       />
-
-      <!-- Background processes -->
+      <OcsTask
+        :op_data="ops.uxm_relock"
+      />
+      <OcsTask
+        :op_data="ops.restart_rssi"
+      />
 
       <OcsProcess
         :op_data="ops.check_state"
@@ -194,12 +233,7 @@
 
       <OcsTask
         :op_data="ops.uxm_setup"
-      >
-      </OcsTask>
-      <OcsTask
-        :op_data="ops.uxm_relock"
-      >
-      </OcsTask>
+      />
       <OcsTask
         :op_data="ops.take_bgmap"
       >
@@ -253,6 +287,7 @@
           // tasks
           uxm_setup: {},
           uxm_relock: {},
+          restart_rssi: {},
           take_bgmap: {},
           take_iv: {},
           take_bias_steps: {},
@@ -269,10 +304,10 @@
           check_state: {},
           stream: {},
         }),
-        op_types: ["Readout", "Detectors"],
+        op_types: ["Standard", "Readout", "Detectors"],
         bands: ["all", 0, 1, 2, 3, 4, 5, 6, 7],
         op_control: {
-          type: "Readout",
+          type: "Standard",
           band: "all",
           bias_dets_arg: "range",
           bias_dets_rfrac: 0.4,
@@ -293,7 +328,8 @@
           case 'uxm_setup':
           case 'uxm_relock':
             {
-              if (this.op_control.band != 'all')
+              if (this.op_control.type == "Readout"
+                  && this.op_control.band != 'all')
                 params.band = [this.op_control.band];
             }
             break;
@@ -312,6 +348,13 @@
           `Launch "${op_name}"?`,
           'Are you sure you want to start this Task?',
           () => window.ocs_bundle.ui_run_task(this.address, op_name, params));
+      },
+      stopStream() {
+        // Get confirmation, then stop the "stream" process.
+        window.ocs_bundle.ui_confirm(
+          "Stop frame data stream?",
+          "Are you sure you want to issue stream.stop?",
+          () => window.ocs_bundle.ui_stop_proc(this.address, "stream"));
       },
       stateVar(key) {
         let data = this.ops.check_state.session.data;

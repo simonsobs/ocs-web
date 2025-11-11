@@ -19,6 +19,7 @@ tasks:
   all_off: {}
   bias_dets: {}
   overbias_tes: {}
+  restart_rssi: {}
   run: {}
   run_test_func: {}
   set_biases: {}
