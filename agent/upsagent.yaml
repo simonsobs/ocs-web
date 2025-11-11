@@ -37,8 +37,8 @@ processes:
         "description": "100"
       },
       "upsBatteryVoltage_0": {
-        "status": 136,
-        "description": "136"
+        "status": 2680,
+        "description": "2680"
       },
       "upsBatteryCurrent_0": {
         "status": 0,
@@ -69,12 +69,12 @@ processes:
         "description": "239"
       },
       "upsOutputCurrent_1": {
-        "status": 0,
-        "description": "0"
+        "status": 37,
+        "description": "37"
       },
       "upsOutputPower_1": {
-        "status": 0,
-        "description": "0"
+        "status": 719,
+        "description": "719"
       },
       "upsOutputPercentLoad_1": {
         "status": 90,

@@ -79,8 +79,8 @@
             fields: [
               {key: "upsBatteryStatus_0", label: "Status"},
               {key: "upsSecondsOnBattery_0", label: "Time on battery (s)"},
-              {key: "upsBatteryVoltage_0", label: "Voltage"},
-              {key: "upsBatteryCurrent_0", label: "Current (0.1 A)"},
+              {key: "upsBatteryVoltage_0", label: "Voltage (V)", scale: 0.1},
+              {key: "upsBatteryCurrent_0", label: "Current (A)", scale: 0.1},
               {key: "upsBatteryTemperature_0", label: "Temp. (C)"},
               {key: "upsEstimatedChargeRemaining_0", label: "Charge remaining (%)"},
               {key: "upsEstimatedMinutesRemaining_0", label: "Minutes remaining"},
@@ -90,18 +90,18 @@
             name: "Output",
             fields: [
               {key: "upsOutputSource_0", label: "Source"},
-              {key: "upsOutputVoltage_1", label: "Voltage"},
-              {key: "upsOutputCurrent_1", label: "Current (0.1 A)"},
-              {key: "upsOutputPower_1", label: "Power (0.1 W)"},
+              {key: "upsOutputVoltage_1", label: "Voltage (V)"},
+              {key: "upsOutputCurrent_1", label: "Current (A)", scale: 0.1},
+              {key: "upsOutputPower_1", label: "Power (W)"},
               {key: "upsOutputPercentLoad_1", label: "Load (%)"},
             ],
           },
           input: {
             name: "Input",
             fields: [
-              {key: "upsInputVoltage_1", label: "Voltage"},
-              {key: "upsInputCurrent_1", label: "Current (0.1 A)"},
-              {key: "upsInputTruePower_1", label: "Power (0.1 W)"},
+              {key: "upsInputVoltage_1", label: "Voltage (V)"},
+              {key: "upsInputCurrent_1", label: "Current (A)", scale: 0.1},
+              {key: "upsInputTruePower_1", label: "Power (W)"},
             ],
           },
         },
@@ -138,6 +138,8 @@
             let label = field.label ? field.label : field.key;
             let data = field_data[field.key];
             let raw_data = data ? data.description : "?";
+            if (field.scale > 0)
+              raw_data = raw_data * field.scale;
             new_data.push([label, raw_data]);
           });
         }
