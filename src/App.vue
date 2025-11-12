@@ -41,6 +41,15 @@
       </div>
     </div>
 
+    <!-- Session detail box -->
+    <div class="fullScreenMask" v-if="opDetail">
+      <div class="infoModal">
+        <div class="infoModalContent">
+          <OpDetail :opDetail="opDetail" @close="clearOpDetail()" />
+        </div>
+      </div>
+    </div>
+
     <!-- Password config -->
     <div class="fullScreenMask" v-if="passwordWindow">
       <div class="errorModal">
@@ -122,6 +131,7 @@
   import ConfigsWindow from './panels/ConfigsWindow.vue';
   import GenericAgent from './panels/GenericAgent.vue';
   import AgentList from './components/AgentList.vue';
+  import OpDetail from './components/OpDetail.vue';
   import PasswordConfig from './components/PasswordConfig.vue';
 
   // Agent panels - OCS
@@ -225,6 +235,7 @@
         mainMode: 'config',
         errorInfo: null,
         userConfirm: null,
+        opDetail: null,
         passwordWindow: null,
         accessLevel: 0,
       }
@@ -244,6 +255,7 @@
       AgentList,
       MainBrowser,
       ConfigsWindow,
+      OpDetail,
       PasswordConfig,
     },
     computed: {
@@ -311,6 +323,9 @@
           this.userConfirm.cancel();
 
         this.userConfirm = null;
+      },
+      clearOpDetail() {
+        this.opDetail = null;
       },
       confirmPw() {
         this.passwordWindow = null;
@@ -446,6 +461,11 @@
               });
       };
 
+      ocs_bundle.ui_show_detail = (data) => {
+        this.opDetail = {title: data.name,
+                         data: data};
+      };
+
       ocs_bundle.get_password_settings = () => {
         return {
           escalation: this.active_agent.escalation,
@@ -563,6 +583,27 @@
     margin: 5%;
     height: 80%;
     padding: 20px;
+    border: 1px solid #88c;
+    background-color: #fff;
+    width: 90%;
+  }
+  .infoModal {
+    position: fixed;
+    left: 10%;
+    top: 5%;
+    width: 80%;
+    background-color: #4888;
+  }
+  @media screen and (max-width: 1000px) {
+    .infoModal {
+      left: 5%;
+      width: 90%;
+    }
+  }
+  .infoModalContent {
+    margin: 5%;
+    height: 80%;
+    padding: 10px;
     border: 1px solid #88c;
     background-color: #fff;
     width: 90%;

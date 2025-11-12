@@ -17,7 +17,7 @@
       <slot></slot>
 
       <div v-if="show_status" class="ocs_row">
-        <label>Status</label>
+        <label><span class="clickable" @click="showData()">Status</span></label>
         <input class="ocs_double"
                type="text"
                disabled="1"
@@ -76,6 +76,9 @@
       abort() {
         window.ocs_bundle.ui_abort_task(this._get_client_or_address(),
                                         this.name);
+      },
+      showData() {
+        window.ocs_bundle.ui_show_detail(this.op_data);
       },
     },
   }
