@@ -4,7 +4,7 @@
       <div class="ocs_row">
         <label class="important">{{ name }}</label>
         <button
-          :disabled="accessLevel < 1"
+          :disabled="accessLevel < 1 || block_start"
           @click="start">Start</button>
         <button
           :disabled="accessLevel < 1"
@@ -33,6 +33,9 @@
       address: String,
       op_data: Object,
       op_name: String,
+      block_start: {
+        default: false,
+      },
       show_status: {
         default: true,
       },
