@@ -386,6 +386,10 @@
         :op_data="ops.stop_and_clear">
       </OcsTask>
 
+      <OcsTask
+        :op_data="ops.clear_faults"
+      />
+
       <OcsProcess
         :op_data="ops.generate_scan">
         <OpParam
@@ -421,6 +425,22 @@
           caption="az_drift"
           modelType="blank_to_null"
           v-model.number="ops.generate_scan.params.az_drift" />
+        <OpParam
+          caption="az_vel_ref"
+          modelType="blank_to_null"
+          v-model.number="ops.generate_scan.params.az_vel_ref" />
+        <OpParam
+          caption="el_freq"
+          modelType="blank_to_null"
+          v-model.number="ops.generate_scan.params.el_freq" />
+        <OpParam
+          caption="scan_type"
+          modelType="blank_to_null"
+          v-model.number="ops.generate_scan.params.scan_type" />
+        <OpParam
+          caption="turnaround_method"
+          modelType="blank_to_null"
+          v-model.number="ops.generate_scan.params.turnaround_method" />
         <OpParam
           caption="num_scans"
           modelType="blank_to_null"
@@ -463,10 +483,6 @@
       </OcsTask>
 
       <!-- Background processes -->
-
-      <OcsTask
-        :op_data="ops.clear_faults"
-      />
 
       <OcsProcess
         :op_data="ops.monitor"
