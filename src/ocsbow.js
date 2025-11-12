@@ -325,8 +325,25 @@ AgentClient.prototype = {
     // These functions should be used when working with the task/proc API.
     //
 
+    _clean_params : function(params) {
+        // Before passing params to a task/process start method, strip off
+        // any entries that have value = null.
+        //
+        // It is almost always the case that passing a param value of None
+        // (null) has the same effect as not passing the param at all.
+        // Unless a param is defined with "treat_none_as_missing=False",
+        // that will be the case.  So to minimize compatibility problems
+        // due to new (but empty) parameters in ocs-web conflicting with
+        // older agents, we strip off any params with null values.
+        return Object.entries(params).reduce((acc, [key, value]) => {
+            if (value !== null)
+                acc[key] = value;
+            return acc;
+        }, {});
+    },
+
     start_task : function(task_name, params) {
-        return this.dispatch('start', task_name, params);
+        return this.dispatch('start', task_name, this._clean_params(params));
     },
 
     wait_task : function(task_name, params) {
@@ -368,7 +385,7 @@ AgentClient.prototype = {
     },
 
     start_proc : function(proc_name, params) {
-        return this.dispatch('start', proc_name, params);
+        return this.dispatch('start', proc_name, this._clean_params(params));
     },
 
     stop_proc : function(proc_name) {
