@@ -1,0 +1,23 @@
+agent_class: 'tauHKAgent'
+instance_id: 'tauhk-1'
+processes:
+  advertise:
+    startup: true
+    data:
+      settables:
+        global_options:
+          restart: []
+        rtd_0:
+          logdac: [int, [0, 15]]
+          something: [float, [0, 15.1]]
+          uvolts: [bool, []]
+          choosable: [enum, {a: 1, b: 2}]
+  receive_data:
+    startup: true
+    data_settings:
+      timestamp_field: timestamp
+    data:
+      timestamp: 1601925677.6914878
+      rtd_0_logdac: 12.0
+tasks:
+  generic_send: {}
