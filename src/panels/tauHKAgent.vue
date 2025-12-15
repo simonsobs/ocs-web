@@ -18,11 +18,15 @@
           v-bind:value="panel.connection_ok">
         </OpReading>
         <OpReading
-          caption="Last update"
+          caption="Latest data"
           mode="ok_val"
           v-bind:value="recent_ok">
         </OpReading>
-
+        <OpReading
+          caption="Crate status"
+          mode="ok_val"
+          v-bind:value="crate_ok">
+        </OpReading>
       </div>
 
       <div class="box">
@@ -67,6 +71,14 @@
 
 
       </div>
+
+      <h2>Upload Excitations</h2>
+      <OcsTask :op_data="ops.load_config">
+        <OpParam
+          caption="Config file path"
+          v-model.string="ops.load_config.params.config_file"/>
+      </OcsTask>
+      
     </div>
 
     <!-- Right block -->
@@ -100,6 +112,7 @@
             }
           },
           receive_data: { auto: true},
+          start_crate: { auto: true},
         }),
         first_pop: true,
         settables: {},
@@ -114,6 +127,12 @@
           return [dt < 90, window.ocs_bundle.util.human_timespan(dt) + ' ago'];
         }
         return [false, "No data"];
+      },
+      crate_ok() {
+        let status = this.ops.start_crate.session.data?.is_alive;
+        if (status === undefined) return [false, "Never Started"];
+        let message = this.ops.start_crate.session.data?.latest_log;
+        return [status, message];
       },
       channels() {
         return Object.keys(this.settables);
