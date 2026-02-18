@@ -1,5 +1,5 @@
 agent_class: 'tauHKAgent'
-instance_id: 'tauhk-1'
+instance_id: 'cryo-tauhk-1'
 processes:
   advertise:
     startup: true
