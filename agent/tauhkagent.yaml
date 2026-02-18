@@ -1,4 +1,4 @@
-agent_class: 'tauHKAgent'
+agent_class: 'TauHKAgent'
 instance_id: 'cryo-tauhk-1'
 processes:
   advertise:
