@@ -6,7 +6,7 @@
     <!-- Left block -->
     <div class="block_unit">
       <div class="box">
-        <OcsAgentHeader :panel="panel">tauHKAgent</OcsAgentHeader>
+        <OcsAgentHeader :panel="panel">TauHKAgent</OcsAgentHeader>
         <h2>Connection</h2>
         <OpReading
           caption="Address"
@@ -113,6 +113,7 @@
           },
           receive_data: { auto: true},
           start_crate: { auto: true},
+          load_config: { auto: true},
         }),
         first_pop: true,
         settables: {},
