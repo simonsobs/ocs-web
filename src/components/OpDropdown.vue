@@ -22,6 +22,16 @@
       </option>
     </select>
 
+    <!-- options_style='object_transpose' -->
+    <select class="ocs_double"
+            :value="modelValue"
+            @input="emitValue($event.target.value)"
+            v-if="options_style == 'object_transpose'">
+      <option v-for="(value, key) in options" v-bind:key="value" :value="value">
+        {{ key }}
+      </option>
+    </select>
+
   </div>
 </template>
 
