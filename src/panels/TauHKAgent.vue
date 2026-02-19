@@ -82,47 +82,50 @@
       <h2>Latest Readings</h2>
 
       <form v-on:submit.prevent>
-        <div class="acu_row">
+        <div class="dset_row">
           <span>Group</span>
           <span>
             <select v-model="dataset.view" class="dataset_filter">
               <option value="all" default>Show all</option>
-              <option value="10k-only">Show 10K</option>
-              <option value="1k-only">Show 1K</option>
-              <option value="100mk-only">Show 100mK</option>
-              <option value="diode-only">Show Diode</option>
-              <option value="rtd-only">Show RTD</option>
+              <option value="100mK_">Show 100mK</option>
+              <option value="1K_">Show 1K</option>
+              <option value="4K_">Show 4K</option>
+              <option value="40K_">Show 40K</option>
+              <option value="80K_">Show 80K</option>
               <option value="nothing" default>Show nothing</option>
             </select>
           </span>
         </div>
-        <div class="acu_row">
+        <div class="dset_triple">
           <span><label>Hide T:<input type="checkbox" id="checkbox" v-model="dataset.hideT" /></label></span>
           <span><label>Hide R,V: <input type="checkbox" id="checkbox" v-model="dataset.hideR" /></label></span>
+          <span><label>Hide others: <input type="checkbox" id="checkbox" v-model="dataset.hideO" /></label></span>
         </div>
-        <div class="acu_row">
+        <div class="dset_row">
           <span>Text Filter</span>
           <span><input type="text"
-                       class="acu_double"
+                       class="dset_double"
                        v-model="dataset.filter"
                 /></span>
         </div>
       </form>
 
       <div id="dataset_table">
-        <div class="acu_row acu_header">
-          <span class="acu_value">Value</span>
-          <span class="acu_label">Field</span>
+        <div class="dset_row dset_header">
+          <span class="dset_value">Value</span>
+          <span class="dset_label">Field</span>
         </div>
         <div v-for="item in statusVars" v-bind:key="item.name">
           <div v-if="(dataset.view=='all' || dataset.view==item.props.specialization)
-                     && !(dataset.hideT && item.props.type == 'T' || dataset.hideR && item.props.type == 'R')
+                     && !(dataset.hideT && item.props.type == 'T'
+                     || dataset.hideR && item.props.type == 'R'
+                     || dataset.hideO && item.props.type == 'O')
                      && (dataset.filter == '' || item.name.trim().toLowerCase().includes(dataset.filter.trim().toLowerCase()))"
-               class="acu_row">
-          <span class="acu_value"
+               class="dset_row">
+          <span class="dset_value"
                 v-bind:class="item.classObj"
           >{{ item.value }}</span>
-          <span class="acu_label">{{ item.name }}</span>
+          <span class="dset_label">{{ item.name }}</span>
         </div>
       </div>
     </div>
@@ -177,6 +180,7 @@
           filter: "",
           hideT: false,
           hideR: false,
+          hideO: false,
         },
       }
     },
@@ -210,12 +214,13 @@
         return 'unknown';
       },
       statusVars() {
-        let sdata = this.ops.receive_data.session.data;
-        let annotated = [];
-        if (!sdata)
-          return annotated;
+        let data = this.ops.receive_data.session.data;
+        if (!data)
+          return [];
 
-        let data = sdata;
+        let annotated = [];
+        let simple_spec = [
+          '100mK_', '1K_', '4K_', '40K_', '80K_'];
 
         for (const [key, value] of Object.entries(data)) {
           let d = {
@@ -228,20 +233,16 @@
             },
           };
 
-          if (key.includes('10K_'))
-            d.props.specialization = '10k-only';
-          if (key.includes('1K_'))
-            d.props.specialization = '1k-only';
-          if (key.includes('100mK_'))
-            d.props.specialization = '100mk-only';
-          if (key.includes('RTD_'))
-            d.props.specialization = 'rtd-only';
-          if (key.includes('DIODE_'))
-            d.props.specialization = 'diode-only';
+          for (const spec of simple_spec)
+            if (key.includes(spec))
+              d.props.specialization = spec;
+
           if (key.includes('temperature'))
             d.props.type = 'T';
           else if (key.includes('resistance') || key.includes('voltage'))
             d.props.type = 'R';
+          else
+            d.props.type = 'O';
 
           annotated.push(d);
         }
@@ -272,32 +273,36 @@
 </script>
 
 <style scoped>
-  .acu_row {
+  .dset_row {
     display: grid;
     grid-template-columns: 1fr 2fr ;
   }
-  .acu_row > div, button, span {
+  .dset_triple {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr ;
+  }
+  .dset_row > div, button, span {
     font-size: 11pt;
     padding: 5px 10px;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .acu_header {
+  .dset_header {
     border-bottom: 1px solid black;
   }
-  .acu_header > span {
+  .dset_header > span {
     font-weight: bold;
     padding: 10px 0px;
   }
-  .acu_value {
+  .dset_value {
     text-align: center;
     margin: 2px;
   }
-  .acu_label {
+  .dset_label {
     text-align: left;
     margin: 2px;
   }
-  .acu_double {
+  .dset_double {
     width: 100%;
     grid-column-start: span 2;
   }

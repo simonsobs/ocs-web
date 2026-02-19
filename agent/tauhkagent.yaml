@@ -152,6 +152,15 @@ processes:
       "RTD_100mK_6_resistance": 5963.305,
       "DIODE_OT1_4K_1_temperature": 8.546854,
       "DIODE_OT1_4K_1_voltage": 1.4125684,
+      "DIODE_4K_10_enabled_chop": false,
+      "DIODE_4K_11_enabled_dc": true,
+      "DIODE_4K_11_enabled_chop": false,
+      "DIODE_4K_12_enabled_dc": true,
+      "DIODE_4K_12_enabled_chop": false,
+      "DIODE_40K_17_enabled_dc": true,
+      "DIODE_40K_17_enabled_chop": false,
+      "DIODE_40K_18_enabled_dc": true,
+      "DIODE_40K_18_enabled_chop": false,
       }
 tasks:
   generic_send: {}
