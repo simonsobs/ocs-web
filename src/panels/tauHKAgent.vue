@@ -94,7 +94,7 @@
 
 <script>
   export default {
-    name: 'tauHKAgent',
+    name: 'TauHKAgent',
     props: {
       address: String,
     },
