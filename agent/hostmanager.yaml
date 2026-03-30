@@ -7,55 +7,64 @@ processes:
       'timestamp_field': 'timestamp'
       }
     data: {
+      "orphans": {},
+      "new_tags": {},
       "child_states": [
         {
           "next_action": "up",
           "target_state": "up",
           "stability": 1,
           "agent_class": "[docker]",
-          "instance_id": "ocs-aggregator"
+          "instance_id": "ocs-aggregator",
+          "restart_required": false
         },
         {
           "next_action": "up",
           "target_state": "up",
           "stability": 1,
           "agent_class": "[docker]",
-          "instance_id": "ocs-influx-publisher"
+          "instance_id": "ocs-influx-publisher",
+          "restart_required": true
         },
         {
           "next_action": "up",
           "target_state": "up",
           "stability": 1,
           "agent_class": "[docker]",
-          "instance_id": "ocs-registry"
+          "instance_id": "ocs-registry",
+          "restart_required": false
         },
         {
           "next_action": "up",
           "target_state": "up",
           "stability": 1,
           "agent_class": "[docker]",
-          "instance_id": "hk-agent-01"
+          "instance_id": "hk-agent-01",
+          "restart_required": false
         },
         {
           "next_action": "up",
           "target_state": "up",
           "stability": 1,
           "agent_class": "[docker]",
-          "instance_id": "ocs-ups-satp-c2-01"
+          "instance_id": "ocs-ups-satp-c2-01",
+          "restart_required": false
         },
         {
           "next_action": "up",
           "target_state": "up",
           "stability": 1,
           "agent_class": "[docker]",
-          "instance_id": "ocs-ups-satp-c1-01"
+          "instance_id": "ocs-ups-satp-c1-01",
+          "restart_required": false
         },
         {
           "next_action": "down",
           "target_state": "down",
           "stability": 0.9978726211941876,
           "agent_class": "[docker]",
-          "instance_id": "ocs-latr-pfeiffer-01"
+          "instance_id": "ocs-latr-pfeiffer-01",
+          "restart_required": false
         }
       ]
     }
