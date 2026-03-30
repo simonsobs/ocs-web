@@ -21,16 +21,19 @@
             caption="Restarts"
             tip="Indicates whether running agents have an update pending; if red, consider restarting agents (as marked in list)."
             :value="this.restartCount <= 0"
+            v-if="this.sessionSchema > 0"
           />
           <OcsLight
             caption="Images"
             tip="Indicates whether all image tags are present on system; if red, consider run of docker_pull task."
             :value="this.pullCount <= 0"
+            v-if="this.sessionSchema > 0"
           />
           <OcsLight
             caption="Orphans"
             tip="Indicates whether orphan containers are found on system; if red, consider run of remove_orphans task."
             :value="this.orphanCount <= 0"
+            v-if="this.sessionSchema > 0"
           />
         </OcsLightLine>
         <form v-on:submit.prevent>
@@ -89,10 +92,14 @@
       </OcsTask>
 
       <OcsTask
-        :op_data="ops.docker_pull" />
+        :op_data="ops.docker_pull"
+        v-if="this.sessionSchema > 0"
+      />
 
       <OcsTask
-        :op_data="ops.remove_orphans" />
+        :op_data="ops.remove_orphans"
+        v-if="this.sessionSchema > 0"
+      />
 
       <!-- etc -->
       <OcsOpAutofill
@@ -111,9 +118,10 @@
       return {
         panel: {},
         children: [],
-        restartCount: 0,
-        pullCount: 0,
-        orphanCount: 0,
+        sessionSchema: 0,
+        restartCount: null,
+        pullCount: null,
+        orphanCount: null,
         ops: window.ocs_bundle.web.ops_data_init({
           'manager': {},
           'update': {
@@ -133,8 +141,15 @@
         if (!session.data || session.status != 'running')
           return;
 
-        this.orphanCount = Object.keys(session.data.orphans).length;
-        this.pullCount = Object.keys(session.data.new_tags).length;
+        if (Object.hasOwn(session.data, 'orphans'))
+          this.sessionSchema = 1;
+        else
+          this.sessionSchema = 0;
+
+        if (this.sessionSchema > 0) {
+          this.orphanCount = Object.keys(session.data.orphans).length;
+          this.pullCount = Object.keys(session.data.new_tags).length;
+        }
 
         function sortKey(state) {
           return [state.agent_class.toUpperCase(),
@@ -149,7 +164,7 @@
                                .map(([,state]) => state);
         let rc = 0;
         for (const child of this.children) {
-          if (child.restart_required) {
+          if (child?.restart_required) {
             child.restart_indicator = ' *update-pending*';
             rc += 1;
           } else {
