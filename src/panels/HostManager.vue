@@ -7,14 +7,35 @@
     <div class="block_unit">
       <div class="box">
         <OcsAgentHeader>Host Manager</OcsAgentHeader>
-        <h2>Connection</h2>
+        <h2>Status</h2>
         <OpReading caption="Address"
                  v-bind:value="address">
         </OpReading>
-        <OpReading caption="Connection"
-                 mode="ok"
-                 v-bind:value="panel.connection_ok">
-        </OpReading>
+        <OcsLightLine caption="OCS/Agent">
+          <OcsLight
+            caption="Connection"
+            tip="Status of the connection between ocs-web and OCS crossbar."
+            :value="panel.connection_ok"
+          />
+          <OcsLight
+            caption="Restarts"
+            tip="Indicates whether running agents have an update pending; if red, consider restarting agents (as marked in list)."
+            :value="this.restartCount <= 0"
+            v-if="this.sessionSchema > 0"
+          />
+          <OcsLight
+            caption="Images"
+            tip="Indicates whether all image tags are present on system; if red, consider run of docker_pull task."
+            :value="this.pullCount <= 0"
+            v-if="this.sessionSchema > 0"
+          />
+          <OcsLight
+            caption="Orphans"
+            tip="Indicates whether orphan containers are found on system; if red, consider run of remove_orphans task."
+            :value="this.orphanCount <= 0"
+            v-if="this.sessionSchema > 0"
+          />
+        </OcsLightLine>
         <form v-on:submit.prevent>
           <div class="ocs_row">
             <label>Refresh config</label>
@@ -33,8 +54,9 @@
             <span class="hm_center">target</span>
             <span class="ocs_double hm_center">set-target</span>
           </div>
-          <div v-for="item in children" :key="item.instance_id" class="hm_row">
-            <span>{{ item.instance_id }}</span>
+          <div v-for="item in children" :key="item.instance_id" class="hm_row"
+               :class="{hm_row_emph: item.restart_required}">
+            <span>{{ item.instance_id }}{{ item.restart_indicator }}</span>
             <span>{{ item.agent_class }}</span>
             <span class="hm_center">{{ item.next_action }}</span>
             <span class="hm_center">{{ item.target_state }}</span>
@@ -62,7 +84,28 @@
 
       <OcsTask
         :op_data="ops.die">
+        <div class="ocs_row">
+          <label>Disown dockers?</label>
+          <input type="checkbox" id="checkbox" v-model="ops.die.params.disown_dockers"
+                 class="ocs_double" />
+        </div>
       </OcsTask>
+
+      <OcsTask
+        :op_data="ops.docker_pull"
+        v-if="this.sessionSchema > 0"
+      />
+
+      <OcsTask
+        :op_data="ops.remove_orphans"
+        v-if="this.sessionSchema > 0"
+      />
+
+      <!-- etc -->
+      <OcsOpAutofill
+        :ops_parent="ops"
+      />
+
     </div>
   </div>
 </template>
@@ -75,12 +118,18 @@
       return {
         panel: {},
         children: [],
+        sessionSchema: 0,
+        restartCount: null,
+        pullCount: null,
+        orphanCount: null,
         ops: window.ocs_bundle.web.ops_data_init({
           'manager': {},
           'update': {
             params: {reload_config: false},
           },
           'die': {},
+          'docker_pull': {},
+          'remove_orphans': {},
         }),
       }
     },
@@ -88,9 +137,19 @@
       address: String,
     },
     methods: {
-      update_child_states(op_name, method, stat, msg, session) {
+      update_from_session_data(op_name, method, stat, msg, session) {
         if (!session.data || session.status != 'running')
           return;
+
+        if (Object.hasOwn(session.data, 'orphans'))
+          this.sessionSchema = 1;
+        else
+          this.sessionSchema = 0;
+
+        if (this.sessionSchema > 0) {
+          this.orphanCount = Object.keys(session.data.orphans).length;
+          this.pullCount = Object.keys(session.data.new_tags).length;
+        }
 
         function sortKey(state) {
           return [state.agent_class.toUpperCase(),
@@ -103,6 +162,17 @@
                                .map(state => [sortKey(state), state])
                                .toSorted()
                                .map(([,state]) => state);
+        let rc = 0;
+        for (const child of this.children) {
+          if (child?.restart_required) {
+            child.restart_indicator = ' *update-pending*';
+            rc += 1;
+          } else {
+            child.restart_indicator = '';
+          }
+        }
+
+        this.restartCount = rc;
       },
       set_target(child, updn) {
         child.target_state = '(' + updn + ')';
@@ -111,11 +181,17 @@
         });
       },
       refresh_config() {
-          window.ocs_bundle.ui_start_proc(this.address, 'update',
-                                          {'reload_config': true});
+        window.ocs_bundle.ui_start_proc(this.address, 'update',
+                                        {'reload_config': true});
+      },
+      remove_orphans() {
+        window.ocs_bundle.ui_start_proc(this.address, 'remove_orphans', {});
+      },
+      docker_pull() {
+        window.ocs_bundle.ui_start_proc(this.address, 'docker_pull', {});
       },
       startListening() {
-        this.panel.client.add_watcher('manager', 5., this.update_child_states);
+        this.panel.client.add_watcher('manager', 5., this.update_from_session_data);
       },
     },
   }
@@ -142,6 +218,10 @@
     padding: 10px 0px;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .hm_row_emph {
+    font-style: italic;
   }
   .hm_header {
     border-bottom: 1px solid black;
