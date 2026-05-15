@@ -1,0 +1,31 @@
+agent_class: 'FLSAgent'
+instance_id: 'fls-1'
+processes:
+  acq:
+    startup: true
+    data_settings: {
+      'timestamp_field': 'timestamp'
+      }
+    data: {
+      "set_frequency": 100,
+      "actual_frequency": 100.00307263471768,
+      "photocurrent": -0.2546461127317887,
+      "bias_voltage": 1.00006103515625,
+      "bias_offset": -0.4999389573922598,
+      "lasers_on": true,
+      "scan_mode": "fast",
+      "scan_min_frequency": 60,
+      "scan_max_frequency": 500,
+      "scan_step": 0.05,
+      "scan_direction": -1,
+      "integration_time": 499.9640615384615,
+      "timestamp": 1778875096.0714755
+    }
+tasks:
+  initialize: {}
+  run_frequency_sweeps: {}
+  set_bias: {}
+  set_frequency: {}
+  set_integration_time: {}
+  stop_frequency_sweep: {}
+  toggle_laser_power: {}
