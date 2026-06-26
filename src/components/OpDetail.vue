@@ -2,12 +2,14 @@
   <h2>{{ opDetail.title }}</h2>
   <div class="holder ocs_ui">
     <div class="tabs">
-      <div v-for="tab in tabs" v-bind:key="tab" :class="{inactive: detailTab!=tab}">
+      <div class="filler"/>
+      <div v-for="tab in tabs" v-bind:key="tab" :class="{inactive: detailTab!=tab}" class="clickable">
         <span
           @click="setDetailTab(tab)"
           :class="{inactive: detailTab!=tab}"
         >{{ tab }}</span>
       </div>
+      <div class="filler"/>
     </div>
     <br />
     <div class="scrollableContent">
@@ -67,14 +69,23 @@
   .tabs > div {
     display: inline;
     border: solid black 1px;
+    border-bottom: none;
     padding: 10px;
     width: 50px;
   }
   .tabs {
     margin: 10px 0px;
+    padding: 10px;
   }
   .inactive {
     background-color: #ddd;
+  }
+  div.inactive {
+    border-bottom: solid black 1px;
+  }
+  div.filler {
+    border: none;
+    border-bottom: solid black 1px;
   }
 
   .holder {

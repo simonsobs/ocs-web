@@ -7,6 +7,17 @@
     <div class="block_unit">
       <div class="box">
         <OcsAgentHeader :panel="panel">ACU Agent</OcsAgentHeader>
+        <div class="tabs">
+          <div v-for="tab in tabs" v-bind:key="tab" :class="{inactive: detailTab!=tab}" class="clickable">
+            <span
+              @click="setDetailTab(tab)"
+              :class="{inactive: detailTab!=tab}"
+            >{{ tab }}</span>
+          </div>
+          <div class="filler"><span width="100%" /></div>
+        </div>
+
+        <template v-if="detailTab == 'Main'">
         <h2>Connection</h2>
         <OpReading
           caption="Address"
@@ -61,10 +72,10 @@
             :value="getIndicator('-', 'General summary fault')"
           />
           <OcsLight v-if="platformFeature('shutter')"
-            caption="SHUTTER"
-            type="multi"
-            tip="Will show green/good if shutter is open, otherwise red/bad."
-            :value="getIndicator('Shutter')"
+                    caption="SHUTTER"
+                    type="multi"
+                    tip="Will show green/good if shutter is open, otherwise red/bad."
+                    :value="getIndicator('Shutter')"
           />
         </OcsLightLine>
 
@@ -92,7 +103,7 @@
         </OcsLightLine>
 
         <OcsLightLine caption="HWP Interlocks"
-          v-if="platformFeature('hwp')" >
+                      v-if="platformFeature('hwp')" >
           <template v-for="item in hwpStats()" v-bind:key="item.label">
             <OcsLight
               :caption='item.short'
@@ -321,7 +332,62 @@
           </div>
         </form>
 
-        <h2>Dataset</h2>
+        </template>
+
+        <form v-if="detailTab == 'HVAC'"
+              v-on:submit.prevent>
+
+          <OpDropdown
+            caption="View"
+            :options="hvac_views"
+            options_style="array"
+            v-model="motion_control.hvac_view"
+          />
+
+          <template v-if="motion_control.hvac_view == 'Summary'">
+            <div class="hvac_row hvac_header">
+              <label>Space</label>
+              <label>Temp (C)</label>
+              <label>Fan</label>
+              <label>Booster</label>
+            </div>
+            <div v-for="item in hvacStats[0]" :key="item.name"
+                 class="hvac_row">
+              <label>{{ item.name }}</label>
+              <input type="text" disabled :value="item.temperature?.average" />
+              <OcsLight type="multi"
+                        :value="item.fan?.status" :caption="item.fan?.short" />
+              <OcsLight type="multi"
+                        :value="item.booster?.status" :caption="item.booster?.short" />
+            </div>
+            <div class="hvac_row hvac_header">
+              <label>Heater</label>
+              <label>Set (C)</label>
+              <label>Enabled</label>
+            </div>
+            <div v-for="item in hvacStats[1]" :key="item.name"
+                 class="hvac_row">
+              <label>{{ item.name }}</label>
+              <input text="text" disabled :value="item.heater?.setpoint" />
+              <OcsLight type="multi"
+                        :value="item.heater?.status" :caption="item.heater?.short" />
+            </div>
+          </template>
+
+          <template v-if="motion_control.hvac_view == 'Temperature Detail'">
+            <div v-for="item in hvacStats[0]" :key="item.name">
+              <OpReading v-if="item.temperature"
+                         :caption="item.name"
+                         :value="item.temperature.one_liner">
+              </OpReading>
+            </div>
+          </template>
+
+        </form>
+
+        <template v-if="detailTab == 'Dataset'">
+
+          <h2>Dataset</h2>
 
           <form v-on:submit.prevent>
             <div class="acu_row">
@@ -362,7 +428,8 @@
               </div>
             </div>
           </div>
-        </div>
+        </template>
+      </div>
 
     </div>
 
@@ -507,7 +574,7 @@
           caption="action"
           modelType="blank_to_null"
           v-model="ops.special_action.params.action"
-          />
+        />
         <OpParam
           caption="Force"
           :checkbox="true"
@@ -624,6 +691,13 @@
             },
           },
         }),
+        tabs_all: [
+          ["Main"],
+          ["HVAC", "ccat"],
+          ["Dataset"],
+        ],
+        tabs: ['Main', 'Dataset'],
+        detailTab: "Main",
         motion_types_all: [
           ["const_el", "Constant el scan"],
           ["goto", "Go to position"],
@@ -632,6 +706,10 @@
           ["hwp_interlock", "HWP Interlocks", "satp"],
           ["shutter", "Shutter", "ccat"],
           ["special", "Special Actions"],
+        ],
+        hvac_views: [
+          "Summary",
+          "Temperature Detail",
         ],
         motion_types: ['?', {}],
         motion_control: {
@@ -648,6 +726,8 @@
 
           goto_target: null,
           goto_target_stop: true,
+
+          hvac_view: "Summary",
         },
         start_types: ["end", "mid"],
         speed_modes: ["high", "low"],
@@ -658,6 +738,9 @@
       }
     },
     methods: {
+      setDetailTab(option) {
+        this.detailTab = option;
+      },
       startMotion() {
         // Called from the special motion_control widget.
         let p = this.motion_control;
@@ -937,6 +1020,12 @@
               new_types[a] = b;
           })
           this.motion_types = [sdata.PlatformType, new_types];
+          let new_tabs = [];
+          this.tabs_all.forEach(function ([k, p]) {
+            if (!p || sdata.PlatformType == p)
+              new_tabs.push(k);
+          });
+          this.tabs = new_tabs;
         }
         switch (feature) {
           case 'boresight':
@@ -1070,6 +1159,9 @@
         if (!detail || !detail.Year || !detail.Time)
           return null;
         return Date.UTC(detail.Year) / 1000 + (Number(detail.Time) - 1) * 86400;
+      },
+      hvacAction(target, op, val) {
+        console.log('HVAC', target, op, val);
       },
     },
     computed: {
@@ -1275,6 +1367,160 @@
         });
         return names;
       },
+      hvacStats() {
+        let hdata = this.ops.monitor.session.data?.Hvac;
+        let output = [];
+        if (!hdata)
+          return output;
+
+        // Parse temperature data.
+        let temperatures = {};
+        for (const [k, v] of Object.entries(hdata)) {
+          let toks = k.split(" ");
+          let _grp = toks[0];
+          if (_grp != 'Temperature')
+            continue;
+          toks = toks.slice(1);
+          let dest = 'values';
+          if (toks[0] == 'Average') {
+            toks = toks.slice(1);
+            dest = 'average';
+          }
+          if (!isNaN(parseInt(toks[toks.length-1])))
+            toks = toks.slice(0, toks.length-1);
+          let _id = toks.join(" ");
+          if (!temperatures[_id])
+            temperatures[_id] = {average: [],
+                                 values: []};
+          temperatures[_id][dest].push(v)
+        }
+        // Reduce a bit more ...
+        for (const v of Object.values(temperatures)) {
+          let tstr = v.average.join(',');
+          let b = v.values.join(',');
+          if (tstr && b) {
+            tstr = tstr + ' [' + b + ']';
+          } else if (b) {
+            tstr = b;
+          }
+          v.average = v.average[0];
+          v.one_liner = tstr;
+        }
+
+        // Now parse fans, boosters, heater.
+        function match(target, prefix, suffix) {
+          if (!target.startsWith(prefix))
+            return null;
+          target = target.substring(prefix.length);
+          if (!suffix)
+            return target;
+          if (!target.endsWith(suffix))
+            return null;
+          return target.substring(0, target.length - suffix.length);
+        }
+
+        function reg(dest, name, f, v) {
+          if (!dest[name])
+            dest[name] = {};
+          dest[name][f] = v;
+        }
+
+        let fans = {};
+        let boosters = {};
+        let heaters = {};
+
+        let patterns = [
+          ['Setpoint Speed Fan ', null, fans, 'setpoint'],
+          ['Fan ', ' Failure',          fans, 'failure'],
+          ['Fan ', ' on',               fans, 'on'],
+          ['Booster ', ' Failure',      boosters, 'failure'],
+          ['Booster ', ' on',           boosters, 'on'],
+        ];
+        let exacts = [
+          ['Setpoint Temperature Yoke Traverse', heaters, 'Yoke Traverse', 'setpoint'],
+          ['Heater on', heaters, 'Yoke Traverse', 'on'],
+        ];
+
+        for (const [k, v] of Object.entries(hdata)) {
+          for (const [p, s, dest, field] of patterns) {
+            let name = match(k, p, s);
+            if (name) {
+              reg(dest, name, field, v);
+              break;
+            }
+          }
+          for (const [p, dest, name, field] of exacts) {
+            if (k == p) {
+              reg(dest, name, field, v);
+              break;
+            }
+          }
+        }
+
+        // Each place has:
+        // - name
+        // - metric -> array used for sorting.
+        // - heater (optional) -> setpoint, on, fail.
+        // - fan (optional)    -> setpoint, on, fail.
+        // - booster (optional) -> on, fail.
+        // - temperature (optional) -> avg, individuals.
+
+        let places = {};
+
+        function apply_status(v, setpoint, type) {
+          if (v.failure) {
+            v.status = 'bad';
+            v.short = 'FAIL';
+          } else if (!v.on) {
+            v.status = 'warning';
+            v.short = 'off';
+          } else {
+            v.status = 'good';  // not failed, not on.
+            v.short = 'on';
+            if (setpoint || setpoint === 0 )
+              v.short += ' @ ' + setpoint + (type == 'heater' ? 'C' : '%');
+          }
+        }
+
+        for (const [metric_idx, dest_key, devs] of [
+          [0, 'fan', fans],
+          [1, 'booster', boosters],
+          [2, 'temperature', temperatures],
+          [3, 'heater', heaters],
+        ]) {
+          for (const [place, v] of Object.entries(devs)) {
+            apply_status(v, v.setpoint, dest_key);
+            if (!Object.hasOwn(places, place))
+              places[place] = {name: place, metric: [1, 1, 1, 1, place]};
+            places[place][dest_key] = v;
+            places[place].metric[metric_idx] = 0;
+          }
+        }
+
+        // Conver to array of values, sort by .metric.
+        let ordered = Object.values(places);
+        ordered.sort((a, b) => (a.metric < b.metric ? -1 : +1));
+
+        // Replace some things.
+        [
+          ['EL ', 'El '],
+          ['Yoke Traverse ', 'YT'],
+          ['Yoke Arm ', 'YA'],
+        ].forEach(([long, short]) => {
+          ordered.forEach((item) => {
+            item.name = item.name.replace(long, short);
+          })
+        });
+
+        // And finally, filter out heaters as separate list.
+        const non_heaters_then_heaters = ordered.reduce((accs, item) => {
+          accs[item.heater ? 1 : 0].push(item);
+          return accs;
+        }, [[], []]);
+
+        return non_heaters_then_heaters;
+      },
+
     },
   }
 </script>
@@ -1326,6 +1572,39 @@
     width: 100%;
   }
 
+  .hvac_row {
+    display: grid;
+    grid-template-columns: 30% 1fr 1fr 1fr;
+    grid-gap: 5px;
+  }
+  .hvac_row > label {
+    text-align: left;
+    padding: 10px;
+    height: 30px;
+    vertical-align: middle;
+  }
+  .hvac_row > input, button {
+    display: grid;
+    font-family: monospace;
+    padding: 10px;
+    border: 2px solid black;
+    border-radius: 4px;
+    width: 100%;
+    text-align: center;
+  }
+  .hvac_row > label {
+    padding: 0px 5px;
+  }
+
+  .hvac_header {
+    font-weight: bold;
+    font-family: sans-serif;
+    padding: 10px 0px;
+  }
+  .hvac_header > label {
+    text-align: center;
+  }
+
   /* Classes for rows in the Dataset table:
    * - isNormal: no error / idle.
    * - isBad: error.
@@ -1346,4 +1625,43 @@
     background-color: #ccf;
   }
 
+  .tabs > div {
+    display: inline;
+    border: solid black 1px;
+    border-bottom: none;
+    padding: 10px;
+  }
+  .tabs {
+    overflow: auto;
+    margin: 10px 0px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    max-height: 10vh;
+  }
+  .inactive {
+    background-color: #ddd;
+  }
+  div.inactive {
+    border-bottom: solid black 1px;
+  }
+  div.filler {
+    border: none;
+    border-bottom: solid black 1px;
+  }
+
+  .holder {
+    overflow: auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    max-height: 70vh;
+  }
+  .scrollableContent {
+    overflow-y: auto;
+    flex-grow: 1;
+  }
+  .buttonGroup button {
+    display: inline-block;
+  }
 </style>
