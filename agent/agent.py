@@ -105,6 +105,8 @@ def add_agent_args(parser_in=None):
     pgroup.add_argument("--schema-file",
                         help='YAML file with description of operations '
                         'to mock')
+    pgroup.add_argument('--mode', action='append', default=[],
+                        help='Special mode settings to apply (can pass multiple; applied in order)')
     return parser_in
 
 def wrap_starter(instance, name, cfg, start_proc):
@@ -115,7 +117,18 @@ def wrap_starter(instance, name, cfg, start_proc):
     func = _f.__get__(instance, instance.__class__)
     setattr(instance, proc_name, func)
     return func
-    
+
+def apply_config_patch(schema, patch):
+    def merge_tree(a, patch):
+        assert (isinstance(a, dict) and isinstance(patch, dict))
+        for k, v in patch.items():
+            if isinstance(v, dict) and isinstance(a.get(k), dict):
+                merge_tree(a[k], v)
+            else:
+                a[k] = v
+    if '_update' in patch:
+        merge_tree(schema, patch['_update'])
+
 
 if __name__ == '__main__':
     txaio.start_logging(level=os.environ.get("LOGLEVEL", "info"))
@@ -124,10 +137,15 @@ if __name__ == '__main__':
     args = site_config.parse_args(agent_class='*host*', parser=parser)
 
     schema = yaml.safe_load(open(args.schema_file, 'rb'))
+    for mode in args.mode:
+        if mode not in schema['modes']:
+            raise ValueError(f"Requested mode '{mode}' not found in available: {schema['modes']}")
+        apply_config_patch(schema, schema['modes'][mode])
+
     args.agent_class = schema['agent_class']
     if args.instance_id is None:
         args.instance_id = schema['instance_id']
-        
+
     agent, runner = ocs_agent.init_site_agent(args)
     mocker = MockingJaygent(agent)
 

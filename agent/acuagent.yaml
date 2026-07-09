@@ -205,3 +205,13 @@ tasks:
   set_boresight: {}
   stop_and_clear: {}
   clear_faults: {}
+  special_action: {}
+
+modes:
+  # Pass --mode platformCcat for better LAT-likeness
+  platformCcat:
+    _update:
+      processes:
+        monitor:
+          data:
+            PlatformType: 'ccat'
