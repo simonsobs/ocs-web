@@ -182,11 +182,11 @@
             caption="Elevation"
             v-model.number="motion_control.goto_el"
           />
-          <div class="ocs_row">
-            <label>Passive if empty</label>
-            <input type="checkbox" id="checkbox" v-model="motion_control.goto_passive"
-                   class="ocs_double" />
-          </div>
+          <OpParam
+            caption="Passive if empty"
+            :checkbox="true"
+            v-model="motion_control.goto_passive" />
+
           <div class="ocs_row">
             <label />
             <button
@@ -206,11 +206,10 @@
             options_style="object"
             v-model="motion_control.goto_target"
           />
-          <div class="ocs_row">
-            <label>Set mode=Stop at end?</label>
-            <input type="checkbox" id="checkbox" v-model="motion_control.goto_target_stop"
-                   class="ocs_double" />
-          </div>
+          <OpParam
+            caption="Set mode=Stop at end?"
+            :checkbox="true"
+            v-model="motion_control.goto_target_stop" />
           <div class="ocs_row">
             <label />
             <button
@@ -298,7 +297,28 @@
               :disabled="accessLevel < 1"
               @click="shutter('close')">Close</button>
           </div>
+        </form>
 
+        <form v-on:submit.prevent
+              v-if="motion_control.type == 'special'">
+          <div class="ocs_row">
+            <label class="acu_double">Clear Faults</label>
+            <button
+              :disabled="accessLevel < 1"
+              @click="special('clear_faults')">Clear</button>
+          </div>
+          <div class="ocs_row">
+            <label class="acu_double">Stop and Clear Program Track</label>
+            <button
+              :disabled="accessLevel < 1"
+              @click="special('stop_and_clear')">Stop</button>
+          </div>
+          <div class="ocs_row" v-if="platformFeature('unstow')">
+            <label class="acu_double">Request UnStow</label>
+            <button
+              :disabled="accessLevel < 1"
+              @click="special('unstow')">UnStow</button>
+          </div>
         </form>
 
         <h2>Dataset</h2>
@@ -361,11 +381,10 @@
           caption="El (deg)"
           modelType="blank_to_null"
           v-model.number="ops.go_to.params.el" />
-        <div class="ocs_row">
-          <label>Set mode=Stop at end?</label>
-          <input type="checkbox" id="checkbox" v-model="ops.go_to.params.end_stop"
-           class="ocs_double" />
-        </div>
+        <OpParam
+          caption="Set mode=Stop at end?"
+          :checkbox="true"
+          v-model="ops.go_to.params.end_stop" />
       </OcsTask>
 
       <!-- set_boresight -->
@@ -375,11 +394,11 @@
         <OpParam
           caption="Angle (deg)"
           v-model.number="ops.set_boresight.params.target" />
-        <div class="ocs_row">
-          <label>Set mode=Stop at end?</label>
-          <input type="checkbox" id="checkbox" v-model="ops.set_boresight.params.end_stop"
-           class="ocs_double" />
-        </div>
+        <OpParam
+          caption="Set mode=Stop at end?"
+          :checkbox="true"
+          v-model="ops.set_boresight.params.end_stop"
+        />
       </OcsTask>
 
       <OcsTask
@@ -480,6 +499,19 @@
           :options="speed_modes"
           v-model="ops.set_speed_mode.params.speed_mode"
         />
+      </OcsTask>
+
+      <OcsTask
+        :op_data="ops.special_action">
+        <OpParam
+          caption="action"
+          modelType="blank_to_null"
+          v-model="ops.special_action.params.action"
+          />
+        <OpParam
+          caption="Force"
+          :checkbox="true"
+          v-model="ops.special_action.params.force" />
       </OcsTask>
 
       <!-- Background processes -->
@@ -584,6 +616,13 @@
           escape_sun_now: {},
           monitor_hwp: {},
           update_hwp: {},
+          special_action: {
+            params: {
+              action: null,
+              force: false,
+              elsync_ref: null,
+            },
+          },
         }),
         motion_types_all: [
           ["const_el", "Constant el scan"],
@@ -592,6 +631,7 @@
           ["sun_stuff", "Sun Avoidance"],
           ["hwp_interlock", "HWP Interlocks", "satp"],
           ["shutter", "Shutter", "ccat"],
+          ["special", "Special Actions"],
         ],
         motion_types: ['?', {}],
         motion_control: {
@@ -872,6 +912,20 @@
           }
         }
       },
+      special(action) {
+        switch (action) {
+          case 'clear_faults':
+            window.ocs_bundle.ui_run_task(this.address, 'clear_faults', {});
+            break;
+          case 'stop_and_clear':
+            window.ocs_bundle.ui_run_task(this.address, 'stop_and_clear', {});
+            break;
+          case 'unstow':
+            window.ocs_bundle.ui_run_task(this.address, 'special_action',
+                                          {'action': 'unstow'});
+            break;
+        }
+      },
       platformFeature(feature) {
         let sdata = this.ops.monitor.session.data;
         if (!sdata || !sdata.PlatformType)
@@ -893,6 +947,12 @@
             return sdata.PlatformType == 'ccat';
           case 'hwp':
             return sdata.PlatformType == 'satp';
+          case 'hvac':
+            return sdata.PlatformType == 'ccat';
+          case 'breakers':
+            return sdata.PlatformType == 'ccat';
+          case 'unstow':
+            return sdata.PlatformType == 'ccat';
         }
         return false;
       },
