@@ -18,319 +18,319 @@
         </div>
 
         <template v-if="detailTab == 'Main'">
-        <h2>Connection</h2>
-        <OpReading
-          caption="Address"
-          v-bind:value="address">
-        </OpReading>
+          <h2>Connection</h2>
+          <OpReading
+            caption="Address"
+            v-bind:value="address">
+          </OpReading>
 
-        <OcsLightLine caption="OCS/Agent">
-          <OcsLight
-            caption="OCS"
-            tip="Status of the connection between ocs-web and OCS crossbar."
-            :value="getIndicator('ocs')"
-          />
-          <OcsLight
-            caption="AGT"
-            tip="Status of the connection between ocs-web and the Agent."
-            :value="getIndicator('agent')"
-          />
-          <OcsLight
-            caption="MON"
-            type="multi"
-            tip="Will show green/good when 'monitor' process is running and
-                     acquiring data normally. The health of this process is required
-                     for numerous other indicators."
-            :value="getIndicator('monitor')"
-          />
-          <OcsLight
-            caption="BCAST"
-            type="multi"
-            tip="Will show green/good when 'broadcast' process appears to be
-                     running and acquiring data normally."
-            :value="getIndicator('broadcast')"
-          />
-        </OcsLightLine>
-
-        <OcsLightLine caption="ACU/Platform">
-          <OcsLight
-            caption="UNLOCKED"
-            type="multi"
-            tip="Will show green/good when remote control is not locked out (Safe)."
-            :value="getIndicator('-', 'Safe')"
-          />
-          <OcsLight
-            caption="REMOTE"
-            type="multi"
-            tip="Will show green/good when ACU is in Remote (rather than Local) control mode."
-            :value="getIndicator('+', 'ACU in remote mode')"
-          />
-          <OcsLight
-            caption="READY"
-            type="multi"
-            tip="Will show green/good unless ACU expresses a General summary fault."
-            :value="getIndicator('-', 'General summary fault')"
-          />
-          <OcsLight v-if="platformFeature('shutter')"
-                    caption="SHUTTER"
-                    type="multi"
-                    tip="Will show green/good if shutter is open, otherwise red/bad."
-                    :value="getIndicator('Shutter')"
-          />
-        </OcsLightLine>
-
-        <OcsLightLine caption="Axis Faults">
-          <template v-for="item in axisFaultLights" v-bind:key="item.name">
+          <OcsLightLine caption="OCS/Agent">
             <OcsLight
-              :caption='item.name'
-              type="multi"
-              :tip="'Will show green/good if not &quot;' + item.key + '&quot;.'"
-              :value="getIndicator('-', item.key)"
-              v-if="!item.feature || platformFeature(item.feature)"
+              caption="OCS"
+              tip="Status of the connection between ocs-web and OCS crossbar."
+              :value="getIndicator('ocs')"
             />
-          </template>
-        </OcsLightLine>
-
-        <OcsLightLine caption="Sun Safety">
-          <template v-for="item in sunSafetyIndicators" v-bind:key="item.name">
             <OcsLight
-              :caption='item.name'
-              type="multi"
-              :tip="item.tip"
-              :value="item.value"
+              caption="AGT"
+              tip="Status of the connection between ocs-web and the Agent."
+              :value="getIndicator('agent')"
             />
-          </template>
-        </OcsLightLine>
-
-        <OcsLightLine caption="HWP Interlocks"
-                      v-if="platformFeature('hwp')" >
-          <template v-for="item in hwpStats()" v-bind:key="item.label">
             <OcsLight
-              :caption='item.short'
+              caption="MON"
               type="multi"
-              :tip="item.tip"
-              :value="item.indicator"
+              tip="Will show green/good when 'monitor' process is running and
+                       acquiring data normally. The health of this process is required
+                       for numerous other indicators."
+              :value="getIndicator('monitor')"
             />
-          </template>
-        </OcsLightLine>
+            <OcsLight
+              caption="BCAST"
+              type="multi"
+              tip="Will show green/good when 'broadcast' process appears to be
+                       running and acquiring data normally."
+              :value="getIndicator('broadcast')"
+            />
+          </OcsLightLine>
 
-        <h2>Pointing</h2>
-        <OpReading
-          caption="Activity"
-          :stale="statusIsStale"
-          v-bind:value="currentMotion" />
-        <OpReading
-          caption="Azimuth"
-          :stale="statusIsStale"
-          v-bind:value="currentPosAndMode('Azimuth')">
-        </OpReading>
-        <OpReading
-          caption="Elevation"
-          :stale="statusIsStale"
-          v-bind:value="currentPosAndMode('Elevation')">
-        </OpReading>
-        <OpReading
-          caption="Boresight"
-          v-if="platformFeature('boresight')"
-          :stale="statusIsStale"
-          v-bind:value="currentPosAndMode('Boresight')">
-        </OpReading>
-        <OpReading
-          caption="Co-rotator"
-          v-if="platformFeature('corotator')"
-          :stale="statusIsStale"
-          v-bind:value="currentPosAndMode('Corotator')">
-        </OpReading>
-        <OpReading
-          caption="Timestamp"
-          :stale="statusIsStale"
-          v-bind:value="currentPosAndMode('Timestamp')">
-        </OpReading>
+          <OcsLightLine caption="ACU/Platform">
+            <OcsLight
+              caption="UNLOCKED"
+              type="multi"
+              tip="Will show green/good when remote control is not locked out (Safe)."
+              :value="getIndicator('-', 'Safe')"
+            />
+            <OcsLight
+              caption="REMOTE"
+              type="multi"
+              tip="Will show green/good when ACU is in Remote (rather than Local) control mode."
+              :value="getIndicator('+', 'ACU in remote mode')"
+            />
+            <OcsLight
+              caption="READY"
+              type="multi"
+              tip="Will show green/good unless ACU expresses a General summary fault."
+              :value="getIndicator('-', 'General summary fault')"
+            />
+            <OcsLight v-if="platformFeature('shutter')"
+                      caption="SHUTTER"
+                      type="multi"
+                      tip="Will show green/good if shutter is open, otherwise red/bad."
+                      :value="getIndicator('Shutter')"
+            />
+          </OcsLightLine>
 
-        <h2>Control</h2>
-        <OpDropdown
-          caption="Action Type"
-          :options="motion_types[1]"
-          options_style="object"
-          v-model="motion_control.type"
-        />
-        <form v-on:submit.prevent
-              v-if="motion_control.type == 'const_el'">
-          <OpParam
-            caption="Azimuth center"
-            v-model.number="motion_control.az_center"
-          />
-          <OpParam
-            caption="Azimuth throw"
-            v-model.number="motion_control.az_throw"
-          />
-          <OpParam
-            caption="Scan speed"
-            v-model.number="motion_control.az_speed"
-          />
-          <OpParam
-            caption="Mean accel"
-            v-model.number="motion_control.az_accel"
-          />
-          <div class="ocs_row">
-            <label />
-            <button
-              :disabled="accessLevel < 1"
-              @click="startMotion">Start</button>
-            <button
-              :disabled="accessLevel < 1"
-              @click="stopMotion">Stop</button>
-          </div>
-        </form>
+          <OcsLightLine caption="Axis Faults">
+            <template v-for="item in axisFaultLights" v-bind:key="item.name">
+              <OcsLight
+                :caption='item.name'
+                type="multi"
+                :tip="'Will show green/good if not &quot;' + item.key + '&quot;.'"
+                :value="getIndicator('-', item.key)"
+                v-if="!item.feature || platformFeature(item.feature)"
+              />
+            </template>
+          </OcsLightLine>
 
-        <form v-on:submit.prevent
-              v-if="motion_control.type == 'goto'">
-          <OpParam
+          <OcsLightLine caption="Sun Safety">
+            <template v-for="item in sunSafetyIndicators" v-bind:key="item.name">
+              <OcsLight
+                :caption='item.name'
+                type="multi"
+                :tip="item.tip"
+                :value="item.value"
+              />
+            </template>
+          </OcsLightLine>
+
+          <OcsLightLine caption="HWP Interlocks"
+                        v-if="platformFeature('hwp')" >
+            <template v-for="item in hwpStats()" v-bind:key="item.label">
+              <OcsLight
+                :caption='item.short'
+                type="multi"
+                :tip="item.tip"
+                :value="item.indicator"
+              />
+            </template>
+          </OcsLightLine>
+
+          <h2>Pointing</h2>
+          <OpReading
+            caption="Activity"
+            :stale="statusIsStale"
+            v-bind:value="currentMotion" />
+          <OpReading
             caption="Azimuth"
-            v-model.number="motion_control.goto_az"
-          />
-          <OpParam
+            :stale="statusIsStale"
+            v-bind:value="currentPosAndMode('Azimuth')">
+          </OpReading>
+          <OpReading
             caption="Elevation"
-            v-model.number="motion_control.goto_el"
-          />
-          <OpParam
-            caption="Passive if empty"
-            :checkbox="true"
-            v-model="motion_control.goto_passive" />
+            :stale="statusIsStale"
+            v-bind:value="currentPosAndMode('Elevation')">
+          </OpReading>
+          <OpReading
+            caption="Boresight"
+            v-if="platformFeature('boresight')"
+            :stale="statusIsStale"
+            v-bind:value="currentPosAndMode('Boresight')">
+          </OpReading>
+          <OpReading
+            caption="Co-rotator"
+            v-if="platformFeature('corotator')"
+            :stale="statusIsStale"
+            v-bind:value="currentPosAndMode('Corotator')">
+          </OpReading>
+          <OpReading
+            caption="Timestamp"
+            :stale="statusIsStale"
+            v-bind:value="currentPosAndMode('Timestamp')">
+          </OpReading>
 
-          <div class="ocs_row">
-            <label />
-            <button
-              :disabled="accessLevel < 1"
-              @click="startMotion">Start</button>
-            <button
-              :disabled="accessLevel < 1"
-              @click="stopMotion">Abort</button>
-          </div>
-        </form>
-
-        <form v-on:submit.prevent
-              v-if="motion_control.type == 'goto_named'">
+          <h2>Control</h2>
           <OpDropdown
-            caption="Position"
-            :options="namedPositionsArray"
+            caption="Action Type"
+            :options="motion_types[1]"
             options_style="object"
-            v-model="motion_control.goto_target"
+            v-model="motion_control.type"
           />
-          <OpParam
-            caption="Set mode=Stop at end?"
-            :checkbox="true"
-            v-model="motion_control.goto_target_stop" />
-          <div class="ocs_row">
-            <label />
-            <button
-              :disabled="accessLevel < 1"
-              @click="startMotion">Start</button>
-            <button
-              :disabled="accessLevel < 1"
-              @click="stopMotion">Abort</button>
-          </div>
-        </form>
+          <form v-on:submit.prevent
+                v-if="motion_control.type == 'const_el'">
+            <OpParam
+              caption="Azimuth center"
+              v-model.number="motion_control.az_center"
+            />
+            <OpParam
+              caption="Azimuth throw"
+              v-model.number="motion_control.az_throw"
+            />
+            <OpParam
+              caption="Scan speed"
+              v-model.number="motion_control.az_speed"
+            />
+            <OpParam
+              caption="Mean accel"
+              v-model.number="motion_control.az_accel"
+            />
+            <div class="ocs_row">
+              <label />
+              <button
+                :disabled="accessLevel < 1"
+                @click="startMotion">Start</button>
+              <button
+                :disabled="accessLevel < 1"
+                @click="stopMotion">Stop</button>
+            </div>
+          </form>
 
-        <form v-on:submit.prevent
-              v-if="motion_control.type == 'sun_stuff'">
-          <OpReading
-            caption="Sun position"
-            :stale="statusIsStale"
-            v-bind:value="sunStat('position')">
-          </OpReading>
-          <OpReading
-            caption="Sun distance"
-            :stale="statusIsStale"
-            v-bind:value="sunStat('distance')">
-          </OpReading>
-          <div class="ocs_row">
-            <label>Reset params</label>
-            <button
-              :disabled="accessLevel < 1"
-              @click="sun('reset')">Go</button>
-          </div>
-          <div class="ocs_row">
-            <label>Escape now</label>
-            <button
-              :disabled="accessLevel < 1"
-              @click="sun('escape')">Go</button>
-          </div>
-          <div class="ocs_row">
-            <label>Enable / Disable mins</label>
-            <button
-              :disabled="accessLevel < 1"
-              @click="sun('enable')">Enable</button>
-            <button
-              :disabled="accessLevel < 1"
-              @click="sun('disable', 30)">Disable, 30 mins</button>
-          </div>
-        </form>
+          <form v-on:submit.prevent
+                v-if="motion_control.type == 'goto'">
+            <OpParam
+              caption="Azimuth"
+              v-model.number="motion_control.goto_az"
+            />
+            <OpParam
+              caption="Elevation"
+              v-model.number="motion_control.goto_el"
+            />
+            <OpParam
+              caption="Passive if empty"
+              :checkbox="true"
+              v-model="motion_control.goto_passive" />
 
-        <form v-on:submit.prevent
-              v-if="motion_control.type == 'hwp_interlock'">
-          <div v-for="item in hwpStats()" :key="item.label">
+            <div class="ocs_row">
+              <label />
+              <button
+                :disabled="accessLevel < 1"
+                @click="startMotion">Start</button>
+              <button
+                :disabled="accessLevel < 1"
+                @click="stopMotion">Abort</button>
+            </div>
+          </form>
+
+          <form v-on:submit.prevent
+                v-if="motion_control.type == 'goto_named'">
+            <OpDropdown
+              caption="Position"
+              :options="namedPositionsArray"
+              options_style="object"
+              v-model="motion_control.goto_target"
+            />
+            <OpParam
+              caption="Set mode=Stop at end?"
+              :checkbox="true"
+              v-model="motion_control.goto_target_stop" />
+            <div class="ocs_row">
+              <label />
+              <button
+                :disabled="accessLevel < 1"
+                @click="startMotion">Start</button>
+              <button
+                :disabled="accessLevel < 1"
+                @click="stopMotion">Abort</button>
+            </div>
+          </form>
+
+          <form v-on:submit.prevent
+                v-if="motion_control.type == 'sun_stuff'">
             <OpReading
-              :caption="item.label"
+              caption="Sun position"
               :stale="statusIsStale"
-              :value="item.value">
+              v-bind:value="sunStat('position')">
             </OpReading>
-          </div>
-          <div class="ocs_row">
-            <label>Enable / Disable mins</label>
-            <button
-              :disabled="accessLevel < 1"
-              @click="hwp('enable')">Enable</button>
-            <button
-              :disabled="accessLevel < 1"
-              @click="hwp('disable', 30)">Disable</button>
-          </div>
-        </form>
+            <OpReading
+              caption="Sun distance"
+              :stale="statusIsStale"
+              v-bind:value="sunStat('distance')">
+            </OpReading>
+            <div class="ocs_row">
+              <label>Reset params</label>
+              <button
+                :disabled="accessLevel < 1"
+                @click="sun('reset')">Go</button>
+            </div>
+            <div class="ocs_row">
+              <label>Escape now</label>
+              <button
+                :disabled="accessLevel < 1"
+                @click="sun('escape')">Go</button>
+            </div>
+            <div class="ocs_row">
+              <label>Enable / Disable mins</label>
+              <button
+                :disabled="accessLevel < 1"
+                @click="sun('enable')">Enable</button>
+              <button
+                :disabled="accessLevel < 1"
+                @click="sun('disable', 30)">Disable, 30 mins</button>
+            </div>
+          </form>
 
-        <form v-on:submit.prevent
-              v-if="motion_control.type == 'shutter'">
-          <OpReading
-            caption="State"
-            :stale="statusIsStale"
-            v-bind:value="shutterStats('shutter')">
-          </OpReading>
-          <OpReading
-            caption="Task"
-            :stale="statusIsStale"
-            v-bind:value="shutterStats('task')">
-          </OpReading>
-          <div class="ocs_row">
-            <label>Move Shutter</label>
-            <button
-              :disabled="accessLevel < 1"
-              @click="shutter('open')">Open</button>
-            <button
-              :disabled="accessLevel < 1"
-              @click="shutter('close')">Close</button>
-          </div>
-        </form>
+          <form v-on:submit.prevent
+                v-if="motion_control.type == 'hwp_interlock'">
+            <div v-for="item in hwpStats()" :key="item.label">
+              <OpReading
+                :caption="item.label"
+                :stale="statusIsStale"
+                :value="item.value">
+              </OpReading>
+            </div>
+            <div class="ocs_row">
+              <label>Enable / Disable mins</label>
+              <button
+                :disabled="accessLevel < 1"
+                @click="hwp('enable')">Enable</button>
+              <button
+                :disabled="accessLevel < 1"
+                @click="hwp('disable', 30)">Disable</button>
+            </div>
+          </form>
 
-        <form v-on:submit.prevent
-              v-if="motion_control.type == 'special'">
-          <div class="ocs_row">
-            <label class="acu_double">Clear Faults</label>
-            <button
-              :disabled="accessLevel < 1"
-              @click="special('clear_faults')">Clear</button>
-          </div>
-          <div class="ocs_row">
-            <label class="acu_double">Stop and Clear Program Track</label>
-            <button
-              :disabled="accessLevel < 1"
-              @click="special('stop_and_clear')">Stop</button>
-          </div>
-          <div class="ocs_row" v-if="platformFeature('unstow')">
-            <label class="acu_double">Request UnStow</label>
-            <button
-              :disabled="accessLevel < 1"
-              @click="special('unstow')">UnStow</button>
-          </div>
-        </form>
+          <form v-on:submit.prevent
+                v-if="motion_control.type == 'shutter'">
+            <OpReading
+              caption="State"
+              :stale="statusIsStale"
+              v-bind:value="shutterStats('shutter')">
+            </OpReading>
+            <OpReading
+              caption="Task"
+              :stale="statusIsStale"
+              v-bind:value="shutterStats('task')">
+            </OpReading>
+            <div class="ocs_row">
+              <label>Move Shutter</label>
+              <button
+                :disabled="accessLevel < 1"
+                @click="shutter('open')">Open</button>
+              <button
+                :disabled="accessLevel < 1"
+                @click="shutter('close')">Close</button>
+            </div>
+          </form>
+
+          <form v-on:submit.prevent
+                v-if="motion_control.type == 'special'">
+            <div class="ocs_row">
+              <label class="acu_double">Clear Faults</label>
+              <button
+                :disabled="accessLevel < 1"
+                @click="special('clear_faults')">Clear</button>
+            </div>
+            <div class="ocs_row">
+              <label class="acu_double">Stop and Clear Program Track</label>
+              <button
+                :disabled="accessLevel < 1"
+                @click="special('stop_and_clear')">Stop</button>
+            </div>
+            <div class="ocs_row" v-if="platformFeature('unstow')">
+              <label class="acu_double">Request UnStow</label>
+              <button
+                :disabled="accessLevel < 1"
+                @click="special('unstow')">UnStow</button>
+            </div>
+          </form>
 
         </template>
 
