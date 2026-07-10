@@ -1463,7 +1463,7 @@
         // - heater (optional) -> setpoint, on, fail.
         // - fan (optional)    -> setpoint, on, fail.
         // - booster (optional) -> on, fail.
-        // - temperature (optional) -> avg, individuals.
+        // - temperature (optional) -> average, values, one_liner.
 
         let places = {};
 
