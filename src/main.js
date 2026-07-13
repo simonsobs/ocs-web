@@ -21,6 +21,7 @@ import OpPrivs        from './components/OpPrivs.vue'
 import OcsAgentHeader from './components/OcsAgentHeader.vue'
 import OcsLightLine   from './components/OcsLightLine.vue'
 import OcsLight       from './components/OcsLight.vue'
+import UiButton       from './components/UiButton.vue'
 
 app
   .component('AgentPanelBase', AgentPanelBase)
@@ -38,6 +39,7 @@ app
   .component('OcsAgentHeader', OcsAgentHeader)
   .component('OcsLightLine', OcsLightLine)
   .component('OcsLight',    OcsLight)
+  .component('UiButton',    UiButton)
 ;
 
 // Font/icon stuff.
