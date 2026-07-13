@@ -383,6 +383,81 @@
             </div>
           </template>
 
+          <template v-if="motion_control.hvac_view == 'Set Heaters'">
+            <div class="hvac_row" height="10px" />
+            <template v-for="item in hvacStats[1]" :key="item.name">
+              <div class="hvac_row">
+                <label>{{ item.name }}</label>
+                <OcsLight type="multi"
+                          :value="item.heater?.status" :caption="item.heater?.short" />
+                <UiButton
+                  @click="hvacAction('heater', 'on', item)">On</UiButton>
+                <UiButton
+                  @click="hvacAction('heater', 'off', item)">Off</UiButton>
+              </div>
+              <div class="hvac_row">
+                <label />
+                <input text :disabled="accessLevel < 1" :value="item.heater.setpoint" />
+                <input text v-model.number="motion_control.hvac_setpoints[item.full_name]" />
+                <UiButton
+                  @click="hvacAction('heater', 'setpoint', item)">Update</UiButton>
+              </div>
+            </template>
+          </template>
+
+          <template v-if="motion_control.hvac_view == 'Set Fans'">
+            <div class="hvac_row">
+              <label>Set All</label>
+              <span />
+              <UiButton
+                @click="hvacAction('fans', 'on', hvacStats[0])">On</UiButton>
+              <UiButton
+                @click="hvacAction('fans', 'off', hvacStats[0])">Off</UiButton>
+            </div>
+            <div class="hvac_row" height="10px" />
+            <template v-for="item in hvacStats[0]" :key="item.name">
+              <div v-if="item.fan" class="hvac_row">
+                <label>{{ item.name }}</label>
+                <OcsLight type="multi"
+                          :value="item.fan?.status" :caption="item.fan?.short" />
+                <UiButton
+                  @click="hvacAction('fan', 'on', item)">On</UiButton>
+                <UiButton
+                  @click="hvacAction('fan', 'off', item)">Off</UiButton>
+              </div>
+              <div v-if="item.fan" class="hvac_row">
+                <label />
+                <input text disabled :value="item.fan.setpoint" />
+                <input text v-model.number="motion_control.hvac_setpoints[item.full_name]" />
+                <UiButton
+                  @click="hvacAction('fan', 'setpoint', item)">Update</UiButton>
+              </div>
+            </template>
+          </template>
+
+          <template v-if="motion_control.hvac_view == 'Set Boosters'">
+            <div class="hvac_row">
+              <label>Set All</label>
+              <span />
+              <UiButton
+                @click="hvacAction('boosters', 'on', hvacStats[0])">On</UiButton>
+              <UiButton
+                @click="hvacAction('boosters', 'off', hvacStats[0])">Off</UiButton>
+            </div>
+            <div class="hvac_row" height="10px" />
+            <template v-for="item in hvacStats[0]" :key="item.name">
+              <div v-if="item.booster" class="hvac_row">
+                <label>{{ item.name }}</label>
+                <OcsLight type="multi"
+                          :value="item.booster?.status" :caption="item.booster?.short" />
+                <UiButton
+                  @click="hvacAction('booster', 'on', item)">On</UiButton>
+                <UiButton
+                  @click="hvacAction('booster', 'off', item)">Off</UiButton>
+              </div>
+            </template>
+          </template>
+
         </form>
 
         <template v-if="detailTab == 'Dataset'">
@@ -697,7 +772,7 @@
           ["Dataset"],
         ],
         tabs: ['Main', 'Dataset'],
-        detailTab: "Main",
+        detailTab: 'Main',
         motion_types_all: [
           ["const_el", "Constant el scan"],
           ["goto", "Go to position"],
@@ -710,6 +785,9 @@
         hvac_views: [
           "Summary",
           "Temperature Detail",
+          "Set Fans",
+          "Set Boosters",
+          "Set Heaters",
         ],
         motion_types: ['?', {}],
         motion_control: {
@@ -728,6 +806,7 @@
           goto_target_stop: true,
 
           hvac_view: "Summary",
+          hvac_setpoints: {},
         },
         start_types: ["end", "mid"],
         speed_modes: ["high", "low"],
@@ -1160,8 +1239,43 @@
           return null;
         return Date.UTC(detail.Year) / 1000 + (Number(detail.Time) - 1) * 86400;
       },
-      hvacAction(target, op, val) {
-        console.log('HVAC', target, op, val);
+      hvacAction(target, op, item) {
+        let target_list = null;
+        let values = op;
+
+        if (op == 'on' || op == 'off') {
+          switch (target) {
+            case 'fans':
+              target_list = item.filter((a) => (a.fan)).map((a) => 'Fan ' + a.full_name);
+              break;
+            case 'boosters':
+              target_list = item.filter((a) => (a.booster)).map((a) => 'Booster ' + a.full_name);
+              break;
+            case 'fan':
+              target_list = ['Fan ' + item.full_name];
+              break;
+            case 'booster':
+              target_list = ['Booster ' + item.full_name];
+              break;
+            case 'heater':
+              target_list = ['Heater'];
+              break;
+          }
+        } else if (op == 'setpoint') {
+          values = this.motion_control.hvac_setpoints[item.full_name];
+          switch (target) {
+            case 'fan':
+              target_list = ['Fan ' + item.full_name];
+              break;
+            case 'heater':
+              target_list = [item.full_name];
+              break;
+          }
+        }
+        if (target_list)
+          window.ocs_bundle.ui_run_task(
+            this.address, 'set_hvac',
+            {'targets': target_list, 'values': values});
       },
     },
     computed: {
@@ -1491,7 +1605,9 @@
           for (const [place, v] of Object.entries(devs)) {
             apply_status(v, v.setpoint, dest_key);
             if (!Object.hasOwn(places, place))
-              places[place] = {name: place, metric: [1, 1, 1, 1, place]};
+              places[place] = {name: place,
+                               full_name: place,
+                               metric: [1, 1, 1, 1, place]};
             places[place][dest_key] = v;
             places[place].metric[metric_idx] = 0;
           }
@@ -1510,6 +1626,13 @@
           ordered.forEach((item) => {
             item.name = item.name.replace(long, short);
           })
+        });
+
+        // Make sure we have a place to store setpoints...
+        let setpoints = this.motion_control.hvac_setpoints;
+        ordered.filter((item) => (item.fan || item.heater)).forEach((item) => {
+          if (!Object.hasOwn(setpoints, item.full_name))
+            setpoints[item.full_name] = null;
         });
 
         // And finally, filter out heaters as separate list.
