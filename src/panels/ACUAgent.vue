@@ -174,12 +174,8 @@
             />
             <div class="ocs_row">
               <label />
-              <button
-                :disabled="accessLevel < 1"
-                @click="startMotion">Start</button>
-              <button
-                :disabled="accessLevel < 1"
-                @click="stopMotion">Stop</button>
+              <UiButton @click="startMotion">Start</UiButton>
+              <UiButton @click="stopMotion">Stop</UiButton>
             </div>
           </form>
 
@@ -200,12 +196,8 @@
 
             <div class="ocs_row">
               <label />
-              <button
-                :disabled="accessLevel < 1"
-                @click="startMotion">Start</button>
-              <button
-                :disabled="accessLevel < 1"
-                @click="stopMotion">Abort</button>
+              <UiButton @click="startMotion">Start</UiButton>
+              <UiButton @click="stopMotion">Abort</UiButton>
             </div>
           </form>
 
@@ -223,12 +215,8 @@
               v-model="motion_control.goto_target_stop" />
             <div class="ocs_row">
               <label />
-              <button
-                :disabled="accessLevel < 1"
-                @click="startMotion">Start</button>
-              <button
-                :disabled="accessLevel < 1"
-                @click="stopMotion">Abort</button>
+              <UiButton @click="startMotion">Start</UiButton>
+              <UiButton @click="stopMotion">Abort</UiButton>
             </div>
           </form>
 
@@ -246,24 +234,16 @@
             </OpReading>
             <div class="ocs_row">
               <label>Reset params</label>
-              <button
-                :disabled="accessLevel < 1"
-                @click="sun('reset')">Go</button>
+              <UiButton @click="sun('reset')">Go</UiButton>
             </div>
             <div class="ocs_row">
               <label>Escape now</label>
-              <button
-                :disabled="accessLevel < 1"
-                @click="sun('escape')">Go</button>
+              <UiButton @click="sun('escape')">Go</UiButton>
             </div>
             <div class="ocs_row">
               <label>Enable / Disable mins</label>
-              <button
-                :disabled="accessLevel < 1"
-                @click="sun('enable')">Enable</button>
-              <button
-                :disabled="accessLevel < 1"
-                @click="sun('disable', 30)">Disable, 30 mins</button>
+              <UiButton @click="sun('enable')">Enable</UiButton>
+              <UiButton @click="sun('disable', 30)">Disable, 30 mins</UiButton>
             </div>
           </form>
 
@@ -278,12 +258,8 @@
             </div>
             <div class="ocs_row">
               <label>Enable / Disable mins</label>
-              <button
-                :disabled="accessLevel < 1"
-                @click="hwp('enable')">Enable</button>
-              <button
-                :disabled="accessLevel < 1"
-                @click="hwp('disable', 30)">Disable</button>
+              <UiButton @click="hwp('enable')">Enable</UiButton>
+              <UiButton @click="hwp('disable', 30)">Disable</UiButton>
             </div>
           </form>
 
@@ -301,12 +277,8 @@
             </OpReading>
             <div class="ocs_row">
               <label>Move Shutter</label>
-              <button
-                :disabled="accessLevel < 1"
-                @click="shutter('open')">Open</button>
-              <button
-                :disabled="accessLevel < 1"
-                @click="shutter('close')">Close</button>
+              <UiButton @click="shutter('open')">Open</UiButton>
+              <UiButton @click="shutter('close')">Close</UiButton>
             </div>
           </form>
 
@@ -314,21 +286,15 @@
                 v-if="motion_control.type == 'special'">
             <div class="ocs_row">
               <label class="acu_double">Clear Faults</label>
-              <button
-                :disabled="accessLevel < 1"
-                @click="special('clear_faults')">Clear</button>
+              <UiButton @click="special('clear_faults')">Clear</UiButton>
             </div>
             <div class="ocs_row">
               <label class="acu_double">Stop and Clear Program Track</label>
-              <button
-                :disabled="accessLevel < 1"
-                @click="special('stop_and_clear')">Stop</button>
+              <UiButton @click="special('stop_and_clear')">Stop</UiButton>
             </div>
             <div class="ocs_row" v-if="platformFeature('unstow')">
               <label class="acu_double">Request UnStow</label>
-              <button
-                :disabled="accessLevel < 1"
-                @click="special('unstow')">UnStow</button>
+              <UiButton @click="special('unstow')">UnStow</UiButton>
             </div>
           </form>
 
@@ -351,6 +317,7 @@
               <label>Fan</label>
               <label>Booster</label>
             </div>
+
             <div v-for="item in hvacStats[0]" :key="item.name"
                  class="hvac_row">
               <label>{{ item.name }}</label>
@@ -390,17 +357,14 @@
                 <label>{{ item.name }}</label>
                 <OcsLight type="multi"
                           :value="item.heater?.status" :caption="item.heater?.short" />
-                <UiButton
-                  @click="hvacAction('heater', 'on', item)">On</UiButton>
-                <UiButton
-                  @click="hvacAction('heater', 'off', item)">Off</UiButton>
+                <UiButton @click="hvacAction('heater', 'on', item)">On</UiButton>
+                <UiButton @click="hvacAction('heater', 'off', item)">Off</UiButton>
               </div>
               <div class="hvac_row">
                 <label />
-                <input text :disabled="accessLevel < 1" :value="item.heater.setpoint" />
+                <input text disabled :value="item.heater.setpoint" />
                 <input text v-model.number="motion_control.hvac_setpoints[item.full_name]" />
-                <UiButton
-                  @click="hvacAction('heater', 'setpoint', item)">Update</UiButton>
+                <UiButton @click="hvacAction('heater', 'setpoint', item)">Update</UiButton>
               </div>
             </template>
           </template>
@@ -409,29 +373,25 @@
             <div class="hvac_row">
               <label>Set All</label>
               <span />
-              <UiButton
-                @click="hvacAction('fans', 'on', hvacStats[0])">On</UiButton>
-              <UiButton
-                @click="hvacAction('fans', 'off', hvacStats[0])">Off</UiButton>
+              <UiButton @click="hvacAction('fans', 'on', hvacStats[0])">On</UiButton>
+              <UiButton @click="hvacAction('fans', 'off', hvacStats[0])">Off</UiButton>
             </div>
-            <div class="hvac_row" height="10px" />
+            <div class="hvac_row" height="10px"><span /></div>
             <template v-for="item in hvacStats[0]" :key="item.name">
               <div v-if="item.fan" class="hvac_row">
                 <label>{{ item.name }}</label>
                 <OcsLight type="multi"
                           :value="item.fan?.status" :caption="item.fan?.short" />
-                <UiButton
-                  @click="hvacAction('fan', 'on', item)">On</UiButton>
-                <UiButton
-                  @click="hvacAction('fan', 'off', item)">Off</UiButton>
+                <UiButton @click="hvacAction('fan', 'on', item)">On</UiButton>
+                <UiButton @click="hvacAction('fan', 'off', item)">Off</UiButton>
               </div>
               <div v-if="item.fan" class="hvac_row">
                 <label />
                 <input text disabled :value="item.fan.setpoint" />
                 <input text v-model.number="motion_control.hvac_setpoints[item.full_name]" />
-                <UiButton
-                  @click="hvacAction('fan', 'setpoint', item)">Update</UiButton>
+                <UiButton @click="hvacAction('fan', 'setpoint', item)">Update</UiButton>
               </div>
+              <div class="hvac_row" height="10px"><span /></div>
             </template>
           </template>
 
@@ -439,21 +399,17 @@
             <div class="hvac_row">
               <label>Set All</label>
               <span />
-              <UiButton
-                @click="hvacAction('boosters', 'on', hvacStats[0])">On</UiButton>
-              <UiButton
-                @click="hvacAction('boosters', 'off', hvacStats[0])">Off</UiButton>
+              <UiButton @click="hvacAction('boosters', 'on', hvacStats[0])">On</UiButton>
+              <UiButton @click="hvacAction('boosters', 'off', hvacStats[0])">Off</UiButton>
             </div>
-            <div class="hvac_row" height="10px" />
+            <div class="hvac_row" height="10px"><span /></div>
             <template v-for="item in hvacStats[0]" :key="item.name">
               <div v-if="item.booster" class="hvac_row">
                 <label>{{ item.name }}</label>
                 <OcsLight type="multi"
                           :value="item.booster?.status" :caption="item.booster?.short" />
-                <UiButton
-                  @click="hvacAction('booster', 'on', item)">On</UiButton>
-                <UiButton
-                  @click="hvacAction('booster', 'off', item)">Off</UiButton>
+                <UiButton @click="hvacAction('booster', 'on', item)">On</UiButton>
+                <UiButton @click="hvacAction('booster', 'off', item)">Off</UiButton>
               </div>
             </template>
           </template>
@@ -683,7 +639,7 @@
     props: {
       address: String,
     },
-    inject: ['accessLevel'],
+    // inject: ['accessLevel'],
     data: function () {
       return {
         dev_mode: false,  // DO NOT COMMIT THIS AS TRUE!
@@ -805,7 +761,7 @@
           goto_target: null,
           goto_target_stop: true,
 
-          hvac_view: "Summary",
+          hvac_view: "Set Fans",
           hvac_setpoints: {},
         },
         start_types: ["end", "mid"],
@@ -1716,7 +1672,7 @@
     text-align: center;
   }
   .hvac_row > label {
-    padding: 0px 5px;
+    padding: 10px 5px;
   }
 
   .hvac_header {
@@ -1726,6 +1682,15 @@
   }
   .hvac_header > label {
     text-align: center;
+  }
+
+  .hvac_row > input:read-only {
+    border: 1px solid gray;
+    border-radius: 4px;
+  }
+  .hvac_row > input:-moz-read-only {
+    border: 1px solid gray;
+    border-radius: 4px;
   }
 
   /* Classes for rows in the Dataset table:
