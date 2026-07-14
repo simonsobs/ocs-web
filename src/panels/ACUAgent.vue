@@ -680,7 +680,8 @@
             },
           },
           set_boresight: {
-            params: {target: 0},
+            params: {target: 0,
+                     end_stop: true},
           },
           stop_and_clear: {
             params: {},
