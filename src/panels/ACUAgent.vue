@@ -241,9 +241,15 @@
               <UiButton @click="sun('escape')">Go</UiButton>
             </div>
             <div class="ocs_row">
-              <label>Enable / Disable mins</label>
+              <label>Enable / Disable</label>
               <UiButton @click="sun('enable')">Enable</UiButton>
-              <UiButton @click="sun('disable', 30)">Disable, 30 mins</UiButton>
+              <UiButton @click="sun('disable')">Disable</UiButton>
+            </div>
+            <div class="ocs_row">
+              <label>Disable for (mins)</label>
+              <input text="text" v-model="motion_control.sun_disable_time"
+                     style="text-align:center;"/>
+              <UiButton @click="sun('temp_disable', motion_control.sun_disable_time)">Disable for</UiButton>
             </div>
           </form>
 
@@ -763,6 +769,7 @@
 
           hvac_view: "Set Fans",
           hvac_setpoints: {},
+          sun_disable_time: 30,
         },
         start_types: ["end", "mid"],
         speed_modes: ["high", "low"],
@@ -871,9 +878,13 @@
             window.ocs_bundle.ui_run_task(this.address, 'update_sun',
                                           {'escape': true});
             break;
-          case 'disable':
+          case 'temp_disable':
             window.ocs_bundle.ui_run_task(this.address, 'update_sun',
                                           {'temporary_disable': arg1 * 60});
+            break;
+          case 'disable':
+            window.ocs_bundle.ui_run_task(this.address, 'update_sun',
+                                          {'enable': false});
             break;
           case 'enable':
             window.ocs_bundle.ui_run_task(this.address, 'update_sun',
