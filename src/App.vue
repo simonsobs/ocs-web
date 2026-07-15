@@ -68,8 +68,13 @@
     <!-- Sidebar -->
     <div class="left_bar">
       <div class="left_bar_menu box" :style="{ backgroundColor: platformColor()}">
-        <h2>Main</h2>
-        <div class="ocs_ui">
+        <h2>ocs:
+          <span class="obviously_clickable" @click="cfgVisible=!cfgVisible">
+            <span>{{ configs[config_index].name }}</span>
+            <span style="float: right;" v-if="cfgVisible">▲▲▲</span>
+            <span style="float: right;" v-else>▼▼▼</span>
+        </span></h2>
+        <div class="ocs_ui" v-show="cfgVisible">
           <ul>
             <li>
               <select class="ocs_dropdown"
@@ -242,6 +247,7 @@
         opDetail: null,
         passwordWindow: null,
         accessLevel: 0,
+        cfgVisible: false,
       }
     },
     provide() {
@@ -518,6 +524,15 @@
 
   .left_bar_menu {
     background-color: #ccf;
+  }
+
+  .left_bar h2 {
+    padding: 5px 0px;
+    font-family: sans-serif;
+  }
+
+  .left_bar span {
+    font-family: monospace;
   }
 
   div.main_title_bar {
