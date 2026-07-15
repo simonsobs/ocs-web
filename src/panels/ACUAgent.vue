@@ -791,7 +791,7 @@
           goto_target: null,
           goto_target_stop: true,
 
-          hvac_view: "Set Fans",
+          hvac_view: "Summary",
           hvac_setpoints: {},
           sun_disable_time: 30,
         },

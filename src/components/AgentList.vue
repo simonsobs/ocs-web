@@ -1,6 +1,9 @@
 <template>
   <div class="ocs_ui">
-    <div v-for="k in active_list" v-bind:key="k" class="al_level1">
+    <div class="al_level1">
+      <input type="text" v-model="filter_text" />
+    </div>
+    <div v-for="k in filtered_list" v-bind:key="k" class="al_level1">
       <span>{{ k[0] }} </span><span v-if="!known_classes.includes(k[0])">[?]</span>
       <div v-for="x in k[1]" v-bind:key="x"
            class="al_level2 obviously_clickable"
@@ -26,12 +29,29 @@
         alphabetical: [],
         by_class: [],
         addr_root: 'observatory',
+        filter_text: '',
       }
     },
     computed: {
-      active_list() {
-        return this.by_class;
-      }
+      filtered_list() {
+        if (!this.filter_text)
+          return this.by_class;
+        let filtered = [];
+        let filter_text = this.filter_text.trim().toLowerCase();
+        this.by_class.forEach(([k, byc]) => {
+          if (k.trim().toLowerCase().includes(filter_text))
+            return filtered.push([k, byc]);
+          let keepers = [];
+          byc.forEach(addr => {
+            let to_match = this.tracked_agents[addr].instance_id.trim().toLowerCase();
+            if (to_match.includes(filter_text))
+              keepers.push(addr);
+          });
+          if (keepers.length)
+            filtered.push([k, keepers]);
+        });
+        return filtered;
+      },
     },
     methods: {
       selectAgent(key, debug) {
@@ -93,5 +113,8 @@
   }
   .missing {
     background-color: #f00;
+  }
+  input {
+    width: 100%;
   }
 </style>
