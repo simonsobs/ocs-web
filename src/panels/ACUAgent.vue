@@ -422,6 +422,28 @@
 
         </form>
 
+        <form v-if="detailTab == 'Power'"
+              v-on:submit.prevent>
+
+          <template v-for="group in powerStats" :key="group.grp_name">
+            <div class="hvac_row hvac_header">
+              <label>{{ group.grp_name }}</label>
+              <label>Status</label>
+              <label>Set on</label>
+              <label>Set off</label>
+            </div>
+
+            <div v-for="item in group.items" :key="item.name"
+                 class="hvac_row">
+              <label>{{ item.name }}</label>
+              <OcsLight type="multi"
+                        :value="item.value" :caption="item.short" />
+              <UiButton @click="powerAction(item, 'on')">On</UiButton>
+              <UiButton @click="powerAction(item, 'off')">Off</UiButton>
+            </div>
+          </template>
+        </form>
+
         <template v-if="detailTab == 'Dataset'">
 
           <h2>Dataset</h2>
@@ -732,6 +754,7 @@
         tabs_all: [
           ["Main"],
           ["HVAC", "ccat"],
+          ["Power", "ccat"],
           ["Dataset"],
         ],
         tabs: ['Main', 'Dataset'],
@@ -1085,7 +1108,7 @@
             return sdata.PlatformType == 'satp';
           case 'hvac':
             return sdata.PlatformType == 'ccat';
-          case 'breakers':
+          case 'power_dist':
             return sdata.PlatformType == 'ccat';
           case 'unstow':
             return sdata.PlatformType == 'ccat';
@@ -1245,6 +1268,11 @@
             this.address, 'set_hvac',
             {'targets': target_list, 'values': values});
       },
+      powerAction(item, set_val) {
+          window.ocs_bundle.ui_run_task(
+            this.address, 'set_power',
+            {'targets': [item.name], 'values': [set_val]});
+      },
     },
     computed: {
       currentMotion() {
@@ -1274,6 +1302,7 @@
         let data = {
           ...sdata['StatusDetailed'],
           ...sdata['Status3rdAxis'],
+          ...sdata['PowerDistribution'],
         };
 
         for (const [key, value] of Object.entries(data)) {
@@ -1611,7 +1640,21 @@
 
         return non_heaters_then_heaters;
       },
-
+      powerStats() {
+        let pmap = this.ops.monitor.session.data?.PowerDistributionAliases;
+        if (!pmap)
+          return [];
+        let pdata = this.ops.monitor.session.data?.PowerDistribution;
+        return Object.entries(pmap).map(([grp_name, submap]) => ({
+          'grp_name': grp_name,
+            'items': Object.entries(submap).map(([k, v]) => ({
+              'name': k,
+              'full_name': v,
+              'value': pdata[v],
+              'short': (pdata[v] ? 'ON' : 'OFF'),
+            })),
+        }));
+      },
     },
   }
 </script>
