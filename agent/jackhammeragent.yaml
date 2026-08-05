@@ -1,0 +1,26 @@
+agent_class: 'JackhammerAgent'
+instance_id: 'jackhammer-1'
+processes:
+  monitor:
+    startup: true
+    data_settings: {
+      'timestamp_field': 'timestamp'
+      }
+    data: {
+      "timestamp": 1721234567.0,
+      "slots": {
+        "2": {"configured": true, "configuring": false},
+        "3": {"configured": false, "configuring": true},
+        "4": {"configured": null, "configuring": null}
+      }
+    }
+tasks:
+  hammer:
+    data: {
+      "slots": [2, 3, 4],
+      "reboot": true,
+      "succeeded_slots": [2, 3],
+      "failed_slots": {"4": "EPICS connection timed out after 180s"},
+      "error": null,
+      "timestamp": 1721234590.0
+    }
