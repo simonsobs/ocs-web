@@ -62,7 +62,7 @@
           <div class="ocs_row">
             <label class="important">hammer</label>
             <button
-              :disabled="accessLevel < 2"
+              :disabled="accessLevel < 1"
               @click="startHammer">Start</button>
           </div>
 
