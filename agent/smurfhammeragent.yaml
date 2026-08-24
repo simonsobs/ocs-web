@@ -1,5 +1,5 @@
-agent_class: 'JackhammerAgent'
-instance_id: 'jackhammer-1'
+agent_class: 'SmurfHammerAgent'
+instance_id: 'smurf-hammer-1'
 processes:
   monitor:
     startup: true

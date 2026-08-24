@@ -115,7 +115,7 @@
 
 <script>
   export default {
-    name: 'JackhammerAgent',
+    name: 'SmurfHammerAgent',
     inject: ['accessLevel'],
     props: {
       address: String,

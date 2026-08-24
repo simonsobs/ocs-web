@@ -159,7 +159,7 @@
   import DS378Agent from './panels/DS378.vue';
   import TauHKAgent from './panels/TauHKAgent.vue';
   import FLSAgent from './panels/FLSAgent.vue';
-  import JackhammerAgent from './panels/JackhammerAgent.vue';
+  import SmurfHammerAgent from './panels/SmurfHammerAgent.vue';
 
   /* Make a map of components to use in activeComp computed property;
      see
@@ -189,7 +189,7 @@
     'DS378Agent': DS378Agent,
     'TauHKAgent': TauHKAgent,
     'FLSAgent': FLSAgent,
-    'JackhammerAgent': JackhammerAgent,
+    'SmurfHammerAgent': SmurfHammerAgent,
 
   };
   
