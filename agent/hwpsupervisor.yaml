@@ -100,12 +100,16 @@ processes:
     }
 
 tasks:
-  brake: {}
+  query_hwp_state: {}
   pid_to_freq: {}
   set_const_voltage: {}
+  brake: {}
   pmx_off: {}
-  abort_action: {}
-  enable_driver_board: {}
-  disable_driver_board: {}
   grip_hwp: {}
   ungrip_hwp: {}
+  enable_driver_board: {}
+  disable_driver_board: {}
+  power_cycle_gripper: {}
+  abort_action: {}
+  update_shutdown: {}
+  cancel_shutdown: {}

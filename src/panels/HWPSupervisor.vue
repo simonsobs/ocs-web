@@ -228,6 +228,20 @@
         :op_data="ops.abort_action"
       />
 
+      <OcsTask
+        :op_data="ops.cancel_shutdown">
+      </OcsTask>
+
+      <OcsTask
+        :op_data="ops.update_shutdown">
+        <OpDropdown
+          caption="Enable/disable"
+          :options="{'': '', true: 'Enable', false: 'Disable'}"
+          options_style="object"
+          v-model.boolnull="ops.update_shutdown.params.enable"
+        />
+      </OcsTask>
+
       <!-- Background processes -->
 
       <OcsProcess
@@ -269,6 +283,8 @@
           spin_control: {},
           grip_hwp: {},
           ungrip_hwp: {},
+          cancel_shutdown: {},
+          update_shutdown: {},
         }),
       }
     },
