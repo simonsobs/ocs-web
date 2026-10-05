@@ -402,10 +402,17 @@
         let output = [];
         if (proc.monitored_sessions) {
           for (const [k, v] of Object.entries(proc.monitored_sessions)) {
-            let stale = (now - v.timestamp) > src_stale_time;
-            output.push({name: k, ok: !stale, agent_id: v.agent_id});
+            if (k == 'ups' && !v) {
+              // The .ups populates as null ... whatever.
+              output.push({name: k, ok: proc.hwp_state?.ups_connected, agent_id: proc.hwp_state?.ups_instance_id});
+            } else {
+              let _ts = (v?.timestamp ? v.timestamp: 0);
+              let stale = (now - _ts) > src_stale_time;
+              output.push({name: k, ok: !stale, agent_id: v?.agent_id});
+            }
           }
         }
+
         return output;
       },
       taskStatus() {
