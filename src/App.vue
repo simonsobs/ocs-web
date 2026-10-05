@@ -154,6 +154,7 @@
   import SynaccessAgent from './panels/SynaccessAgent.vue';
   import PysmurfControllerAgent from './panels/PysmurfController.vue';
   import UPSAgent from './panels/UPSAgent.vue';
+  import HWPGripperAgent from './panels/HWPGripperAgent.vue';
   import HWPSupervisor from './panels/HWPSupervisor.vue';
   import CrateAgent from './panels/CrateAgent.vue';
   import DS378Agent from './panels/DS378.vue';
@@ -183,6 +184,7 @@
     'SynaccessAgent': SynaccessAgent,
     'PysmurfController': PysmurfControllerAgent,
     'UPSAgent': UPSAgent,
+    'HWPGripperAgent': HWPGripperAgent,
     'HWPSupervisor': HWPSupervisor,
     'CrateAgent': CrateAgent,
     'DS378Agent': DS378Agent,

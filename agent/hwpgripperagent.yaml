@@ -1,0 +1,23 @@
+agent_class: 'HWPGripperAgent'
+instance_id: 'hwp-gripper'
+processes:
+  monitor_state:
+    startup: true
+    data_settings:
+      timestamp_field: last_updated
+    data:
+      state:
+        jxc_setup: 1
+  monitor_supervisor:
+    startup: true
+    data_settings:
+      timestamp_field: time
+    data:
+      gripper_action: "ok"
+      shutdown_mode: false
+      spin_check_enabled: true
+      spin_check_disable_until: 0
+
+tasks:
+  update_spin_check: {}
+  ungrip: {}
