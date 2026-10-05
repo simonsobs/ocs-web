@@ -101,6 +101,11 @@
             type="multi"
             :value="getIndicator('gripper')" />
         </OcsLightLine>
+          <div class="ocs_row">
+            <label>Activity<span><div class="light"
+                                :class="{idle_light: !taskStatus[0], flash: taskStatus[0]}" /></span></label>
+            <div class="ocs_double task_log_box" v-html="taskStatus[1]" />
+          </div>
 
         <h2>Quick Actions</h2>
 
@@ -403,6 +408,95 @@
         }
         return output;
       },
+      taskStatus() {
+        // Record the last few things that happened...
+        let events = [];
+        let any_running = false;
+        for (const [k, v] of Object.entries(this.ops)) {
+          if (k == 'monitor' || k == 'spin_control')
+            continue;
+          let sess = v?.session;
+          if (!sess)
+            continue;
+          let dt = 0;
+          let ht = '';
+          switch (sess.status) {
+            case 'running':
+              dt = window.ocs_bundle.util.timestamp_now() - sess.start_time;
+              ht = window.ocs_bundle.util.human_timespan(dt);
+              events.push({text: k + ' RUNNING, was started ' + ht + ' ago.',
+                           active: 1,
+                           ago: dt})
+              any_running = true;
+              break;
+            case 'done':
+              dt = window.ocs_bundle.util.timestamp_now() - sess.end_time;
+              ht = window.ocs_bundle.util.human_timespan(dt);
+              events.push({text: k + ' finished [' + (sess?.success ? "ok" : "ERROR") + '] ' + ht + ' ago.',
+                           active: 0,
+                           ago: dt})
+              break;
+          }
+        }
+        // Sort most recent to the top...
+        events.sort((a, b) => (a.active > b.active ? -1 : (a.ago < b.ago ? -1 : +1)));
+        let text = "";
+        for (const [idx, item] of events.entries()) {
+          if (idx > 3)
+            break;
+          let line = "<p>" + (item.active ? "<b>" : "") + item.text + (item.active ? "</b>" : "") + "</p>\n";
+          text += line;
+        }
+        return [any_running, text];
+      }
     },
   }
 </script>
+
+<style>
+
+/* The activity log box. */
+
+.task_log_box {
+  text-indent: 2em hanging;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 10px;
+
+  height: 150px;
+  border: 2px solid black;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.task_log_box > p {
+  margin-top: 0rem;
+}
+
+/* The blinking task light. */
+
+.light {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #ff3b30;
+  display: inline-block;
+  vertical-align: middle;
+  margin: 10px;
+}
+
+.idle_light {
+  border: 2px solid gray;
+  background-color: #ffffff;
+}
+
+.flash {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+</style>
