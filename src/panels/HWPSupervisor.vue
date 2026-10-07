@@ -7,7 +7,7 @@
     <div class="block_unit">
       <div class="box">
         <OcsAgentHeader :panel="panel">HWP Supervisor</OcsAgentHeader>
-        <h2>Connection</h2>
+        <h2>Connection and Shutdown Status</h2>
         <OpReading
           caption="Address"
           v-bind:value="address">
@@ -41,14 +41,28 @@
         </OcsLightLine>
 
         <OcsLightLine caption="Data sources">
-          <div v-for="item in dataSources" v-bind:key="item.name">
+          <template v-for="item in dataSources" v-bind:key="item.name">
             <OcsLight
               :caption="item.name"
               type="multi"
               tip="Will show green/good when data source is not stale."
               :value="item.ok"
             />
-          </div>
+          </template>
+        </OcsLightLine>
+
+        <OcsLightLine
+          caption="Shutdown Status">
+          <OcsLight
+            :caption="getIndicator('shutdown1') == 'good' ? 'Armed': 'Disarmed'"
+            tip="Shutdown system status: Green/good: 'enabled'; Yellow/warning: 'disabled'."
+            type="multi"
+            :value="getIndicator('shutdown1')" />
+          <OcsLight
+            :caption="getIndicator('shutdown2') ? 'Triggered': 'Idle'"
+            tip="Shutdown system status: Green/good: 'enabled, no shutdown'; 'Red/bad: 'enabled, shutdown in progress'; Yellow/warning: 'shutdown disabled'."
+            type="multi"
+            :value="!getIndicator('shutdown2')" />
         </OcsLightLine>
 
         <h2>HWP Summary</h2>
@@ -101,15 +115,15 @@
             type="multi"
             :value="getIndicator('gripper')" />
         </OcsLightLine>
+
+        <h2>Quick Actions</h2>
+
+        <form v-on:submit.prevent>
           <div class="ocs_row">
             <label>Activity<span><div class="light"
                                 :class="{idle_light: !taskStatus[0], flash: taskStatus[0]}" /></span></label>
             <div class="ocs_double task_log_box" v-html="taskStatus[1]" />
           </div>
-
-        <h2>Quick Actions</h2>
-
-        <form v-on:submit.prevent>
           <div class="ocs_row">
             <label>Stopping</label>
             <button
@@ -382,6 +396,13 @@
                 return 'warning';
             }
           }
+        } else if (name == "shutdown1") {
+          let v = this.ops.monitor.session.data.actions?.shutdown_enabled
+          if (v)
+            return 'good';
+          return 'warning';
+        } else if (name == "shutdown2") {
+          return false; //this.ops.monitor.session.data.actions?.shutdown_mode;
         }
         return 'notapplic';
       },
@@ -446,7 +467,7 @@
           }
         }
         // Sort most recent to the top...
-        events.sort((a, b) => (a.active > b.active ? -1 : (a.ago < b.ago ? -1 : +1)));
+        events.sort((a, b) => (a.active != b.active ? -(a.active - b.active) : a.ago - b.ago));
         let text = "";
         for (const [idx, item] of events.entries()) {
           if (idx > 3)
@@ -483,10 +504,10 @@
 /* The blinking task light. */
 
 .light {
-  width: 30px;
+  width: 50px;
   height: 30px;
-  border-radius: 50%;
-  background-color: #ff3b30;
+  border-radius: 15px;
+  background-color: #594; /* input.good color */
   display: inline-block;
   vertical-align: middle;
   margin: 10px;
