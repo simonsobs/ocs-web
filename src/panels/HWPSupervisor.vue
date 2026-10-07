@@ -17,26 +17,26 @@
           <OcsLight
             caption="OCS"
             tip="Status of the connection between ocs-web and OCS crossbar."
-            :value="getIndicator('ocs')"
+            :value="indicators.ocs"
           />
           <OcsLight
             caption="AGT"
             tip="Status of the connection between ocs-web and the Agent."
-            :value="getIndicator('agent')"
+            :value="indicators.agent"
           />
           <OcsLight
             caption="MON"
             type="multi"
             tip="Will show green/good when 'monitor' process is running and
                      acquiring data normally."
-            :value="getIndicator('monitor')"
+            :value="indicators.monitor"
           />
           <OcsLight
             caption="CTRL"
             type="multi"
             tip="Will show green/good when 'spin_control' process appears to be
                      running normally."
-            :value="getIndicator('spin_control')"
+            :value="indicators.spin_control"
           />
         </OcsLightLine>
 
@@ -54,15 +54,15 @@
         <OcsLightLine
           caption="Shutdown Status">
           <OcsLight
-            :caption="getIndicator('shutdown1') == 'good' ? 'Armed': 'Disarmed'"
-            tip="Shutdown system status: Green/good: 'enabled'; Yellow/warning: 'disabled'."
+            :caption="indicators.shutdown_enabled == 'good' ? 'Armed': 'Disarmed'"
+            tip="Is shutdown system armed / enabled?: Green/good: 'enabled'; Yellow/warning: 'disabled'."
             type="multi"
-            :value="getIndicator('shutdown1')" />
+            :value="indicators.shutdown_enabled" />
           <OcsLight
-            :caption="getIndicator('shutdown2') ? 'Triggered': 'Idle'"
-            tip="Shutdown system status: Green/good: 'enabled, no shutdown'; 'Red/bad: 'enabled, shutdown in progress'; Yellow/warning: 'shutdown disabled'."
+            :caption="indicators.shutdown_mode ? 'Triggered': 'Idle'"
+            tip="Shutdown mode active: Green/good: 'idle, no shutdown'; 'Red/bad: 'active, shutdown in progress'."
             type="multi"
-            :value="!getIndicator('shutdown2')" />
+            :value="!indicators.shutdown_mode" />
         </OcsLightLine>
 
         <h2>HWP Summary</h2>
@@ -108,12 +108,12 @@
             caption="PMX"
             tip="Supervisor system action recommendation: Green/good: 'ok'; Red/bad: 'stop'; Yellow/warning: 'no_data'."
             type="multi"
-            :value="getIndicator('pmx')" />
+            :value="indicators.pmx" />
           <OcsLight
             caption="Gripper"
             tip="Supervisor system action recommendation: Green/good: 'ok'; Red/bad: 'stop'; Yellow/warning: 'no_data'."
             type="multi"
-            :value="getIndicator('gripper')" />
+            :value="indicators.gripper" />
         </OcsLightLine>
 
         <h2>Quick Actions</h2>
@@ -364,48 +364,6 @@
         }
         return null;
       },
-      getIndicator(name) {
-        let proc_stale_time = 3;  // Seems to be enough
-
-        // If OCS is not connected, nothing else can be reported.
-        let now = window.ocs_bundle.util.timestamp_now();
-        let ocs_ok = window.ocs.connection.isConnected;
-        if (name == 'ocs')
-          return ocs_ok;
-
-        if (name == 'agent')
-          return this.panel.connection_ok;
-
-        if (!ocs_ok || !this.panel.connection_ok)
-          return 'notapplic';
-
-        if (name == 'monitor' || name == 'spin_control') {
-          let proc = this.ops[name].session;
-          let stale = now - proc.data['timestamp'] > proc_stale_time;
-          return (proc.status == 'running' && !stale);
-        }
-        else if (name == 'pmx' || name == 'gripper') {
-          let proc = this.ops.monitor.session.data;
-          if (proc && proc.actions) {
-            switch(proc.actions[name]) {
-              case 'ok':
-                return 'good';
-              case 'stop':
-                return 'bad';
-              case 'no_data':
-                return 'warning';
-            }
-          }
-        } else if (name == "shutdown1") {
-          let v = this.ops.monitor.session.data.actions?.shutdown_enabled
-          if (v)
-            return 'good';
-          return 'warning';
-        } else if (name == "shutdown2") {
-          return false; //this.ops.monitor.session.data.actions?.shutdown_mode;
-        }
-        return 'notapplic';
-      },
       quickAction(name) {
         // Use ui_start_proc, instead of ui_run_task, since these will
         // often run for a long time.
@@ -414,6 +372,47 @@
       },
     },
     computed: {
+      indicators() {
+        let ind = {
+          ocs: window.ocs.connection.isConnected,
+          agent: this.panel.connection_ok,
+          monitor: 'notapplic',
+          spin_control: 'notapplic',
+          shutdown_enabled: 'notapplic',
+          shutdown_triggered: 'notapplic',
+          pmx: 'notapplic',
+          gripper: 'notapplic',
+        }
+        let proc_stale_time = 3;  // Seems to be enough
+
+        // If OCS is not connected, nothing else can be reported.
+        let now = window.ocs_bundle.util.timestamp_now();
+        if (!ind.ocs || !ind.agent)
+          return ind;
+
+        for (const name of ['monitor', 'spin_control']) {
+          let proc = this.ops[name].session;
+          let stale = now - proc.data['timestamp'] > proc_stale_time;
+          ind[name] = (proc.status == 'running' && !stale);
+        }
+
+        let msg_map = {
+          'ok': 'good',
+          'stop': 'bad',
+          'no_data': 'warning'
+        };
+
+        for (const name of ['pmx', 'gripper']) {
+          let proc = this.ops.monitor.session.data;
+          if (proc && proc.actions)
+            ind[name] = msg_map[proc.actions[name]];
+        }
+        let v = this.ops.monitor.session.data.actions?.shutdown_enabled
+        ind.shutdown_enabled = v ? 'good' : 'warning';
+        ind.shutdown_triggered = this.ops.monitor.session.data.actions?.shutdown_mode;
+
+        return ind;
+      },
       dataSources() {
         let src_stale_time = 10;  // Seems to be enough
         let now = window.ocs_bundle.util.timestamp_now();
