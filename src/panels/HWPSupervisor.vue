@@ -7,7 +7,7 @@
     <div class="block_unit">
       <div class="box">
         <OcsAgentHeader :panel="panel">HWP Supervisor</OcsAgentHeader>
-        <h2>Connection</h2>
+        <h2>Connection and Shutdown Status</h2>
         <OpReading
           caption="Address"
           v-bind:value="address">
@@ -17,38 +17,52 @@
           <OcsLight
             caption="OCS"
             tip="Status of the connection between ocs-web and OCS crossbar."
-            :value="getIndicator('ocs')"
+            :value="indicators.ocs"
           />
           <OcsLight
             caption="AGT"
             tip="Status of the connection between ocs-web and the Agent."
-            :value="getIndicator('agent')"
+            :value="indicators.agent"
           />
           <OcsLight
             caption="MON"
             type="multi"
             tip="Will show green/good when 'monitor' process is running and
                      acquiring data normally."
-            :value="getIndicator('monitor')"
+            :value="indicators.monitor"
           />
           <OcsLight
             caption="CTRL"
             type="multi"
             tip="Will show green/good when 'spin_control' process appears to be
                      running normally."
-            :value="getIndicator('spin_control')"
+            :value="indicators.spin_control"
           />
         </OcsLightLine>
 
         <OcsLightLine caption="Data sources">
-          <div v-for="item in dataSources" v-bind:key="item.name">
+          <template v-for="item in dataSources" v-bind:key="item.name">
             <OcsLight
               :caption="item.name"
               type="multi"
               tip="Will show green/good when data source is not stale."
               :value="item.ok"
             />
-          </div>
+          </template>
+        </OcsLightLine>
+
+        <OcsLightLine
+          caption="Shutdown Status">
+          <OcsLight
+            :caption="indicators.shutdown_enabled == 'good' ? 'Armed': 'Disarmed'"
+            tip="Is shutdown system armed / enabled?: Green/good: 'enabled'; Yellow/warning: 'disabled'."
+            type="multi"
+            :value="indicators.shutdown_enabled" />
+          <OcsLight
+            :caption="indicators.shutdown_mode ? 'Triggered': 'Idle'"
+            tip="Shutdown mode active: Green/good: 'idle, no shutdown'; 'Red/bad: 'active, shutdown in progress'."
+            type="multi"
+            :value="!indicators.shutdown_mode" />
         </OcsLightLine>
 
         <h2>HWP Summary</h2>
@@ -94,17 +108,22 @@
             caption="PMX"
             tip="Supervisor system action recommendation: Green/good: 'ok'; Red/bad: 'stop'; Yellow/warning: 'no_data'."
             type="multi"
-            :value="getIndicator('pmx')" />
+            :value="indicators.pmx" />
           <OcsLight
             caption="Gripper"
             tip="Supervisor system action recommendation: Green/good: 'ok'; Red/bad: 'stop'; Yellow/warning: 'no_data'."
             type="multi"
-            :value="getIndicator('gripper')" />
+            :value="indicators.gripper" />
         </OcsLightLine>
 
         <h2>Quick Actions</h2>
 
         <form v-on:submit.prevent>
+          <div class="ocs_row">
+            <label>Activity<span><div class="light"
+                                :class="{idle_light: !taskStatus[0], flash: taskStatus[0]}" /></span></label>
+            <div class="ocs_double task_log_box" v-html="taskStatus[1]" />
+          </div>
           <div class="ocs_row">
             <label>Stopping</label>
             <button
@@ -228,6 +247,20 @@
         :op_data="ops.abort_action"
       />
 
+      <OcsTask
+        :op_data="ops.cancel_shutdown">
+      </OcsTask>
+
+      <OcsTask
+        :op_data="ops.update_shutdown">
+        <OpDropdown
+          caption="Enable/disable"
+          :options="{'': '', true: 'Enable', false: 'Disable'}"
+          options_style="object"
+          v-model.boolnull="ops.update_shutdown.params.enable"
+        />
+      </OcsTask>
+
       <!-- Background processes -->
 
       <OcsProcess
@@ -269,6 +302,8 @@
           spin_control: {},
           grip_hwp: {},
           ungrip_hwp: {},
+          cancel_shutdown: {},
+          update_shutdown: {},
         }),
       }
     },
@@ -329,41 +364,6 @@
         }
         return null;
       },
-      getIndicator(name) {
-        let proc_stale_time = 3;  // Seems to be enough
-
-        // If OCS is not connected, nothing else can be reported.
-        let now = window.ocs_bundle.util.timestamp_now();
-        let ocs_ok = window.ocs.connection.isConnected;
-        if (name == 'ocs')
-          return ocs_ok;
-
-        if (name == 'agent')
-          return this.panel.connection_ok;
-
-        if (!ocs_ok || !this.panel.connection_ok)
-          return 'notapplic';
-
-        if (name == 'monitor' || name == 'spin_control') {
-          let proc = this.ops[name].session;
-          let stale = now - proc.data['timestamp'] > proc_stale_time;
-          return (proc.status == 'running' && !stale);
-        }
-        else if (name == 'pmx' || name == 'gripper') {
-          let proc = this.ops.monitor.session.data;
-          if (proc && proc.actions) {
-            switch(proc.actions[name]) {
-              case 'ok':
-                return 'good';
-              case 'stop':
-                return 'bad';
-              case 'no_data':
-                return 'warning';
-            }
-          }
-        }
-        return 'notapplic';
-      },
       quickAction(name) {
         // Use ui_start_proc, instead of ui_run_task, since these will
         // often run for a long time.
@@ -372,6 +372,47 @@
       },
     },
     computed: {
+      indicators() {
+        let ind = {
+          ocs: window.ocs.connection.isConnected,
+          agent: this.panel.connection_ok,
+          monitor: 'notapplic',
+          spin_control: 'notapplic',
+          shutdown_enabled: 'notapplic',
+          shutdown_triggered: 'notapplic',
+          pmx: 'notapplic',
+          gripper: 'notapplic',
+        }
+        let proc_stale_time = 3;  // Seems to be enough
+
+        // If OCS is not connected, nothing else can be reported.
+        let now = window.ocs_bundle.util.timestamp_now();
+        if (!ind.ocs || !ind.agent)
+          return ind;
+
+        for (const name of ['monitor', 'spin_control']) {
+          let proc = this.ops[name].session;
+          let stale = now - proc.data['timestamp'] > proc_stale_time;
+          ind[name] = (proc.status == 'running' && !stale);
+        }
+
+        let msg_map = {
+          'ok': 'good',
+          'stop': 'bad',
+          'no_data': 'warning'
+        };
+
+        for (const name of ['pmx', 'gripper']) {
+          let proc = this.ops.monitor.session.data;
+          if (proc && proc.actions)
+            ind[name] = msg_map[proc.actions[name]];
+        }
+        let v = this.ops.monitor.session.data.actions?.shutdown_enabled
+        ind.shutdown_enabled = v ? 'good' : 'warning';
+        ind.shutdown_triggered = this.ops.monitor.session.data.actions?.shutdown_mode;
+
+        return ind;
+      },
       dataSources() {
         let src_stale_time = 10;  // Seems to be enough
         let now = window.ocs_bundle.util.timestamp_now();
@@ -381,12 +422,108 @@
         let output = [];
         if (proc.monitored_sessions) {
           for (const [k, v] of Object.entries(proc.monitored_sessions)) {
-            let stale = (now - v.timestamp) > src_stale_time;
-            output.push({name: k, ok: !stale, agent_id: v.agent_id});
+            if (k == 'ups' && !v) {
+              // The .ups populates as null ... whatever.
+              output.push({name: k, ok: proc.hwp_state?.ups_connected, agent_id: proc.hwp_state?.ups_instance_id});
+            } else {
+              let _ts = (v?.timestamp ? v.timestamp: 0);
+              let stale = (now - _ts) > src_stale_time;
+              output.push({name: k, ok: !stale, agent_id: v?.agent_id});
+            }
           }
         }
+
         return output;
       },
+      taskStatus() {
+        // Record the last few things that happened...
+        let events = [];
+        let any_running = false;
+        for (const [k, v] of Object.entries(this.ops)) {
+          if (k == 'monitor' || k == 'spin_control')
+            continue;
+          let sess = v?.session;
+          if (!sess)
+            continue;
+          let dt = 0;
+          let ht = '';
+          switch (sess.status) {
+            case 'running':
+              dt = window.ocs_bundle.util.timestamp_now() - sess.start_time;
+              ht = window.ocs_bundle.util.human_timespan(dt);
+              events.push({text: k + ' RUNNING, was started ' + ht + ' ago.',
+                           active: 1,
+                           ago: dt})
+              any_running = true;
+              break;
+            case 'done':
+              dt = window.ocs_bundle.util.timestamp_now() - sess.end_time;
+              ht = window.ocs_bundle.util.human_timespan(dt);
+              events.push({text: k + ' finished [' + (sess?.success ? "ok" : "ERROR") + '] ' + ht + ' ago.',
+                           active: 0,
+                           ago: dt})
+              break;
+          }
+        }
+        // Sort most recent to the top...
+        events.sort((a, b) => (a.active != b.active ? -(a.active - b.active) : a.ago - b.ago));
+        let text = "";
+        for (const [idx, item] of events.entries()) {
+          if (idx > 3)
+            break;
+          let line = "<p>" + (item.active ? "<b>" : "") + item.text + (item.active ? "</b>" : "") + "</p>\n";
+          text += line;
+        }
+        return [any_running, text];
+      }
     },
   }
 </script>
+
+<style>
+
+/* The activity log box. */
+
+.task_log_box {
+  text-indent: 2em hanging;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 10px;
+
+  height: 150px;
+  border: 2px solid black;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.task_log_box > p {
+  margin-top: 0rem;
+}
+
+/* The blinking task light. */
+
+.light {
+  width: 50px;
+  height: 30px;
+  border-radius: 15px;
+  background-color: #594; /* input.good color */
+  display: inline-block;
+  vertical-align: middle;
+  margin: 10px;
+}
+
+.idle_light {
+  border: 2px solid gray;
+  background-color: #ffffff;
+}
+
+.flash {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+</style>
