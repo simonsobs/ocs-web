@@ -198,7 +198,7 @@
       },
       startHammer() {
         let slots = this.availableSlots.filter(s => this.selectedSlots[s]);
-        if (slots.length === 0) slots = null;
+        if (slots.length === 0) return;
         let params = {
           slots: slots,
           no_reboot: this.ops.hammer.params.no_reboot,
