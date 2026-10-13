@@ -59,6 +59,20 @@
         // Handle the "vmodel.boolean"
         if (this.modelModifiers.boolean)
           value = (value == "true");
+        // Handle the "vmodel.boolnull"
+        if (this.modelModifiers.boolnull) {
+          switch(value) {
+            case "":
+              value = null;
+              break;
+            case "true":
+              value = true;
+              break;
+            case "false":
+              value = false;
+              break;
+          }
+        }
         this.$emit('update:modelValue', value);
       },
     },
